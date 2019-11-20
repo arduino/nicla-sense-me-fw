@@ -61,7 +61,7 @@ void apply_update(FILE *file, uint32_t address)
     while (true) {
 
         // Read data for this page
-        memset(page_buffer, 0, sizeof(page_buffer));
+        memset(page_buffer, 0, sizeof(char) * page_size);
         int size_read = fread(page_buffer, 1, page_size, file);
         if (size_read <= 0) {
             break;
