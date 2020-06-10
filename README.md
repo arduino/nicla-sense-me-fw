@@ -1,3 +1,4 @@
+![](./resources/official_armmbed_example_badge.png)
 # Getting started with bootloader on mbed OS
 
 This example shows how to create a bootloader.
