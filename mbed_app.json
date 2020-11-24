@@ -1,42 +1,32 @@
 {
+    "requires": ["bare-metal", "rtos-api", "spif-driver", "filesystem", "littlefs", "fat_chan", "flashiap-block-device"],
     "config": {
         "update_file": {
             "help": "Path to the application update binary on the SD card",
             "value": "\"mbed-os-example-blinky_application.bin\""
         },
-        "sd_card_mosi": {
-            "help": "MCU pin connected to the SD card's SPI MOSI pin",
-            "value": "D11"
+        "spif_mosi": {
+            "help": "MCU pin connected to the SPI MOSI pin of the flash",
+            "value": "P0_13"
         },
-        "sd_card_miso": {
-            "help": "MCU pin connected to the SD card's SPI MISO pin",
-            "value": "D12"
+        "spif_miso": {
+            "help": "MCU pin connected to the SPI MISO pin of the flash",
+            "value": "P0_14"
         },
-        "sd_card_sck": {
-            "help": "MCU pin connected to the SD card's SPI SCK pin",
-            "value": "D13"
+        "spif_sck": {
+            "help": "MCU pin connected to the SPI SCK pin of the flash",
+            "value": "P0_12"
         },
-        "sd_card_cs": {
-            "help": "MCU pin connected to the SD card's SPI CS pin",
-            "value": "D10"
+        "spif_cs": {
+            "help": "MCU pin connected to the SPI CS pin of the flash",
+            "value": "P0_5"
         }
     },
     "target_overrides": {
-        "K64F": {
-            "target.restrict_size": "0x40000",
-            "sd_card_mosi": "PTE3",
-            "sd_card_miso": "PTE1",
-            "sd_card_sck": "PTE2",
-            "sd_card_cs": "PTE4"
-        },
-        "NUCLEO_F429ZI": {
-            "target.components_add": ["SD"],
-            "target.restrict_size": "0x40000"
-        },
-        "UBLOX_EVK_ODIN_W2": {
-            "target.components_add": ["SD"],
-            "target.restrict_size": "0x40000",
-            "sd_card_cs": "D9"
+        "UNISENSE": {
+            "target.restrict_size": "0x10000",
+            "target.components_add" : ["SPIF"],
+            "target.c_lib": "small"
         }
     }
 }

@@ -1,41 +1,57 @@
 #include "mbed.h"
-#include "SDBlockDevice.h"
-#include "FATFileSystem.h"
+#include "SPIFBlockDevice.h"
+#include "LittleFileSystem.h"
 
-#define SD_MOUNT_PATH           "sd"
-#define FULL_UPDATE_FILE_PATH   "/" SD_MOUNT_PATH "/" MBED_CONF_APP_UPDATE_FILE
+#define MOUNT_PATH           "fs"
+#define ANNA_UPDATE_FILE_PATH   "/" MOUNT_PATH "/ANNA_UPDATE.BIN"
+
+#define DEBUG_PRINTF(...) printf(__VA_ARGS__)
+
+#define WRONG_OTA_BINARY 	(-1)
+#define MOUNT_FAILED 		(-2)
+#define NO_OTA_FILE 		(-3)
+#define INIT_FAILED 		(-4)
 
 #if !defined(POST_APPLICATION_ADDR)
 #error "target.restrict_size must be set for your target in mbed_app.json"
 #endif
 
 //Pin order: MOSI, MISO, SCK, CS
-SDBlockDevice sd(MBED_CONF_APP_SD_CARD_MOSI, MBED_CONF_APP_SD_CARD_MISO,
-                 MBED_CONF_APP_SD_CARD_SCK, MBED_CONF_APP_SD_CARD_CS);
-FATFileSystem fs(SD_MOUNT_PATH);
+SPIFBlockDevice spif(MBED_CONF_APP_SPIF_MOSI, MBED_CONF_APP_SPIF_MISO,
+                     MBED_CONF_APP_SPIF_SCK, MBED_CONF_APP_SPIF_CS);
+
+LittleFileSystem fs(MOUNT_PATH);
 FlashIAP flash;
 
 void apply_update(FILE *file, uint32_t address);
 
 int main()
 {
-    sd.init();
-    fs.mount(&sd);
+    int err = fs.mount(&spif);
+    if (err) {
+        DEBUG_PRINTF("Formatting file system...\n");
+        err=fs.reformat(&spif);
+        if (err) {
+            DEBUG_PRINTF("Mount failed\n");
+            return MOUNT_FAILED;
+        }
+    }
 
-    FILE *file = fopen(FULL_UPDATE_FILE_PATH, "rb");
+
+    FILE *file = fopen(ANNA_UPDATE_FILE_PATH, "rb");
     if (file != NULL) {
         printf("Firmware update found\r\n");
 
         apply_update(file, POST_APPLICATION_ADDR);
 
         fclose(file);
-        remove(FULL_UPDATE_FILE_PATH);
+        remove(ANNA_UPDATE_FILE_PATH);
     } else {
         printf("No update found to apply\r\n");
     }
 
     fs.unmount();
-    sd.deinit();
+    spif.deinit();
 
     printf("Starting application\r\n");
 
