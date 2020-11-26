@@ -23,7 +23,9 @@ SPIFBlockDevice spif(MBED_CONF_APP_SPIF_MOSI, MBED_CONF_APP_SPIF_MISO,
 LittleFileSystem fs(MOUNT_PATH);
 FlashIAP flash;
 
-void apply_update(FILE *file, uint32_t address);
+int apply_update(FILE *file, uint32_t address);
+
+int ret_val = 0;
 
 int main()
 {
@@ -42,7 +44,7 @@ int main()
     if (file != NULL) {
         printf("Firmware update found\r\n");
 
-        apply_update(file, POST_APPLICATION_ADDR);
+        ret_val = apply_update(file, POST_APPLICATION_ADDR);
 
         fclose(file);
         remove(ANNA_UPDATE_FILE_PATH);
@@ -53,16 +55,33 @@ int main()
     fs.unmount();
     spif.deinit();
 
-    printf("Starting application\r\n");
+    if (ret_val) {
+        printf("Starting application\r\n");
+    }
 
     mbed_start_application(POST_APPLICATION_ADDR);
 }
 
-void apply_update(FILE *file, uint32_t address)
+int apply_update(FILE *file, uint32_t address)
 {
     fseek(file, 0, SEEK_END);
-    long len = ftell(file);
+    long len = ftell(file) - 1;     //the last byte contains the CRC
     printf("Firmware size is %ld bytes\r\n", len);
+    char buffer[len];
+    fseek(file, 0, SEEK_SET);
+    //copy the file content into a buffer of chars, including the CRC
+    fread(buffer, 1, len+1, file);
+    char crc = buffer[0]^buffer[1];
+    for(long i=2; i<len; i++) {
+        crc = crc^buffer[i];
+    }
+    if (crc!=buffer[len]) {
+        printf("Wrong CRC! The computed CRC is %d, while it should be %d \r\n", crc, buffer[len]);
+        return 0;
+    } else {
+        printf("Correct CRC=%x \r\n", crc);
+    }
+
     fseek(file, 0, SEEK_SET);
   
     flash.init();
@@ -111,4 +130,6 @@ void apply_update(FILE *file, uint32_t address)
     delete[] page_buffer;
 
     flash.deinit();
+
+    return 1;
 }
