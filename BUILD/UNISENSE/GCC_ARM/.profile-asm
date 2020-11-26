@@ -1,0 +1,23 @@
+{
+    "flags": [
+        "-c",
+        "-x",
+        "assembler-with-cpp"
+    ],
+    "macros": [],
+    "symbols": [
+        "ARM_MATH_CM4",
+        "BOARD_PCA10040",
+        "CMSIS_VECTAB_VIRTUAL",
+        "CMSIS_VECTAB_VIRTUAL_HEADER_FILE=\"cmsis_nvic.h\"",
+        "MBED_MPU_CUSTOM",
+        "MBED_TICKLESS",
+        "NRF52",
+        "SWI_DISABLE0",
+        "TARGET_NRF52832",
+        "__CMSIS_RTOS",
+        "__CORTEX_M4",
+        "__FPU_PRESENT=1",
+        "__MBED_CMSIS_RTOS_CM"
+    ]
+}
