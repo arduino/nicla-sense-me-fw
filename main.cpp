@@ -25,6 +25,9 @@ FlashIAP flash;
 
 int apply_update(FILE *file, uint32_t address);
 
+DigitalIn boot_rst_n(P0_20,PullUp);
+Timer timer_rst_n;
+
 int ret_val = 0;
 
 int main()
@@ -42,14 +45,15 @@ int main()
 
     FILE *file = fopen(ANNA_UPDATE_FILE_PATH, "rb");
     if (file != NULL) {
-        printf("Firmware update found\r\n");
 
         ret_val = apply_update(file, POST_APPLICATION_ADDR);
 
         fclose(file);
         remove(ANNA_UPDATE_FILE_PATH);
+
     } else {
-        printf("No update found to apply\r\n");
+        printf("Starting application\r\n");
+        mbed_start_application(POST_APPLICATION_ADDR);
     }
 
     fs.unmount();
@@ -57,16 +61,25 @@ int main()
 
     if (ret_val) {
         printf("Starting application\r\n");
+        mbed_start_application(POST_APPLICATION_ADDR);
     }
 
-    mbed_start_application(POST_APPLICATION_ADDR);
 }
 
 int apply_update(FILE *file, uint32_t address)
 {
     fseek(file, 0, SEEK_END);
-    long len = ftell(file) - 1;     //the last byte contains the CRC
+    long len = ftell(file);
+
+    if (len == 0) {
+        //No valid firmware update found, the main application can start
+        return 1;
+    }
+
+    printf("Firmware update found\r\n");
+    len = len - 1;     //the last byte contains the CRC
     printf("Firmware size is %ld bytes\r\n", len);
+
     char buffer[len];
     fseek(file, 0, SEEK_SET);
     //copy the file content into a buffer of chars, including the CRC
@@ -76,8 +89,35 @@ int apply_update(FILE *file, uint32_t address)
         crc = crc^buffer[i];
     }
     if (crc!=buffer[len]) {
-        printf("Wrong CRC! The computed CRC is %d, while it should be %d \r\n", crc, buffer[len]);
-        return 0;
+        printf("Wrong CRC! The computed CRC is %x, while it should be %x \r\n", crc, buffer[len]);
+        printf("Press the button for at least 5 seconds to enter the Fail Safe mode \r\n");
+
+        //wait for the button to be pressed
+        while(boot_rst_n) {}
+
+        //Try fail safe: check button state
+        //if button pressed, start timer
+        printf("Button pressed \r\n");
+        int elapsed_time_ms = 0;
+        timer_rst_n.start();
+
+        while((elapsed_time_ms < 5000) && (boot_rst_n == 0)) {
+            elapsed_time_ms = timer_rst_n.read_ms();
+        }
+
+        timer_rst_n.stop();
+
+        if (elapsed_time_ms < 5000) {
+            //NO fail safe
+            printf("Button for fail safe has been pulled down for less than 5 seconds. No fail safe! \r\n");
+            return 0;
+        } else {
+            //Fail safe
+            printf("Fail safe mode ON \r\n", elapsed_time_ms);
+            return 1;
+            //maybe retrieve a know firmware?
+        }
+
     } else {
         printf("Correct CRC=%x \r\n", crc);
     }
@@ -133,3 +173,4 @@ int apply_update(FILE *file, uint32_t address)
 
     return 1;
 }
+
