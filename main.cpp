@@ -23,48 +23,39 @@ SPIFBlockDevice spif(MBED_CONF_APP_SPIF_MOSI, MBED_CONF_APP_SPIF_MISO,
 LittleFileSystem fs(MOUNT_PATH);
 FlashIAP flash;
 
-int apply_update(FILE *file, uint32_t address);
-
 DigitalIn boot_rst_n(P0_20,PullUp);
 Timer timer_rst_n;
 
-int ret_val = 0;
+int try_fail_safe(int timeout);
+int try_update(void);
+int apply_update(FILE *file, uint32_t address);
 
-int main()
-{
-    int err = fs.mount(&spif);
-    if (err) {
-        DEBUG_PRINTF("Formatting file system...\n");
-        err=fs.reformat(&spif);
-        if (err) {
-            DEBUG_PRINTF("Mount failed\n");
-            return MOUNT_FAILED;
-        }
+int try_fail_safe(int timeout) {
+    //Try fail safe: check button state
+    //if button pressed, start timer
+    printf("Button pressed \r\n");
+    int elapsed_time_ms = 0;
+    timer_rst_n.start();
+
+    while((elapsed_time_ms < timeout) && (boot_rst_n == 0)) {
+        elapsed_time_ms = timer_rst_n.read_ms();
     }
 
+    timer_rst_n.stop();
+    timer_rst_n.reset();
 
-    FILE *file = fopen(ANNA_UPDATE_FILE_PATH, "rb");
-    if (file != NULL) {
-
-        ret_val = apply_update(file, POST_APPLICATION_ADDR);
-
-        fclose(file);
-        remove(ANNA_UPDATE_FILE_PATH);
-
+    if (elapsed_time_ms < timeout) {
+        //NO fail safe
+        printf("Button for fail safe has been pulled down for less than 3 seconds. No fail safe! \r\n");
+        return 0;
     } else {
-        printf("Starting application\r\n");
-        mbed_start_application(POST_APPLICATION_ADDR);
+        //Fail safe
+        printf("Fail safe mode ON \r\n");
+        return 1;
+        //maybe retrieve a know firmware?
     }
-
-    fs.unmount();
-    spif.deinit();
-
-    if (ret_val) {
-        printf("Starting application\r\n");
-        mbed_start_application(POST_APPLICATION_ADDR);
-    }
-
 }
+
 
 int apply_update(FILE *file, uint32_t address)
 {
@@ -127,33 +118,12 @@ int apply_update(FILE *file, uint32_t address)
 
     if (crc!=crc_file) {
         printf("Wrong CRC! The computed CRC is %x, while it should be %x \r\n", crc, crc_file);
-        printf("Press the button for at least 5 seconds to enter the Fail Safe mode \r\n");
+        printf("Press the button for at least 3 seconds to enter the Fail Safe mode \r\n");
 
         //wait for the button to be pressed
         while(boot_rst_n) {}
 
-        //Try fail safe: check button state
-        //if button pressed, start timer
-        printf("Button pressed \r\n");
-        int elapsed_time_ms = 0;
-        timer_rst_n.start();
-
-        while((elapsed_time_ms < 5000) && (boot_rst_n == 0)) {
-            elapsed_time_ms = timer_rst_n.read_ms();
-        }
-
-        timer_rst_n.stop();
-
-        if (elapsed_time_ms < 5000) {
-            //NO fail safe
-            printf("Button for fail safe has been pulled down for less than 5 seconds. No fail safe! \r\n");
-            return 0;
-        } else {
-            //Fail safe
-            printf("Fail safe mode ON \r\n", elapsed_time_ms);
-            return 1;
-            //maybe retrieve a know firmware?
-        }
+        return try_fail_safe(3000);
 
     } else {
         printf("Correct CRC=%x \r\n", crc);
@@ -211,3 +181,53 @@ int apply_update(FILE *file, uint32_t address)
     return 1;
 }
 
+
+int try_update()
+{
+    int ret_val = 0;
+
+    int err = fs.mount(&spif);
+    if (err) {
+        DEBUG_PRINTF("Formatting file system...\n");
+        err=fs.reformat(&spif);
+        if (err) {
+            DEBUG_PRINTF("Mount failed\n");
+            return MOUNT_FAILED;
+        }
+    }
+
+
+    FILE *file = fopen(ANNA_UPDATE_FILE_PATH, "rb");
+    if (file != NULL) {
+
+        ret_val = apply_update(file, POST_APPLICATION_ADDR);
+
+        fclose(file);
+        remove(ANNA_UPDATE_FILE_PATH);
+
+    } else {
+        printf("Starting application\r\n");
+        mbed_start_application(POST_APPLICATION_ADDR);
+    }
+
+    fs.unmount();
+    spif.deinit();
+
+    if (ret_val) {
+        printf("Starting application\r\n");
+        mbed_start_application(POST_APPLICATION_ADDR);
+    }
+}
+
+
+int main()
+{
+    if(!boot_rst_n) {
+        if (try_fail_safe(3000)) {
+            printf("Starting application\r\n");
+            mbed_start_application(POST_APPLICATION_ADDR);
+        }
+    }
+
+    try_update();
+}
