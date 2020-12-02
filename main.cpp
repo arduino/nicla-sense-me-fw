@@ -77,19 +77,56 @@ int apply_update(FILE *file, uint32_t address)
     }
 
     printf("Firmware update found\r\n");
+
     len = len - 1;     //the last byte contains the CRC
     printf("Firmware size is %ld bytes\r\n", len);
 
-    char buffer[len];
+    //read by chunks of 256 bytes
+    uint8_t iterations = len/256;
+    uint8_t spare_bytes = len%256;
+
+    char buffer[256];
+    char crc_file;
+
+    fseek(file, len, SEEK_SET);
+    //read CRC written at the end of the file
+    fread(&crc_file, 1, 1, file);
+    printf("CRC written in file is %x \r\n", crc_file);
+
     fseek(file, 0, SEEK_SET);
-    //copy the file content into a buffer of chars, including the CRC
-    fread(buffer, 1, len+1, file);
-    char crc = buffer[0]^buffer[1];
-    for(long i=2; i<len; i++) {
-        crc = crc^buffer[i];
+
+    char crc;
+    int buffer_index = 2;
+
+    //copy the file content by chunks of 256 bytes into a buffer of chars
+    for (int i = 0; i < iterations; i++) {
+        //read 256 bytes into buffer
+        fread(buffer, 1, 256, file);
+
+        if (i==0) {
+            //we are at the beginning of the file, so we must compute the first xor between bytes
+            crc = buffer[0]^buffer[1];
+        }
+
+        for(int i=buffer_index; i<256; i++) {
+            crc = crc^buffer[i];
+        }
+
+        buffer_index = 0;
+
     }
-    if (crc!=buffer[len]) {
-        printf("Wrong CRC! The computed CRC is %x, while it should be %x \r\n", crc, buffer[len]);
+
+    if (spare_bytes) {
+        //read the spare bytes, without the CRC
+        fread(buffer, 1, spare_bytes, file);
+
+        for(int i=0; i<spare_bytes; i++) {
+            crc = crc^buffer[i];
+        }
+    }
+
+    if (crc!=crc_file) {
+        printf("Wrong CRC! The computed CRC is %x, while it should be %x \r\n", crc, crc_file);
         printf("Press the button for at least 5 seconds to enter the Fail Safe mode \r\n");
 
         //wait for the button to be pressed
