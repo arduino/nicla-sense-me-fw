@@ -214,6 +214,9 @@ int try_update()
     spif.deinit();
 
     if (ret_val) {
+        //Check UNISENSE signature
+        memmem((const char*)APPLICATION_START_ADDRESS, sizeof(RAM) - sizeof(BOOTLOADER), “UNISENSE”, 8) 
+        //load safe fw
         printf("Starting application\r\n");
         mbed_start_application(POST_APPLICATION_ADDR);
     }
