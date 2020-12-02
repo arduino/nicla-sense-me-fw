@@ -1,55 +1,42 @@
 #include <Arduino.h>
 
-uint8_t sensorId;
+#define ESLOV_MAX_LENGTH (255)
 
-// samle rate is used also to enable/disable the sensor
-// 0 for disable, else for enable
-//uint32_t sampleRate;
-float sampleRate;
+#define ESLOV_ADDRESS
 
-// how much ms time a new value is retained in its fifo
-// before a notification to the host is sent via interrupt
-// expressed in 24 bit
-uint32_t latency;
+int _rxIndex = 0;
+uint8_t _rxBuffer[ESLOV_MAX_LENGTH] = {0};
+bool _packetComplete = false;
 
-// The host can read sensor's values when it receives an interrupt.
-// Alternatively, it can use the fifo flush command that sends all the fifo values and
-// discard sensor's fifos 
+// pack received data, or making classes for fifo events?
+//void receivedEvent(uint8_t* pdata)
+//{
+  //struct __attribute__ ((packed)) FIFOEvent {
+    //uint8_t eventId;
+    //uint8_t plen;
+  //} *eventHdr = (FIFOEvent*)pdata;
+//}
+
+void receiveEvent(int howMany)
+{
+  while(Wire.available()) 
+  {
+    _rxBuffer[_rxIndex++] = Wire.read(); 
+    Serial.println(_rxBuffer[_rxIndex-1]);
+  }
+}
 
 void setup()
 {
+  Wire.begin(ESLOV_ADDRESS);                // join i2c bus with address #4
+  Wire.onReceive(receiveEvent); // register event
+  Serial.begin(9600);           // start serial for output
+  while(!Serial);
 }
 
 void loop()
 {
-  if ()
-  {
-
+  if (_packetComplete) {
+    Serial.println("Packet received");
   }
 }
-
-// pack received data, or making classes for fifo events?
-void receivedEvent(uint8_t* pdata)
-{
-  struct __attribute__ ((packed)) FIFOEvent {
-    uint8_t eventId;
-    uint8_t plen;
-  } *eventHdr = (FIFOEvent*)pdata;
-}
-
-class SmartSensor {
-  public:
-    void interruptHandler() { _hasNewData = true; }
-    bool hasNewData() { return _hasNewData;}
-
-    void loop() 
-    {
-      if (_hasNewData()) {
-
-      }
-    }
-
-  private:
-    bool _hasNewData;
-};
-
