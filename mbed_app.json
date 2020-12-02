@@ -1,0 +1,32 @@
+{
+    "requires": ["bare-metal", "rtos-api", "spif-driver", "filesystem", "littlefs", "fat_chan", "flashiap-block-device"],
+    "config": {
+        "update_file": {
+            "help": "Path to the application update binary on the SD card",
+            "value": "\"mbed-os-example-blinky_application.bin\""
+        },
+        "spif_mosi": {
+            "help": "MCU pin connected to the SPI MOSI pin of the flash",
+            "value": "P0_13"
+        },
+        "spif_miso": {
+            "help": "MCU pin connected to the SPI MISO pin of the flash",
+            "value": "P0_14"
+        },
+        "spif_sck": {
+            "help": "MCU pin connected to the SPI SCK pin of the flash",
+            "value": "P0_12"
+        },
+        "spif_cs": {
+            "help": "MCU pin connected to the SPI CS pin of the flash",
+            "value": "P0_5"
+        }
+    },
+    "target_overrides": {
+        "UNISENSE": {
+            "target.restrict_size": "0x10000",
+            "target.components_add" : ["SPIF"],
+            "target.c_lib": "small"
+        }
+    }
+}
