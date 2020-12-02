@@ -9,8 +9,15 @@
 */
 
 #include <ArduinoBLE.h>
+#include <Wire.h>
 #include "FlashIAPBlockDevice.h"
 #include "LittleFileSystem.h"
+
+#define UNISENSE_CONFIG_HEADER  0xFC
+#define UNISENSE_APP_CONFIG     0x01
+#define UNISENSE_DFU_INTERNAL   0x02
+#define UNISENSE_DFU_SENSOR     0x03
+#define ESLOV_DEFAULT_ADDRESS   0x55
 
 // half the flash (512KB) is dedicated as dfu temporary storage
 static FlashIAPBlockDevice bd(0x80000, 0x80000);
@@ -37,6 +44,12 @@ struct __attribute__((packed)) dfuPacket {
   uint8_t data[64];
 };
 
+uint8_t tryReadAndApplyConfig() {
+  return ESLOV_DEFAULT_ADDRESS;
+}
+
+
+
 BLEService configService("34c2e3b8-34aa-11eb-adc1-0242ac120002"); // BLE LED Service
 
 BLEStringCharacteristic configCharacteristic("34c2e3b8-34aa-11eb-adc1-0242ac120002", BLEWrite, 64 + sizeof(configurationPacket) + sizeof(dfuPacket));
@@ -49,6 +62,11 @@ void setup() {
   if (err) {
     err = fs.reformat(&bd);
   }
+
+  uint8_t address = tryReadAndApplyConfig();
+
+  Wire.begin(address);
+  Wire.onReceive(receiveEvent);
 
   // begin initialization
   if (!BLE.begin()) {
@@ -73,10 +91,11 @@ void setup() {
   Serial.println("BLE DFU Test");
 }
 
-#define UNISENSE_CONFIG_HEADER  0xFC
-#define UNISENSE_APP_CONFIG     0x01
-#define UNISENSE_DFU_INTERNAL   0x02
-#define UNISENSE_DFU_SENSOR     0x03
+void receiveEvent(int howmany) {
+  uint8_t tempbuf[howmany];
+  Wire.readBytes(tempbuf, howmany);
+  parseConfig((struct configurationPacket *)tempbuf);
+}
 
 void configureApp(struct configPacket* config) {}
 
@@ -90,7 +109,7 @@ void writeDfuChunk(int where, struct dfuPacket* config) {
     }
   }
   if (target != NULL) {
-      fwrite(config->data, config->last ? config->remaining : sizeof(config->data), 1, target);
+    fwrite(config->data, config->last ? config->remaining : sizeof(config->data), 1, target);
   }
   if (config->last) {
     fclose(target);
