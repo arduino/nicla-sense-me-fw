@@ -1,3 +1,6 @@
+#define _GNU_SOURCE
+#include <string.h>
+
 #include "mbed.h"
 #include "SPIFBlockDevice.h"
 #include "LittleFileSystem.h"
@@ -214,8 +217,26 @@ int try_update()
     spif.deinit();
 
     if (ret_val) {
-        printf("Starting application\r\n");
-        mbed_start_application(POST_APPLICATION_ADDR);
+        //check UNISENSE signature
+        void *temp = NULL;
+        temp = memmem((const char*)POST_APPLICATION_ADDR, POST_APPLICATION_SIZE, "UNISENSE", sizeof("UNISENSE"));
+
+        if (temp != NULL) {
+            printf("Signature check PASSED \r\n");
+            printf("Starting application\r\n");
+            mbed_start_application(POST_APPLICATION_ADDR);
+        } else {
+            printf("Unisense signature NOT found! \r\n");
+            printf("Press the button for at least 3 seconds to enter the Fail Safe mode \r\n");
+            //wait for the button to be pressed
+            while(boot_rst_n) {}
+            if(try_fail_safe(3000)) {
+                // These 2 lines will be removed when the safe fw recovery will be added to try_fail_safe function
+                printf("Starting application\r\n");
+                mbed_start_application(POST_APPLICATION_ADDR);
+            }
+        }
+
     }
 }
 
