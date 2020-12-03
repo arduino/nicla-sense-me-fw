@@ -1,6 +1,17 @@
 #ifndef BOSCH_SENSORTEC_H_
 #define BOSCH_SENSORTEC_H_
 
+#include "channel.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+#include "bosch/bhy2.h"
+#ifdef __cplusplus
+}
+#endif
+
 #define SENSOR_QUEUE_SIZE (10)
 
 struct SensorConfiguration {
@@ -42,7 +53,10 @@ class BoschSensortec {
 
     // ANNA <-> BOSCH interface
     void interruptHandler() { _hasNewData = true; }
-    void configureBosch() {}
+    void configureBosch() 
+    {
+      bhy2_init(BHY2_SPI_INTERFACE, bhy2_spi_read, bhy2_spi_write, bhy2_delay_us, MAX_READ_WRITE_LEN, NULL, &_bhy2);
+    }
     void retrieveData() {}
 
     // sketch-side API
@@ -61,6 +75,8 @@ class BoschSensortec {
     bool _hasNewData;
     SensorData _sensorQueue[SENSOR_QUEUE_SIZE];
     SensorConfiguration* _savedConfig;
+    
+    struct bhy2_dev _bhy2;
 };
 
 
