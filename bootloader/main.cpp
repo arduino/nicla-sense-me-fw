@@ -171,7 +171,6 @@ int apply_update(FILE *file, uint32_t address)
             uint32_t percent_done_new = ftell(file) * 100 / len;
             if (percent_done != percent_done_new) {
                 percent_done = percent_done_new;
-                printf("Flashed %3ld%%\r", percent_done);
             }
         }
     }
@@ -187,7 +186,7 @@ int apply_update(FILE *file, uint32_t address)
 
 int try_update()
 {
-    int ret_val = 0;
+    int update = 0;
 
     int err = fs.mount(&spif);
     if (err) {
@@ -203,7 +202,7 @@ int try_update()
     FILE *file = fopen(ANNA_UPDATE_FILE_PATH, "rb");
     if (file != NULL) {
 
-        ret_val = apply_update(file, POST_APPLICATION_ADDR);
+        update = apply_update(file, POST_APPLICATION_ADDR);
 
         fclose(file);
         remove(ANNA_UPDATE_FILE_PATH);
@@ -216,7 +215,7 @@ int try_update()
     fs.unmount();
     spif.deinit();
 
-    if (ret_val) {
+    if (update) {
         //check UNISENSE signature
         void *temp = NULL;
         temp = memmem((const char*)POST_APPLICATION_ADDR, POST_APPLICATION_SIZE, "UNISENSE", sizeof("UNISENSE"));
