@@ -1,41 +1,116 @@
 #include <Arduino.h>
+#include "Wire.h"
+#include "ArduinoBLE.h"
+#include "src/BoschSensortec/BoschSensortec.h"
+#include "src/DataChannel.h"
+#include "src/DFUChannel.h"
 
-#define ESLOV_MAX_LENGTH (255)
+// ESLOV config
+#define ESLOV_MAX_LENGTH      255
+#define ESLOV_DEFAULT_ADDRESS 0x55
 
-#define ESLOV_ADDRESS
+enum EslovOpcode {
+  ESLOV_DFU_INTERNAL_OPCODE,
+  ESLOV_DFU_EXTERNAL_OPCODE
+};
 
 int _rxIndex = 0;
 uint8_t _rxBuffer[ESLOV_MAX_LENGTH] = {0};
 bool _packetComplete = false;
+///////
 
-// pack received data, or making classes for fifo events?
-//void receivedEvent(uint8_t* pdata)
-//{
-  //struct __attribute__ ((packed)) FIFOEvent {
-    //uint8_t eventId;
-    //uint8_t plen;
-  //} *eventHdr = (FIFOEvent*)pdata;
-//}
+// BLE config
+BLEService dfuService("34c2e3b8-34aa-11eb-adc1-0242ac120002"); 
+auto dfuInternalUuid = "34c2e3b9-34aa-11eb-adc1-0242ac120002";
+auto dfuExternalUuid = "34c2e3ba-34aa-11eb-adc1-0242ac120002";
+BLECharacteristic dfuInternalCharacteristic(dfuInternalUuid, BLEWrite, sizeof(DFUPacket));
+BLECharacteristic dfuExternalCharacteristic(dfuExternalUuid, BLEWrite, sizeof(DFUPacket));
+////////
 
+// BLE receiver
+void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic) 
+{
+  uint8_t data[sizeof(DFUPacket)];
+  characteristic.readValue(data, sizeof(data));
+  DFUChannel.processPacket(dfuType, data);
+}
+
+void receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic)
+{
+  processDFUPacket(DFU_INTERNAL, characteristic);
+}
+
+void receivedExternalDFU(BLEDevice central, BLECharacteristic characteristic)
+{
+  processDFUPacket(DFU_EXTERNAL, characteristic);
+}
+/////////////
+
+// Eslov receiver
 void receiveEvent(int howMany)
 {
   while(Wire.available()) 
   {
     _rxBuffer[_rxIndex++] = Wire.read(); 
-    Serial.println(_rxBuffer[_rxIndex-1]);
+    //Serial.println(_rxBuffer[_rxIndex-1]);
+
+    // Check if packet is complete depending on its opcode
+    if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
+      if (_rxIndex == sizeof(DFUPacket) + 1) {
+        DFUChannel.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
+      }
+
+    } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
+      if (_rxIndex == sizeof(DFUPacket) + 1) {
+        DFUChannel.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
+      }
+
+    } else {
+      // Not valid opcode. Discarding packet
+      _rxIndex = 0;
+    }
+
+    if (_rxIndex == ESLOV_MAX_LENGTH) {
+      // Packet too long. Discarding it
+      _rxIndex = 0;
+    }
   }
 }
+////////
 
+BoschSensortec sensortec;
+
+// Initialize bosch sensortec
+// Initialize and link channels 
 void setup()
 {
-  Wire.begin(ESLOV_ADDRESS);                // join i2c bus with address #4
-  Wire.onReceive(receiveEvent); // register event
-  Serial.begin(9600);           // start serial for output
+  sensortec.begin();
+
+  // debug port
+  Serial.begin(9600);           
   while(!Serial);
+
+  // ESLOV receiver setup
+  Wire.begin(ESLOV_DEFAULT_ADDRESS);                
+  Wire.onReceive(receiveEvent); 
+  ///////////
+
+  // BLE receiver setup
+  BLE.begin();
+  BLE.setLocalName("UNISENSE");
+  BLE.setAdvertisedService(dfuService);
+  dfuService.addCharacteristic(dfuInternalCharacteristic);
+  dfuService.addCharacteristic(dfuExternalCharacteristic);
+  BLE.addService(dfuService);
+  BLE.advertise();
+  dfuInternalCharacteristic.setEventHandler(BLEWritten, receivedInternalDFU);
+  dfuExternalCharacteristic.setEventHandler(BLEWritten, receivedExternalDFU);
+  ///////
 }
 
 void loop()
 {
+  BLE.poll();
   if (_packetComplete) {
     Serial.println("Packet received");
   }
