@@ -5,22 +5,29 @@
 #include "src/DataChannel.h"
 #include "src/DFUChannel.h"
 
-// ESLOV part
-#define ESLOV_MAX_LENGTH (255)
-#define ESLOV_ADDRESS
+// ESLOV config
+#define ESLOV_MAX_LENGTH      255
+#define ESLOV_DEFAULT_ADDRESS 0x55
+
+enum EslovOpcode {
+  ESLOV_DFU_INTERNAL_OPCODE,
+  ESLOV_DFU_EXTERNAL_OPCODE
+};
+
 int _rxIndex = 0;
 uint8_t _rxBuffer[ESLOV_MAX_LENGTH] = {0};
 bool _packetComplete = false;
 ///////
 
-// BLE part
+// BLE config
 BLEService dfuService("34c2e3b8-34aa-11eb-adc1-0242ac120002"); 
 auto dfuInternalUuid = "34c2e3b9-34aa-11eb-adc1-0242ac120002";
 auto dfuExternalUuid = "34c2e3ba-34aa-11eb-adc1-0242ac120002";
 BLECharacteristic dfuInternalCharacteristic(dfuInternalUuid, BLEWrite, sizeof(DFUPacket));
 BLECharacteristic dfuExternalCharacteristic(dfuExternalUuid, BLEWrite, sizeof(DFUPacket));
-/////////////
+////////
 
+// BLE receiver
 void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic) 
 {
   uint8_t data[sizeof(DFUPacket)];
@@ -37,15 +44,39 @@ void receivedExternalDFU(BLEDevice central, BLECharacteristic characteristic)
 {
   processDFUPacket(DFU_EXTERNAL, characteristic);
 }
+/////////////
 
+// Eslov receiver
 void receiveEvent(int howMany)
 {
   while(Wire.available()) 
   {
     _rxBuffer[_rxIndex++] = Wire.read(); 
-    Serial.println(_rxBuffer[_rxIndex-1]);
+    //Serial.println(_rxBuffer[_rxIndex-1]);
+
+    // Check if packet is complete depending on its opcode
+    if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
+      if (_rxIndex == sizeof(DFUPacket) + 1) {
+        DFUChannel.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
+      }
+
+    } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
+      if (_rxIndex == sizeof(DFUPacket) + 1) {
+        DFUChannel.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
+      }
+
+    } else {
+      // Not valid opcode. Discarding packet
+      _rxIndex = 0;
+    }
+
+    if (_rxIndex == ESLOV_MAX_LENGTH) {
+      // Packet too long. Discarding it
+      _rxIndex = 0;
+    }
   }
 }
+////////
 
 BoschSensortec sensortec;
 
@@ -59,12 +90,12 @@ void setup()
   Serial.begin(9600);           
   while(!Serial);
 
-  // ESLOV part
-  Wire.begin(ESLOV_ADDRESS);                // join i2c bus with address #4
-  Wire.onReceive(receiveEvent); // register event
+  // ESLOV receiver setup
+  Wire.begin(ESLOV_DEFAULT_ADDRESS);                
+  Wire.onReceive(receiveEvent); 
   ///////////
 
-  // BLE part
+  // BLE receiver setup
   BLE.begin();
   BLE.setLocalName("UNISENSE");
   BLE.setAdvertisedService(dfuService);
