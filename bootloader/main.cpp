@@ -239,17 +239,6 @@ int try_update()
 {
     int update = 0;
 
-    int err = fs.mount(&spif);
-    if (err) {
-        DEBUG_PRINTF("Formatting file system...\n");
-        err=fs.reformat(&spif);
-        if (err) {
-            DEBUG_PRINTF("Mount failed\n");
-            return MOUNT_FAILED;
-        }
-    }
-
-
     FILE *file = fopen(ANNA_UPDATE_FILE_PATH, "rb");
     if (file != NULL) {
 
@@ -263,9 +252,6 @@ int try_update()
         mbed_start_application(POST_APPLICATION_ADDR);
     }
 
-    fs.unmount();
-    spif.deinit();
-
     if (update) {
         check_signature(false);
     }
@@ -274,13 +260,30 @@ int try_update()
 
 int main()
 {
+    //Mount the file system
+    int err = fs.mount(&spif);
+    if (err) {
+        DEBUG_PRINTF("Formatting file system...\n");
+        err=fs.reformat(&spif);
+        if (err) {
+            DEBUG_PRINTF("Mount failed\n");
+            return MOUNT_FAILED;
+        }
+    }
+
     if(!boot_rst_n) {
 
         printf("!boot_rst_n condition met \r\n");
         if(try_fail_safe(3000)) {
             check_signature(true);
         }
+
+    } else {
+
+        try_update();
+
     }
 
-    try_update();
+    fs.unmount();
+    spif.deinit();
 }
