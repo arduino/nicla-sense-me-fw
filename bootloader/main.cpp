@@ -7,6 +7,7 @@
 
 #define MOUNT_PATH           "fs"
 #define ANNA_UPDATE_FILE_PATH   "/" MOUNT_PATH "/ANNA_UPDATE.BIN"
+#define FAIL_SAFE_FILE_PATH "/" MOUNT_PATH "/FAIL_SAFE.BIN"
 
 #define DEBUG_PRINTF(...) printf(__VA_ARGS__)
 
@@ -31,7 +32,7 @@ Timer timer_rst_n;
 
 int try_fail_safe(int timeout);
 int try_update(void);
-int apply_update(FILE *file, uint32_t address);
+int apply_update(FILE *file, uint32_t address, bool fail_safe);
 
 int try_fail_safe(int timeout) {
     //Try fail safe: check button state
@@ -54,13 +55,26 @@ int try_fail_safe(int timeout) {
     } else {
         //Fail safe
         printf("Fail safe mode ON \r\n");
-        return 1;
-        //maybe retrieve a know firmware?
+        //Retrieve a know firmware from FAIL_SAFE.BIN file
+        FILE *file_fail_safe = fopen(FAIL_SAFE_FILE_PATH, "rb");
+        if (file_fail_safe != NULL) {
+            printf("Fail safe file found \r\n");
+
+            int safe_fw_found = apply_update(file_fail_safe, POST_APPLICATION_ADDR, true);
+
+            fclose(file_fail_safe);
+
+            return safe_fw_found;
+
+        } else {
+            printf("No fail safe firmware found \r\n");
+            return 0;
+        }
     }
 }
 
 
-int apply_update(FILE *file, uint32_t address)
+int apply_update(FILE *file, uint32_t address, bool fail_safe)
 {
     fseek(file, 0, SEEK_END);
     long len = ftell(file);
@@ -120,13 +134,18 @@ int apply_update(FILE *file, uint32_t address)
     }
 
     if (crc!=crc_file) {
-        printf("Wrong CRC! The computed CRC is %x, while it should be %x \r\n", crc, crc_file);
-        printf("Press the button for at least 3 seconds to enter the Fail Safe mode \r\n");
+        if (!fail_safe) {
+            printf("Wrong CRC! The computed CRC is %x, while it should be %x \r\n", crc, crc_file);
+            printf("Press the button for at least 3 seconds to enter the Fail Safe mode \r\n");
 
-        //wait for the button to be pressed
-        while(boot_rst_n) {}
+            //wait for the button to be pressed
+            while(boot_rst_n) {}
 
-        return try_fail_safe(3000);
+            return try_fail_safe(3000);
+        } else {
+            printf("ERROR! Wrong CRC in fail safe sketch \r\n");
+            return 0;
+        }
 
     } else {
         printf("Correct CRC=%x \r\n", crc);
@@ -202,13 +221,13 @@ int try_update()
     FILE *file = fopen(ANNA_UPDATE_FILE_PATH, "rb");
     if (file != NULL) {
 
-        update = apply_update(file, POST_APPLICATION_ADDR);
+        update = apply_update(file, POST_APPLICATION_ADDR, false);
 
         fclose(file);
         remove(ANNA_UPDATE_FILE_PATH);
 
     } else {
-        printf("Starting application\r\n");
+        printf("No ANNA_UPDATE_FILE found. Starting main application\r\n");
         mbed_start_application(POST_APPLICATION_ADDR);
     }
 
