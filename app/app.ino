@@ -2,7 +2,7 @@
 #include "Wire.h"
 #include "ArduinoBLE.h"
 #include "src/BoschSensortec/BoschSensortec.h"
-#include "src/DataChannel.h"
+#include "src/SensorChannel.h"
 #include "src/DFUChannel.h"
 
 // ESLOV config
@@ -11,7 +11,10 @@
 
 enum EslovOpcode {
   ESLOV_DFU_INTERNAL_OPCODE,
-  ESLOV_DFU_EXTERNAL_OPCODE
+  ESLOV_DFU_EXTERNAL_OPCODE,
+  ESLOV_SENSOR_DATA_OPCODE,
+  ESLOV_SENSOR_CONFIG_OPCODE,
+  ESLOV_SENSOR_REQUEST_OPCODE
 };
 
 int _rxIndex = 0;
@@ -58,11 +61,28 @@ void receiveEvent(int howMany)
     if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
         DFUChannel.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
+
+        _rxIndex = 0;
       }
 
     } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
         DFUChannel.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
+
+        _rxIndex = 0;
+      }
+
+    } else if (_rxBuffer[0] == ESLOV_SENSOR_REQUEST_OPCODE) {
+      uint8_t numAvailableData = SensorChannel.processPacket(SENSOR_REQUEST_PACKET, NULL);
+      // return length of available data to ESLOV master
+
+      _rxIndex = 0;
+
+    } else if (_rxBuffer[0] == ESLOV_SENSOR_CONFIG_OPCODE) {
+      if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
+        SensorChannel.processPacket(SENSOR_CONFIG_PACKET, &_rxBuffer[1]);
+
+        _rxIndex = 0;
       }
 
     } else {
