@@ -2,6 +2,7 @@
 #define SENSOR_CHANNEL_H_
 
 #include "Arduino.h"
+#include "BoschSensortec/BoschSensortec.h"
 
 // For future more generic use
 struct __attribute__((packed)) SensorDataHeader {

@@ -48,28 +48,18 @@ struct SensorData {
 // This will use the BHY functions for configuring sensors and retrieving data
 class BoschSensortec {
   public:
-    BoschSensortec() : _hasNewData(false), _savedConfig(NULL) {}
-    virtual ~BoschSensortec() {}
-
-    // ANNA <-> BOSCH interface
-    void interruptHandler() { _hasNewData = true; }
-    void configureBosch() 
-    {
-      bhy2_init(BHY2_SPI_INTERFACE, bhy2_spi_read, bhy2_spi_write, bhy2_delay_us, MAX_READ_WRITE_LEN, NULL, &_bhy2);
-    }
-    void retrieveData() {}
+    BoschSensortec();
+    virtual ~BoschSensortec();
 
     // sketch-side API
-    void begin() { configureBosch(); }
-    bool hasNewData() { return _hasNewData;}
-    void update() 
-    {
-      if (_hasNewData) {
-        // Retrieve data and store it in the queue
-        // also handle the queue by storing it in flash if full
-        retrieveData();
-      }
-    }
+    void begin(); 
+    bool hasNewData(); 
+    void update();
+
+    // ANNA <-> BOSCH interface
+    static void interruptHandler();
+    //void configureBosch(); // moved into begin
+    void retrieveData() {}
 
   private:
     bool _hasNewData;
@@ -79,5 +69,6 @@ class BoschSensortec {
     struct bhy2_dev _bhy2;
 };
 
+extern BoschSensortec sensortec;
 
 #endif
