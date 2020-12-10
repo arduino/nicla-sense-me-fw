@@ -1,14 +1,14 @@
 #include "SensorChannel.h"
 
-SensorChannelClass::SensorChannelClass()
+SensorChannel::SensorChannel()
 {
 }
 
-SensorChannelClass::~SensorChannelClass()
+SensorChannel::~SensorChannel()
 {
 }
 
-uint8_t SensorChannelClass::processPacket(SensorPacketType type, const uint8_t* data)
+uint8_t SensorChannel::processPacket(SensorPacketType type, const uint8_t* data)
 {
   uint8_t returnValue = 1;
 
@@ -24,7 +24,7 @@ uint8_t SensorChannelClass::processPacket(SensorPacketType type, const uint8_t* 
   return returnValue;
 }
 
-uint8_t SensorChannelClass::getNextDataPacket(uint8_t* data)
+uint8_t SensorChannel::getNextDataPacket(uint8_t* data)
 {
   SensorDataPacket* packet = (SensorDataPacket*) data;
   // Retrieve sensor data from sensortec object and populate the packet
@@ -32,4 +32,4 @@ uint8_t SensorChannelClass::getNextDataPacket(uint8_t* data)
   return sizeof(SensorDataPacket);
 }
 
-SensorChannelClass SensorChannel;
+SensorChannel sensorChannel;

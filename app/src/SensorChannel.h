@@ -30,12 +30,12 @@ enum SensorPacketType {
   SENSOR_REQUEST_PACKET
 };
 
-class SensorChannelClass {
+class SensorChannel {
   public: 
-    SensorChannelClass();
-    ~SensorChannelClass();
+    SensorChannel();
+    virtual ~SensorChannel();
 
-    void setup();
+    void begin();
     uint8_t processPacket(SensorPacketType type, const uint8_t* data);
 
     uint8_t getNextDataPacket(uint8_t* data);
@@ -43,6 +43,6 @@ class SensorChannelClass {
   private:
 };
 
-extern SensorChannelClass SensorChannel;
+extern SensorChannel sensorChannel;
 
 #endif

@@ -1,19 +1,19 @@
 #include "DFUChannel.h"
 
 // half the flash (512KB) is dedicated as dfu temporary storage
-FlashIAPBlockDevice DFUChannelClass::_bd(0x80000, 0x80000);
-mbed::LittleFileSystem DFUChannelClass::_fs("fs");
+FlashIAPBlockDevice DFUChannel::_bd(0x80000, 0x80000);
+mbed::LittleFileSystem DFUChannel::_fs("fs");
 
-DFUChannelClass::DFUChannelClass() :
+DFUChannel::DFUChannel() :
   _target(NULL)
 {
 }
 
-DFUChannelClass::~DFUChannelClass()
+DFUChannel::~DFUChannel()
 {
 }
 
-void DFUChannelClass::setup()
+void DFUChannel::begin()
 {
   int err = _fs.mount(&_bd);
   if (err) {
@@ -21,7 +21,7 @@ void DFUChannelClass::setup()
   }
 }
 
-void DFUChannelClass::processPacket(DFUType dfuType, const uint8_t* data)
+void DFUChannel::processPacket(DFUType dfuType, const uint8_t* data)
 {
   DFUPacket* packet = (DFUPacket*)data;
   if (packet->index == 0) {
@@ -45,4 +45,4 @@ void DFUChannelClass::processPacket(DFUType dfuType, const uint8_t* data)
   }
 }
 
-DFUChannelClass DFUChannel;
+DFUChannel dfuChannel;

@@ -29,7 +29,7 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
 {
   uint8_t data[sizeof(DFUPacket)];
   characteristic.readValue(data, sizeof(data));
-  DFUChannel.processPacket(dfuType, data);
+  dfuChannel.processPacket(dfuType, data);
 }
 
 void BLEHandler::receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic)
@@ -47,10 +47,10 @@ void BLEHandler::receivedSensorConfig(BLEDevice central, BLECharacteristic chara
 {
   uint8_t data[sizeof(SensorConfigurationPacket)];
   characteristic.readValue(data, sizeof(data));
-  SensorChannel.processPacket(SENSOR_CONFIG_PACKET, data);
+  sensorChannel.processPacket(SENSOR_CONFIG_PACKET, data);
 }
 
-void BLEHandler::setup()
+void BLEHandler::begin()
 {
   BLE.begin();
   BLE.setLocalName("UNISENSE");
@@ -73,7 +73,7 @@ void BLEHandler::setup()
   BLE.advertise();
 }
 
-void BLEHandler::poll()
+void BLEHandler::update()
 {
   BLE.poll();
 }

@@ -19,12 +19,12 @@ struct __attribute__((packed)) DFUPacket {
   uint8_t data[64];
 };
 
-class DFUChannelClass {
+class DFUChannel {
   public: 
-    DFUChannelClass();
-    ~DFUChannelClass();
+    DFUChannel();
+    virtual ~DFUChannel();
 
-    void setup();
+    void begin();
     void processPacket(DFUType dfuType, const uint8_t* data);
 
   private:
@@ -33,8 +33,6 @@ class DFUChannelClass {
     FILE* _target;
 };
 
-extern DFUChannelClass DFUChannel;
-
-
+extern DFUChannel dfuChannel;
 
 #endif

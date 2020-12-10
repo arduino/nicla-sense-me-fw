@@ -13,12 +13,12 @@ void setup()
   Serial.begin(9600);           
   while(!Serial);
 
-  eslovHandler.setup();
-  bleHandler.setup();
+  eslovHandler.begin();
+  bleHandler.begin();
 }
 
 void loop()
 {
-  bleHandler.poll();
+  bleHandler.update();
   sensortec.update();
 }
