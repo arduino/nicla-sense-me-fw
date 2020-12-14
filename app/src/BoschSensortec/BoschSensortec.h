@@ -2,6 +2,7 @@
 #define BOSCH_SENSORTEC_H_
 
 #include "channel.h"
+#include "SensorTypes.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -12,38 +13,8 @@ extern "C"
 }
 #endif
 
-#define SENSOR_QUEUE_SIZE (10)
-
-struct SensorConfiguration {
-//struct __attribute__((packed)) SensorConfiguration {
-  uint8_t sensorId;
-  // sample rate is used also to enable/disable the sensor
-  // 0 for disable, else for enable
-  //uint32_t sampleRate;
-  float sampleRate;
-  // how much ms time a new value is retained in its fifo
-  // before a notification to the host is sent via interrupt
-  // expressed in 24 bit
-  uint32_t latency;
-  // The host can read sensor's values when it receives an interrupt.
-  // Alternatively, it can use the fifo flush command that sends all the fifo values and
-  // discard sensor's fifos 
-};
-
-enum SensorDataType {
-  TypeInteger,
-  TypeUnsigned,
-  TypeFloat
-};
-
-// Generic data structure
-// Size is the effective number of bytes
-struct SensorData {
-//struct __attribute__((packed)) SensorData {
-  SensorDataType type;
-  uint64_t data;
-  uint8_t size;
-};
+#define SENSOR_QUEUE_SIZE   10
+#define WORK_BUFFER_SIZE    2048
 
 // This will use the BHY functions for configuring sensors and retrieving data
 class BoschSensortec {
@@ -55,16 +26,20 @@ class BoschSensortec {
     void begin(); 
     bool hasNewData(); 
     void update();
+    void configureSensor(SensorConfigurationPacket *config);
 
     // ANNA <-> BOSCH interface
     static void interruptHandler();
-    //void configureBosch(); // moved into begin
-    void retrieveData() {}
+    static void retrieveData(const struct bhy2_fifo_parse_data_info *data, void *arg);
+    void addNewData(const struct bhy2_fifo_parse_data_info *fifoData);
 
   private:
     bool _hasNewData;
-    SensorData _sensorQueue[SENSOR_QUEUE_SIZE];
-    SensorConfiguration* _savedConfig;
+    SensorDataPacket _sensorQueue[SENSOR_QUEUE_SIZE];
+    uint8_t _sensorQueueIndex;
+    uint8_t _workBuffer[WORK_BUFFER_SIZE];
+
+    SensorConfigurationPacket* _savedConfig;
     
     struct bhy2_dev _bhy2;
 };
