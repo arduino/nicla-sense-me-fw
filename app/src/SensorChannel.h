@@ -21,7 +21,7 @@ class SensorChannel {
     void begin();
     uint8_t processPacket(SensorPacketType type, const uint8_t* data);
 
-    uint8_t getNextDataPacket(uint8_t* data);
+    SensorDataPacket* readSensorData();
 
   private:
 };

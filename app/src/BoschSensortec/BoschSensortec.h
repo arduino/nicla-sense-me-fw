@@ -24,19 +24,24 @@ class BoschSensortec {
 
     // sketch-side API
     void begin(); 
-    bool hasNewData(); 
     void update();
     void configureSensor(SensorConfigurationPacket *config);
 
+    uint8_t availableSensorData();
+    SensorDataPacket* readSensorData();
+
     // ANNA <-> BOSCH interface
     static void interruptHandler();
-    static void retrieveData(const struct bhy2_fifo_parse_data_info *data, void *arg);
-    void addNewData(const struct bhy2_fifo_parse_data_info *fifoData);
+    static void parseBhyData(const struct bhy2_fifo_parse_data_info *data, void *arg);
+    void addSensorData(const struct bhy2_fifo_parse_data_info *fifoData);
 
   private:
     bool _hasNewData;
+
     SensorDataPacket _sensorQueue[SENSOR_QUEUE_SIZE];
-    uint8_t _sensorQueueIndex;
+    uint8_t _sensorQueueFirst;
+    uint8_t _sensorQueueLast;
+
     uint8_t _workBuffer[WORK_BUFFER_SIZE];
 
     SensorConfigurationPacket* _savedConfig;
