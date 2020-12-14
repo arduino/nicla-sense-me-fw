@@ -3,24 +3,7 @@
 
 #include "Arduino.h"
 #include "BoschSensortec/BoschSensortec.h"
-
-// For future more generic use
-struct __attribute__((packed)) SensorDataHeader {
-  uint8_t sensorId;
-  uint8_t length;
-};
-
-struct __attribute__((packed)) SensorDataPacket {
-  uint8_t sensorId;
-  uint8_t length;
-  uint64_t data;
-};
-
-struct __attribute__((packed)) SensorConfigurationPacket {
-  uint8_t sensorId;
-  float sampleRate;
-  uint32_t latency;
-};
+#include "BoschSensortec/SensorTypes.h"
 
 enum SensorPacketType {
   // Outcoming packets
