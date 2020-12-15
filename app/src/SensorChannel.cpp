@@ -1,3 +1,4 @@
+#if 0
 #include "SensorChannel.h"
 
 SensorChannel::SensorChannel()
@@ -35,3 +36,5 @@ SensorDataPacket* SensorChannel::readSensorData()
 }
 
 SensorChannel sensorChannel;
+
+#endif

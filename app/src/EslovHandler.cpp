@@ -1,7 +1,7 @@
 #include "EslovHandler.h"
 
 #include "DFUChannel.h"
-#include "SensorChannel.h"
+#include "BoschSensortec/BoschSensortec.h"
 
 EslovHandler::EslovHandler() :
   _rxIndex(0),
@@ -49,14 +49,14 @@ void EslovHandler::receiveEvent(int howMany)
       }
 
     } else if (_rxBuffer[0] == ESLOV_SENSOR_REQUEST_OPCODE) {
-      uint8_t numAvailableData = sensorChannel.processPacket(SENSOR_REQUEST_PACKET, NULL);
-      // return length of available data to ESLOV master
+      uint8_t availableData = sensortec.availableSensorData();
 
       _rxIndex = 0;
 
     } else if (_rxBuffer[0] == ESLOV_SENSOR_CONFIG_OPCODE) {
       if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
-        sensorChannel.processPacket(SENSOR_CONFIG_PACKET, &_rxBuffer[1]);
+        SensorConfigurationPacket *config = (SensorConfigurationPacket*)&_rxBuffer[1];
+        sensortec.configureSensor(config);
 
         _rxIndex = 0;
       }

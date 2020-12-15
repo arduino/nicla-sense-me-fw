@@ -1,6 +1,6 @@
 #include "BLEHandler.h"
 
-#include "SensorChannel.h"
+#include "BoschSensortec/BoschSensortec.h"
 
 // DFU channels
 BLEService dfuService("34c2e3b8-34aa-11eb-adc1-0242ac120002"); 
@@ -45,9 +45,9 @@ void BLEHandler::receivedExternalDFU(BLEDevice central, BLECharacteristic charac
 // Sensor channel
 void BLEHandler::receivedSensorConfig(BLEDevice central, BLECharacteristic characteristic)
 {
-  uint8_t data[sizeof(SensorConfigurationPacket)];
-  characteristic.readValue(data, sizeof(data));
-  sensorChannel.processPacket(SENSOR_CONFIG_PACKET, data);
+  SensorConfigurationPacket data;
+  characteristic.readValue(&data, sizeof(data));
+  sensortec.configureSensor(&data);
 }
 
 void BLEHandler::begin()
@@ -82,9 +82,9 @@ void BLEHandler::update()
 
     // Simulate a request for reading new sensor data
     // Better: bypass SensorChannel
-    uint8_t availableData = sensorChannel.processPacket(SENSOR_REQUEST_PACKET, NULL);
+    uint8_t availableData = sensortec.availableSensorData();
     while (availableData) {
-      SensorDataPacket* data = sensorChannel.readSensorData();
+      SensorDataPacket* data = sensortec.readSensorData();
       sensorDataCharacteristic.writeValue(data, sizeof(SensorDataPacket));
       --availableData;
     }

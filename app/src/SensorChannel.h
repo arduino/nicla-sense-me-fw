@@ -1,3 +1,4 @@
+#if 0
 #ifndef SENSOR_CHANNEL_H_
 #define SENSOR_CHANNEL_H_
 
@@ -27,5 +28,7 @@ class SensorChannel {
 };
 
 extern SensorChannel sensorChannel;
+
+#endif
 
 #endif
