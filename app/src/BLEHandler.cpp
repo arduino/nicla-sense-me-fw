@@ -76,6 +76,20 @@ void BLEHandler::begin()
 void BLEHandler::update()
 {
   BLE.poll();
+
+  // This check doesn't work with more than one client at the same time
+  if (sensorDataCharacteristic.subscribed()) {
+
+    // Simulate a request for reading new sensor data
+    // Better: bypass SensorChannel
+    uint8_t availableData = sensorChannel.processPacket(SENSOR_REQUEST_PACKET, NULL);
+    while (availableData) {
+      SensorDataPacket* data = sensorChannel.readSensorData();
+      sensorDataCharacteristic.writeValue(data, sizeof(SensorDataPacket));
+      --availableData;
+    }
+
+  }
 }
 
 BLEHandler bleHandler;
