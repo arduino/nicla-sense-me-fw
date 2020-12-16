@@ -2,9 +2,8 @@
 
 BoschSensortec::BoschSensortec() : 
   _hasNewData(false), 
-  _sensorQueueFirst(0),
-  _sensorQueueLast(0),
-  _savedConfig(NULL)
+  _savedConfig(NULL),
+  _sensorQueue()
 {
 }
 
@@ -31,37 +30,29 @@ void BoschSensortec::configureSensor(SensorConfigurationPacket *config)
 
 uint8_t BoschSensortec::availableSensorData()
 {
-  return _sensorQueueLast - _sensorQueueFirst;
+  return _sensorQueue.size();
 }
 
-SensorDataPacket* BoschSensortec::readSensorData()
+bool BoschSensortec::readSensorData(SensorDataPacket &data)
 {
-  if (_sensorQueueLast == _sensorQueueFirst) {
-    //error: queue is empty
-  }
-  SensorDataPacket* sensorData = &_sensorQueue[_sensorQueueFirst++];
-  if (_sensorQueueFirst == _sensorQueueLast) {
-    _sensorQueueFirst = 0;
-    _sensorQueueLast = 0;
-  }
-  return sensorData;
+  return _sensorQueue.pop(data);
 }
 
 // Retrieve data and store it in the Sensortec's queue
 void BoschSensortec::parseBhyData(const struct bhy2_fifo_parse_data_info *fifoData, void *arg)
 {
-  sensortec.addSensorData(fifoData);
+  SensorDataPacket sensorData;
+  sensorData.sensorId = fifoData->sensor_id;
+  memcpy(&sensorData.data, fifoData->data_ptr, sizeof(fifoData->data_size));
+  sensorData.size = fifoData->data_size;
+
+  sensortec.addSensorData(sensorData);
 }
 
-void BoschSensortec::addSensorData(const struct bhy2_fifo_parse_data_info *fifoData)
+void BoschSensortec::addSensorData(const SensorDataPacket &sensorData)
 {
-  if (_sensorQueueLast < SENSOR_QUEUE_SIZE) {
-    SensorDataPacket sensorData = _sensorQueue[_sensorQueueLast++];
-
-    sensorData.sensorId = fifoData->sensor_id;
-    memcpy(&sensorData.data, fifoData->data_ptr, sizeof(fifoData->data_size));
-    sensorData.size = fifoData->data_size;
-
+  if (!_sensorQueue.full()) {
+    _sensorQueue.push(sensorData);
   } else {
     // handle the queue by storing it in flash if full
   }

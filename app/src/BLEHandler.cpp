@@ -84,8 +84,9 @@ void BLEHandler::update()
     // Better: bypass SensorChannel
     uint8_t availableData = sensortec.availableSensorData();
     while (availableData) {
-      SensorDataPacket* data = sensortec.readSensorData();
-      sensorDataCharacteristic.writeValue(data, sizeof(SensorDataPacket));
+      SensorDataPacket data;
+      sensortec.readSensorData(data);
+      sensorDataCharacteristic.writeValue(&data, sizeof(SensorDataPacket));
       --availableData;
     }
 

@@ -1,6 +1,8 @@
 #ifndef BOSCH_SENSORTEC_H_
 #define BOSCH_SENSORTEC_H_
 
+#include "mbed.h"
+
 #include "channel.h"
 #include "SensorTypes.h"
 
@@ -28,19 +30,17 @@ class BoschSensortec {
     void configureSensor(SensorConfigurationPacket *config);
 
     uint8_t availableSensorData();
-    SensorDataPacket* readSensorData();
+    bool readSensorData(SensorDataPacket &data);
 
     // ANNA <-> BOSCH interface
     static void interruptHandler();
     static void parseBhyData(const struct bhy2_fifo_parse_data_info *data, void *arg);
-    void addSensorData(const struct bhy2_fifo_parse_data_info *fifoData);
+    void addSensorData(const SensorDataPacket &sensorData);
 
   private:
     bool _hasNewData;
 
-    SensorDataPacket _sensorQueue[SENSOR_QUEUE_SIZE];
-    uint8_t _sensorQueueFirst;
-    uint8_t _sensorQueueLast;
+    mbed::CircularBuffer<SensorDataPacket, SENSOR_QUEUE_SIZE, uint8_t> _sensorQueue;
 
     uint8_t _workBuffer[WORK_BUFFER_SIZE];
 
