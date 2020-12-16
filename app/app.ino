@@ -3,8 +3,6 @@
 #include "src/EslovHandler.h"
 #include "src/BLEHandler.h"
 
-BoschSensortec sensortec;
-
 // Initialize bosch sensortec
 // Initialize and link channels 
 void setup()
@@ -15,11 +13,12 @@ void setup()
   Serial.begin(9600);           
   while(!Serial);
 
-  eslovHandler.setup();
-  bleHandler.setup();
+  eslovHandler.begin();
+  bleHandler.begin();
 }
 
 void loop()
 {
-  bleHandler.poll();
+  bleHandler.update();
+  sensortec.update();
 }

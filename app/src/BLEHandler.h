@@ -9,10 +9,10 @@
 class BLEHandler {
   public:
     BLEHandler();
-    ~BLEHandler();
+    virtual ~BLEHandler();
 
-    void setup();
-    void poll();
+    void begin();
+    void update();
 
   private:
     void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic);

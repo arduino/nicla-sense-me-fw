@@ -19,10 +19,10 @@ enum EslovOpcode {
 class EslovHandler {
   public:
     EslovHandler();
-    ~EslovHandler();
+    virtual ~EslovHandler();
 
     static void wireCallback(int howMany);
-    void setup();
+    void begin();
 
   private:
     void receiveEvent(int howMany);

@@ -1,6 +1,6 @@
 #include "BLEHandler.h"
 
-#include "SensorChannel.h"
+#include "BoschSensortec/BoschSensortec.h"
 
 // DFU channels
 BLEService dfuService("34c2e3b8-34aa-11eb-adc1-0242ac120002"); 
@@ -29,7 +29,7 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
 {
   uint8_t data[sizeof(DFUPacket)];
   characteristic.readValue(data, sizeof(data));
-  DFUChannel.processPacket(dfuType, data);
+  dfuChannel.processPacket(dfuType, data);
 }
 
 void BLEHandler::receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic)
@@ -45,12 +45,12 @@ void BLEHandler::receivedExternalDFU(BLEDevice central, BLECharacteristic charac
 // Sensor channel
 void BLEHandler::receivedSensorConfig(BLEDevice central, BLECharacteristic characteristic)
 {
-  uint8_t data[sizeof(SensorConfigurationPacket)];
-  characteristic.readValue(data, sizeof(data));
-  SensorChannel.processPacket(SENSOR_CONFIG_PACKET, data);
+  SensorConfigurationPacket data;
+  characteristic.readValue(&data, sizeof(data));
+  sensortec.configureSensor(&data);
 }
 
-void BLEHandler::setup()
+void BLEHandler::begin()
 {
   BLE.begin();
   BLE.setLocalName("UNISENSE");
@@ -73,9 +73,24 @@ void BLEHandler::setup()
   BLE.advertise();
 }
 
-void BLEHandler::poll()
+void BLEHandler::update()
 {
   BLE.poll();
+
+  // This check doesn't work with more than one client at the same time
+  if (sensorDataCharacteristic.subscribed()) {
+
+    // Simulate a request for reading new sensor data
+    // Better: bypass SensorChannel
+    uint8_t availableData = sensortec.availableSensorData();
+    while (availableData) {
+      SensorDataPacket data;
+      sensortec.readSensorData(data);
+      sensorDataCharacteristic.writeValue(&data, sizeof(SensorDataPacket));
+      --availableData;
+    }
+
+  }
 }
 
 BLEHandler bleHandler;

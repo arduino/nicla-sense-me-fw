@@ -1,25 +1,10 @@
+#if 0
 #ifndef SENSOR_CHANNEL_H_
 #define SENSOR_CHANNEL_H_
 
 #include "Arduino.h"
-
-// For future more generic use
-struct __attribute__((packed)) SensorDataHeader {
-  uint8_t sensorId;
-  uint8_t length;
-};
-
-struct __attribute__((packed)) SensorDataPacket {
-  uint8_t sensorId;
-  uint8_t length;
-  uint64_t data;
-};
-
-struct __attribute__((packed)) SensorConfigurationPacket {
-  uint8_t sensorId;
-  float sampleRate;
-  uint32_t latency;
-};
+#include "BoschSensortec/BoschSensortec.h"
+#include "BoschSensortec/SensorTypes.h"
 
 enum SensorPacketType {
   // Outcoming packets
@@ -29,19 +14,21 @@ enum SensorPacketType {
   SENSOR_REQUEST_PACKET
 };
 
-class SensorChannelClass {
+class SensorChannel {
   public: 
-    SensorChannelClass();
-    ~SensorChannelClass();
+    SensorChannel();
+    virtual ~SensorChannel();
 
-    void setup();
+    void begin();
     uint8_t processPacket(SensorPacketType type, const uint8_t* data);
 
-    uint8_t getNextDataPacket(uint8_t* data);
+    SensorDataPacket* readSensorData();
 
   private:
 };
 
-extern SensorChannelClass SensorChannel;
+extern SensorChannel sensorChannel;
+
+#endif
 
 #endif
