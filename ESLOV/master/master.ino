@@ -11,6 +11,27 @@ uint8_t count = 0;
 
 void loop()
 {
+  static auto time = millis();
+  if (millis() - time >= 2000) {
+    time = millis();
+
+    Wire.beginTransmission(4);
+    uint8_t resp = 1;
+    Wire.write(resp);
+    Wire.endTransmission();
+
+    delay(100);
+
+    Wire.requestFrom(4, 1);
+    while (Wire.available()){
+      char b = Wire.read();
+      Serial.println(b);
+    }
+
+  }
+
+
+#if 0
   Wire.beginTransmission(4); // transmit to device #4
   Wire.write(name[len++]);              // sends one byte  
   Wire.endTransmission();    // stop transmitting
@@ -21,7 +42,8 @@ void loop()
     if (count == 10) count = 0;
     delay(10000);
   }
+#endif
 
-  delay(200);
+  //delay(1000);
 }
 
