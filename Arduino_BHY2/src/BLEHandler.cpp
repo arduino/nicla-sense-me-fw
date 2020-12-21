@@ -29,7 +29,7 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
 {
   uint8_t data[sizeof(DFUPacket)];
   characteristic.readValue(data, sizeof(data));
-  dfuChannel.processPacket(dfuType, data);
+  dfuManager.processPacket(dfuType, data);
 }
 
 void BLEHandler::receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic)

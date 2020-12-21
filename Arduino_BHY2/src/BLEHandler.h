@@ -4,7 +4,7 @@
 #include "Arduino.h"
 #include "ArduinoBLE.h"
 
-#include "DFUChannel.h"
+#include "DFUManager.h"
 
 class BLEHandler {
 public:

@@ -1,6 +1,6 @@
 #include "EslovHandler.h"
 
-#include "DFUChannel.h"
+#include "DFUManager.h"
 #include "BoschSensortec.h"
 
 EslovHandler::EslovHandler() :
@@ -57,7 +57,7 @@ void EslovHandler::receiveEvent(int length)
     // Check if packet is complete depending on its opcode
     if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
-        dfuChannel.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
+        dfuManager.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
 
         dump();
         _rxIndex = 0;
@@ -65,7 +65,7 @@ void EslovHandler::receiveEvent(int length)
 
     } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
-        dfuChannel.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
+        dfuManager.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
 
         dump();
         _rxIndex = 0;

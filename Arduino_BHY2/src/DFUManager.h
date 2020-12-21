@@ -1,5 +1,5 @@
-#ifndef DFU_CHANNEL_H_
-#define DFU_CHANNEL_H_
+#ifndef DFU_MANAGER_H_
+#define DFU_MANAGER_H_
 
 #include "Arduino.h"
 #include "FlashIAPBlockDevice.h"
@@ -19,10 +19,10 @@ struct __attribute__((packed)) DFUPacket {
   uint8_t data[64];
 };
 
-class DFUChannel {
+class DFUManager {
 public: 
-  DFUChannel();
-  virtual ~DFUChannel();
+  DFUManager();
+  virtual ~DFUManager();
 
   void begin();
   void processPacket(DFUType dfuType, const uint8_t* data);
@@ -33,6 +33,6 @@ private:
   FILE* _target;
 };
 
-extern DFUChannel dfuChannel;
+extern DFUManager dfuManager;
 
 #endif
