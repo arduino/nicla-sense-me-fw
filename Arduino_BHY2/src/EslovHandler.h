@@ -33,12 +33,16 @@ private:
   void receiveEvent(int length);
   void requestEvent();
 
-  void dump();
-
   int _rxIndex;
   uint8_t _rxBuffer[ESLOV_MAX_LENGTH];
 
   EslovState _state;
+
+private:
+  friend class Arduino_BHY2;
+  void debug(Stream &stream);
+  void dump();
+  Stream *_debug;
 };
 
 extern EslovHandler eslovHandler;

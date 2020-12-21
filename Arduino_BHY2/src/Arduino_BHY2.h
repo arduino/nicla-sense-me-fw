@@ -1,6 +1,7 @@
 #ifndef ARDUINO_BHY2_H_
 #define ARDUINO_BHY2_H_
 
+#include "Arduino.h"
 #include "SensorTypes.h"
 
 class Arduino_BHY2 {
@@ -17,6 +18,8 @@ public:
   void addSensorData(const SensorDataPacket &sensorData);
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);
+
+  void debug(Stream &stream);
 };
 
 extern Arduino_BHY2 BHY2;

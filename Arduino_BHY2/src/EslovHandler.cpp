@@ -90,25 +90,36 @@ void EslovHandler::receiveEvent(int length)
 
     } else {
       // Not valid opcode. Discarding packet
-      Serial.println("discard");
+      if (_debug) {
+        _debug->println("discard");
+      }
       _rxIndex = 0;
     }
 
     if (_rxIndex == ESLOV_MAX_LENGTH) {
-      Serial.println("discard");
+      if (_debug) {
+        _debug->println("discard");
+      }
       // Packet too long. Discarding it
       _rxIndex = 0;
     }
   }
 }
 
+void EslovHandler::debug(Stream &stream)
+{
+  _debug = &stream;
+}
+
 void EslovHandler::dump() 
 {
-  Serial.print("received: ");
-  for (int i = 0; i < _rxIndex; i++) {
-    Serial.print(_rxBuffer[i]);
+  if (_debug) {
+    _debug->print("received: ");
+    for (int i = 0; i < _rxIndex; i++) {
+      _debug->print(_rxBuffer[i], HEX);
+    }
+    _debug->println();
   }
-  Serial.println();
 }
 
 EslovHandler eslovHandler;

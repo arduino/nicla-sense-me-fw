@@ -24,6 +24,7 @@ void setup()
   Serial.begin(115200);           
 
   BHY2.begin();
+  BHY2.debug(Serial);
 }
 
 void loop()

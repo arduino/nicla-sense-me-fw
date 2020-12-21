@@ -45,4 +45,9 @@ bool Arduino_BHY2::readSensorData(SensorDataPacket &data)
   return sensortec.readSensorData(data);
 }
 
+void Arduino_BHY2::debug(Stream &stream)
+{
+  eslovHandler.debug(stream);
+}
+
 Arduino_BHY2 BHY2;
