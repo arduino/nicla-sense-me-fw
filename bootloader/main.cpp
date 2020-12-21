@@ -273,7 +273,6 @@ int main()
 
     if(!boot_rst_n) {
 
-        printf("!boot_rst_n condition met \r\n");
         if(try_fail_safe(3000)) {
             check_signature(true);
         }
