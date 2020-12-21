@@ -48,6 +48,7 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
   if (digitalRead(P0_20)==LOW) {
+    delay(5000);
     fclose(file);
     system_reset();
   }
