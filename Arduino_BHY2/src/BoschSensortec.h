@@ -3,7 +3,7 @@
 
 #include "mbed.h"
 
-#include "channel.h"
+#include "SPIChannel.h"
 #include "SensorTypes.h"
 
 #ifdef __cplusplus
