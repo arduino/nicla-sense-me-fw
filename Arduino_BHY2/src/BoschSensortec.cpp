@@ -2,8 +2,7 @@
 
 BoschSensortec::BoschSensortec() : 
   _hasNewData(false), 
-  _savedConfig(NULL),
-  _sensorQueue()
+  _savedConfig(NULL)
 {
 }
 
