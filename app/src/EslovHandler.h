@@ -10,25 +10,35 @@
 enum EslovOpcode {
   ESLOV_DFU_INTERNAL_OPCODE,
   ESLOV_DFU_EXTERNAL_OPCODE,
-  ESLOV_SENSOR_DATA_OPCODE,
   ESLOV_SENSOR_CONFIG_OPCODE,
-  ESLOV_SENSOR_REQUEST_OPCODE
+  ESLOV_SENSOR_STATE_OPCODE
 };
 
+enum EslovState {
+  ESLOV_AVAILABLE_SENSOR_STATE = 0x00,
+  ESLOV_READ_SENSOR_STATE = 0x01
+};
 
 class EslovHandler {
   public:
     EslovHandler();
     virtual ~EslovHandler();
 
-    static void wireCallback(int howMany);
     void begin();
 
-  private:
-    void receiveEvent(int howMany);
+    static void onReceive(int length);
+    static void onRequest();
 
-    int _rxIndex = 0;
-    uint8_t _rxBuffer[ESLOV_MAX_LENGTH] = {0};
+  private:
+    void receiveEvent(int length);
+    void requestEvent();
+
+    void dump();
+
+    int _rxIndex;
+    uint8_t _rxBuffer[ESLOV_MAX_LENGTH];
+
+    EslovState _state;
 };
 
 extern EslovHandler eslovHandler;

@@ -1,5 +1,6 @@
 #include "Arduino.h"
-#include <Wire.h>
+#include "Wire.h"
+#if 0
 #include "FlashIAPBlockDevice.h"
 #include "FATFileSystem.h"
 
@@ -104,4 +105,41 @@ void receiveEvent(int howMany)
       memcpy(nameUpdated, rxBuffer, sizeof(rxBuffer));
     }
   }
+}
+#endif
+
+void receiveEvent(int howMany)
+{
+  Serial.print("Received: ");
+  while(Wire.available()) 
+  {
+    Serial.print(Wire.read());
+  }
+  Serial.println();
+}
+
+uint8_t c = 99;
+void requestEvent()
+{
+  c = c + 1;
+  if (c == 'z') c = 'a';
+  Serial.print("Requested: ");
+  Serial.println(c);
+  Wire.write(&c, 1);
+}
+
+void setup()
+{
+  Serial.begin(9600);           // start serial for output
+  while(!Serial);
+  Serial.println("halo");
+
+  Wire.begin(4);                // join i2c bus with address #4
+  Wire.onReceive(receiveEvent); // register event
+  Wire.onRequest(requestEvent); // register event
+}
+
+void loop()
+{
+  delay(100);
 }
