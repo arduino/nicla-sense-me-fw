@@ -10,6 +10,11 @@ enum DFUType {
   DFU_EXTERNAL 
 };
 
+enum DFUAckCode {
+  DFUAck = 0x0F,
+  DFUNack = 0x00
+};
+
 struct __attribute__((packed)) DFUPacket {
   uint8_t last: 1;
   union {
@@ -27,10 +32,14 @@ public:
   void begin();
   void processPacket(DFUType dfuType, const uint8_t* data);
 
+  uint8_t acknowledgment();
+
 private:
   static FlashIAPBlockDevice _bd;
   static mbed::LittleFileSystem _fs;
   FILE* _target;
+
+  uint8_t _acknowledgment;
 };
 
 extern DFUManager dfuManager;

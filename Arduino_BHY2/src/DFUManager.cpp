@@ -24,6 +24,7 @@ void DFUManager::begin()
 void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
 {
   DFUPacket* packet = (DFUPacket*)data;
+
   if (packet->index == 0) {
     if (dfuType == DFU_INTERNAL) {
       _target = fopen("/fs/UPDATE.BIN", "wb");
@@ -31,9 +32,13 @@ void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
       _target = fopen("/fs/BH104.BIN", "wb");
     }
   }
+
   if (_target != NULL) {
-    fwrite(packet->data, packet->last ? packet->remaining : sizeof(packet->data), 1, _target);
+    int ret = fwrite(packet->data, packet->last ? packet->remaining : sizeof(packet->data), 1, _target);
+    if (ret < 0) _acknowledgment = DFUNack;
+    else _acknowledgment = DFUAck;
   }
+
   if (packet->last) {
     fclose(_target);
     _target = NULL;
@@ -43,6 +48,11 @@ void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
       //apply bosch update
     }
   }
+}
+
+uint8_t DFUManager::acknowledgment()
+{
+  return _acknowledgment;
 }
 
 DFUManager dfuManager;

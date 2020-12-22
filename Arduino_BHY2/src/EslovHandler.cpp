@@ -44,6 +44,11 @@ void EslovHandler::requestEvent()
     SensorDataPacket data;
     sensortec.readSensorData(data);
     Wire.write((uint8_t*)&data, sizeof(SensorDataPacket));
+
+  } else if (_state == ESLOV_DFU_ACK_STATE) {
+    uint8_t ack = dfuManager.acknowledgment();
+    Wire.write(ack);
+    
   }
 }
 
