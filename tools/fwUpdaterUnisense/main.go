@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
 	"log"
 	"os"
@@ -15,16 +16,12 @@ import (
 - 2 bytes: LENGTH/REMAINING
 - 64 bytes: DATA
 */
-type packet_s struct {
-	opcode   byte
-	lastPack byte
-	index    uint16
-	data     []byte
-}
 
 var crc8bit byte
 var Ack = (byte)(0x0F)
 var Nack = (byte)(0x00)
+var packSize = 64
+var FullPackSize = packSize + 4
 
 func check(e error) {
 	if e != nil {
@@ -39,7 +36,7 @@ func CRC8(buf []byte) {
 
 	crc8bit = b1 ^ b2
 
-	for i := 2; i < 64; i++ {
+	for i := 2; i < packSize; i++ {
 		b1 = buf[i]
 		crc8bit = crc8bit ^ b1
 	}
@@ -51,7 +48,14 @@ func main() {
 	USBport := os.Args[2]
 	baud_rate, _ := strconv.Atoi(os.Args[3])
 	oc, _ := strconv.Atoi(os.Args[4])
-	opcode := byte(oc)
+
+	oc16 := (uint16)(oc)
+	opcode := make([]byte, 2)
+
+	binary.BigEndian.PutUint16(opcode, oc16)
+
+	last := make([]byte, 1)
+	idx := make([]byte, 2)
 
 	mode := &serial.Mode{
 		BaudRate: baud_rate,
@@ -65,9 +69,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//Opcode will be unique for all the packets
-	packet := packet_s{opcode: opcode}
-
 	//Open the firmware binary file and get the length
 	f, err := os.Open(bin_path)
 	check(err)
@@ -76,43 +77,56 @@ func main() {
 	fw_size := fi.Size()
 	fmt.Printf("The firware is %d bytes long\n", fw_size)
 
-	buf := make([]byte, 64)
+	buf := make([]byte, packSize)
 
-	nChunks := int(fw_size / 64)
-	spareBytes := uint16(fw_size % 64)
+	nChunks := int(fw_size / ((int64)(packSize)))
+	fmt.Printf("nChunks: %d\n", nChunks)
+	spareBytes := uint16(fw_size % ((int64)(packSize)))
+	fmt.Printf("spareBytes: %d\n", spareBytes)
 
 	for n := 0; n <= nChunks; n++ {
 
 		if n < nChunks || spareBytes > 0 {
-			//Read 64 bytes from the binary file
+			//Read packSize bytes from the binary file
 			_, err := f.Read(buf)
 			check(err)
 
-			//update the CRC at each chunk of 64 bytes read
+			//update the CRC at each chunk of packSize bytes read
 			CRC8(buf)
 		}
 
 		if n == nChunks { //Last packet
-			packet.lastPack = 1
+			last[0] = 1
 			//Add 8-bit CRC to len
-			packet.index = spareBytes + 1
+			binary.BigEndian.PutUint16(idx, (spareBytes + 1))
 			//Add CRC to data
 			buf[spareBytes] = crc8bit
 		} else {
-			packet.lastPack = 0
-			packet.index = (uint16)(n)
+			last[0] = 0
+			index := (uint16)(n)
+			binary.BigEndian.PutUint16(idx, index)
 		}
 
-		packet.data = buf[:64]
+		fmt.Printf("opcode: %d\n", opcode[1:])
+		fmt.Printf("lastPack: %d\n", last)
+		fmt.Printf("index: %d\n", idx[:2])
+		for j := 0; j < packSize; j++ {
+			fmt.Printf("%x, ", buf[j])
+		}
+
+		header := make([]byte, 3)
+		header = append(last, idx[:2]...)
+		opcodeHeader := make([]byte, 4)
+		opcodeHeader = append(opcode[1:], header...)
+		packet := make([]byte, FullPackSize)
+		packet = append(opcodeHeader, buf...)
 
 		ackReceived := false
 
 		for ackReceived == false {
-			//Send packet
-			_, err = port.Write(packet.data)
-			if err != nil {
-				log.Fatal(err)
-			}
+			_, err = port.Write(packet)
+			check(err)
+			fmt.Printf("Packet sent to MKR\n")
 
 			ackBuf := make([]byte, 1)
 
@@ -121,10 +135,6 @@ func main() {
 				bytesAck, err := port.Read(ackBuf)
 				if err != nil {
 					log.Fatal(err)
-				}
-
-				if bytesAck == 0 {
-					continue
 				}
 
 				if bytesAck == 1 {
@@ -138,9 +148,6 @@ func main() {
 					}
 					fmt.Printf("ERROR! Unknows ACK format: %x\n", ackBuf[0])
 					break
-				} else {
-					fmt.Printf("ERROR! Received %d bytes from Unisense. Only 1 was expected\n", bytesAck)
-					break
 				}
 			}
 
@@ -148,7 +155,7 @@ func main() {
 
 		if n != nChunks {
 			//Adjust pointer to fw binary file
-			p := (int64)((n+1)*64 + 1)
+			p := (int64)((n+1)*packSize + 1)
 			_, err = f.Seek(p, 0)
 			check(err)
 		}
