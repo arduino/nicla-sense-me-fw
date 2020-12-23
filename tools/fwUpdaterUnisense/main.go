@@ -23,8 +23,8 @@ type packet_s struct {
 }
 
 var crc8bit byte
-var Ack byte
-var Nack byte
+var Ack = (byte)(0x0F)
+var Nack = (byte)(0x00)
 
 func check(e error) {
 	if e != nil {
@@ -80,10 +80,6 @@ func main() {
 
 	nChunks := int(fw_size / 64)
 	spareBytes := uint16(fw_size % 64)
-
-	//Unisense Ack/Nack reponses
-	Ack = 0xFF
-	Nack = 0x00
 
 	for n := 0; n <= nChunks; n++ {
 
