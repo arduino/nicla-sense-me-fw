@@ -123,6 +123,7 @@ void EslovHandler::dump()
     _debug->println(_rxIndex);
     for (int i = 0; i < _rxIndex; i++) {
       _debug->print(_rxBuffer[i], HEX);
+      _debug->print(", ");
     }
     _debug->println();
   }

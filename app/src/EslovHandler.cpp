@@ -106,7 +106,8 @@ void EslovHandler::dump()
 {
   Serial.print("received: ");
   for (int i = 0; i < _rxIndex; i++) {
-    Serial.print(_rxBuffer[i]);
+    Serial.print(_rxBuffer[i], HEX);
+    Serial.print(", ");
   }
   Serial.println();
 }
