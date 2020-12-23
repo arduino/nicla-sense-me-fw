@@ -1,6 +1,8 @@
 #include "Arduino.h"
 #include "Wire.h"
 
+#define DEBUG false
+
 #define ESLOV_DEFAULT_ADDRESS 0x55
 
 enum EslovOpcode {
@@ -22,7 +24,6 @@ struct __attribute__((packed)) DFUPacket {
     uint16_t index: 15;
     uint16_t remaining: 15;
   };
-  //uint8_t data[64];
   uint8_t data[8];
 };
 
@@ -38,7 +39,6 @@ void writeStateChange(EslovState state)
 
 void writeDfuPacket(uint8_t *data, uint8_t length)
 {
-  delay(100);
   Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
   Wire.write(data, length);
   Wire.endTransmission();
@@ -55,52 +55,50 @@ uint8_t requestDfuPacketAck()
 }
 
 
-static uint8_t testFw[sizeof(DFUPacket)+1] = {
-  0x01, 0x00, 0x00, 0x00,
-  0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
-};
-
-//static uint8_t testFw[sizeof(DFUPacket)+1] = {
-  //0x01, 0x00, 0x00, 0x00,
-  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
-//};
-
-
 int _rxIndex;
 uint8_t _rxBuffer[255];
 
 void setup()
 {
-  Wire.begin();                
-  Serial.begin(115200);
-  while (!Serial);
+  Wire.begin();   
+  Serial.begin(115200);  
+  while (!Serial);           
+  Serial1.begin(115200);
+  while (!Serial1);
 }
 
 void loop()
 {
-  // Test
-  writeDfuPacket(testFw, sizeof(testFw));
-  uint8_t ack = requestDfuPacketAck();
-  Serial.println(ack);
+  while (Serial1.available()) {
+    _rxBuffer[_rxIndex++] = Serial1.read();
+  }
+  
+  if (_rxIndex == sizeof(DFUPacket) + 1) {
 
-  //while (Serial1.available()) {
-    //_rxBuffer[_rxIndex++] = Serial1.read(); 
+    if(DEBUG){
+      Serial.print("Received: ");
+      for(int n=0; n<_rxIndex; n++) {
+        Serial.print(_rxBuffer[n], HEX);
+        Serial.print(", ");
+      }
+      Serial.println();
+    }
 
-    //if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE)
-      //if (_rxIndex == sizeof(DFUPacket) + 1) {
-        //writeDfuPacket(_rxBuffer, sizeof(DFUPacket) + 1);
+    if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
+        writeDfuPacket(_rxBuffer, sizeof(DFUPacket) + 1);
 
-        //uint8_t ack = requestDfuPacketAck();
-        //Serial1.println(ack);
 
-        //_rxIndex = 0;
-      //}
-  //}
+        uint8_t ack = requestDfuPacketAck();
+        if(DEBUG){
+          Serial.print("Sent Ack: ");
+          Serial.print(ack, HEX);
+          Serial.println(" back to PC");
+        }
+        
+        Serial1.write(ack);
+
+        _rxIndex = 0;
+
+    }
+  }
 }
