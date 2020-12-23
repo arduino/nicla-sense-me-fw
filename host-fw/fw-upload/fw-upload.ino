@@ -22,7 +22,8 @@ struct __attribute__((packed)) DFUPacket {
     uint16_t index: 15;
     uint16_t remaining: 15;
   };
-  uint8_t data[64];
+  //uint8_t data[64];
+  uint8_t data[8];
 };
 
 void writeStateChange(EslovState state)
@@ -37,6 +38,7 @@ void writeStateChange(EslovState state)
 
 void writeDfuPacket(uint8_t *data, uint8_t length)
 {
+  delay(100);
   Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
   Wire.write(data, length);
   Wire.endTransmission();
@@ -46,9 +48,29 @@ void writeDfuPacket(uint8_t *data, uint8_t length)
 uint8_t requestDfuPacketAck()
 {
   writeStateChange(ESLOV_DFU_ACK_STATE);
-  uint8_t ack = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
-  return ack;
+  uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
+  if (!ret) return 0;
+  return Wire.read();
+  delay(100);
 }
+
+
+static uint8_t testFw[sizeof(DFUPacket)+1] = {
+  0x01, 0x00, 0x00, 0x00,
+  0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
+};
+
+//static uint8_t testFw[sizeof(DFUPacket)+1] = {
+  //0x01, 0x00, 0x00, 0x00,
+  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  //0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
+//};
 
 
 int _rxIndex;
@@ -57,23 +79,28 @@ uint8_t _rxBuffer[255];
 void setup()
 {
   Wire.begin();                
-  Serial1.begin(115200);
-  while (!Serial1);
+  Serial.begin(115200);
+  while (!Serial);
 }
 
 void loop()
 {
-  while (Serial1.available()) {
-    _rxBuffer[_rxIndex++] = Serial1.read(); 
+  // Test
+  writeDfuPacket(testFw, sizeof(testFw));
+  uint8_t ack = requestDfuPacketAck();
+  Serial.println(ack);
 
-    if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE)
-      if (_rxIndex == sizeof(DFUPacket) + 1) {
-        writeDfuPacket(_rxBuffer, sizeof(DFUPacket) + 1);
+  //while (Serial1.available()) {
+    //_rxBuffer[_rxIndex++] = Serial1.read(); 
 
-        uint8_t ack = requestDfuPacketAck();
-        Serial1.write(ack);
+    //if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE)
+      //if (_rxIndex == sizeof(DFUPacket) + 1) {
+        //writeDfuPacket(_rxBuffer, sizeof(DFUPacket) + 1);
 
-        _rxIndex = 0;
-      }
-  }
+        //uint8_t ack = requestDfuPacketAck();
+        //Serial1.println(ack);
+
+        //_rxIndex = 0;
+      //}
+  //}
 }

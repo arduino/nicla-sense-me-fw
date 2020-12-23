@@ -5,7 +5,8 @@ FlashIAPBlockDevice DFUManager::_bd(0x80000, 0x80000);
 mbed::LittleFileSystem DFUManager::_fs("fs");
 
 DFUManager::DFUManager() :
-  _target(NULL)
+  _target(NULL),
+  _acknowledgment(DFUNack)
 {
 }
 
@@ -24,19 +25,22 @@ void DFUManager::begin()
 void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
 {
   DFUPacket* packet = (DFUPacket*)data;
+  Serial.println("process packet");
+  _acknowledgment = DFUAck;
 
   if (packet->index == 0) {
-    if (dfuType == DFU_INTERNAL) {
-      _target = fopen("/fs/UPDATE.BIN", "wb");
-    } else {
-      _target = fopen("/fs/BH104.BIN", "wb");
-    }
+    Serial.println("first packet");
+    //if (dfuType == DFU_INTERNAL) {
+      //_target = fopen("/fs/UPDATE.BIN", "wb");
+    //} else {
+      //_target = fopen("/fs/BH104.BIN", "wb");
+    //}
   }
 
   if (_target != NULL) {
-    int ret = fwrite(packet->data, packet->last ? packet->remaining : sizeof(packet->data), 1, _target);
-    if (ret < 0) _acknowledgment = DFUNack;
-    else _acknowledgment = DFUAck;
+    //int ret = fwrite(packet->data, packet->last ? packet->remaining : sizeof(packet->data), 1, _target);
+    //if (ret < 0) _acknowledgment = DFUNack;
+    //else _acknowledgment = DFUAck;
   }
 
   if (packet->last) {

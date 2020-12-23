@@ -120,6 +120,7 @@ void EslovHandler::dump()
 {
   if (_debug) {
     _debug->print("received: ");
+    _debug->println(_rxIndex);
     for (int i = 0; i < _rxIndex; i++) {
       _debug->print(_rxBuffer[i], HEX);
     }
