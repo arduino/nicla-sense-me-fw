@@ -3,6 +3,7 @@
 
 #include "mbed.h"
 #include "SPIFBlockDevice.h"
+#include "IS31FL3194.h"
 #include "LittleFileSystem.h"
 
 #define MOUNT_PATH           "fs"
@@ -27,7 +28,7 @@ SPIFBlockDevice spif(MBED_CONF_APP_SPIF_MOSI, MBED_CONF_APP_SPIF_MISO,
 LittleFileSystem fs(MOUNT_PATH);
 FlashIAP flash;
 
-DigitalIn boot_rst_n(P0_20,PullUp);
+DigitalIn boot_rst_n(INT_BQ, PullUp);
 Timer timer_rst_n;
 
 int try_fail_safe(int timeout);
@@ -257,9 +258,12 @@ int try_update()
     }
 }
 
+IS31FL3194 leds;
 
 int main()
 {
+    printf("Bootloader starting\r\n");
+
     //Mount the file system
     int err = fs.mount(&spif);
     if (err) {
@@ -270,6 +274,13 @@ int main()
             return MOUNT_FAILED;
         }
     }
+
+    leds.reset();
+    printf("IS31FL3194 RGB led driver %02X\n", leds.getChipID());
+    leds.reset();
+    leds.init();
+    leds.powerUp();
+    leds.ledBlink(blue, 1000);
 
     if(!boot_rst_n) {
 
