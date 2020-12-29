@@ -119,8 +119,6 @@ uint8_t IS31FL3194::readByte(uint8_t address, uint8_t subAddress)
 {
   char response = 0xFF;
   int ret = i2c.write(address << 1, (const char*)&subAddress, 1);
-  printf("i2c write returned %d\n", ret);
   ret = i2c.read(address << 1, &response, 1);
-  printf("i2c read returned %d\n", ret);
   return response;
 }

@@ -28,7 +28,7 @@ SPIFBlockDevice spif(MBED_CONF_APP_SPIF_MOSI, MBED_CONF_APP_SPIF_MISO,
 LittleFileSystem fs(MOUNT_PATH);
 FlashIAP flash;
 
-DigitalIn boot_rst_n(INT_BQ, PullUp);
+DigitalIn* boot_rst_n;
 Timer timer_rst_n;
 
 int try_fail_safe(int timeout);
@@ -54,7 +54,7 @@ int check_signature(bool fail_safe)
         } else {
             printf("Press the button for at least 3 seconds to enter the Fail Safe mode \r\n");
             //wait for the button to be pressed
-            while(boot_rst_n) {}
+            while(*boot_rst_n) {}
             if(try_fail_safe(3000)) {
                 printf("Starting safe application\r\n");
                 mbed_start_application(POST_APPLICATION_ADDR);
@@ -74,7 +74,7 @@ int try_fail_safe(int timeout)
     int elapsed_time_ms = 0;
     timer_rst_n.start();
 
-    while((elapsed_time_ms < timeout) && (boot_rst_n == 0)) {
+    while((elapsed_time_ms < timeout) && (*boot_rst_n == 0)) {
         elapsed_time_ms = timer_rst_n.read_ms();
     }
 
@@ -172,7 +172,7 @@ int apply_update(FILE *file, uint32_t address, bool fail_safe)
             printf("Press the button for at least 3 seconds to enter the Fail Safe mode \r\n");
 
             //wait for the button to be pressed
-            while(boot_rst_n) {}
+            while(*boot_rst_n) {}
 
             return try_fail_safe(3000);
         } else {
@@ -262,6 +262,13 @@ IS31FL3194 leds;
 
 int main()
 {
+
+    CoreDebug->DEMCR = 0;
+    NRF_CLOCK->TRACECONFIG = 0;
+
+    boot_rst_n = new DigitalIn(BUTTON1, PullUp);
+
+    bool forced_reboot = !*boot_rst_n;
     printf("Bootloader starting\r\n");
 
     //Mount the file system
@@ -275,14 +282,19 @@ int main()
         }
     }
 
-    leds.reset();
     printf("IS31FL3194 RGB led driver %02X\n", leds.getChipID());
+
     leds.reset();
     leds.init();
     leds.powerUp();
-    leds.ledBlink(blue, 1000);
 
-    if(!boot_rst_n) {
+
+    while (1) {
+        leds.ledBlink(green, 1000);
+        ThisThread::sleep_for(1s);
+    }
+
+    if(forced_reboot) {
 
         if(try_fail_safe(3000)) {
             check_signature(true);
