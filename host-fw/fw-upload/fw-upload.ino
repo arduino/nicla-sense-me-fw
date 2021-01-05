@@ -5,7 +5,7 @@
 
 #define ESLOV_DEFAULT_ADDRESS 0x55
 
-#define ESLOV_DELAY (100)
+#define ESLOV_DELAY (1)
 #define ESLOV_DFU_CHUNK_SIZE (64)
 
 enum EslovOpcode {
@@ -54,7 +54,6 @@ uint8_t requestDfuPacketAck()
   uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
   if (!ret) return 0;
   return Wire.read();
-  delay(ESLOV_DELAY);
 }
 
 #if defined (ESLOV_DEBUG) && (ESLOV_DFU_CHUNK_SIZE == 64)
@@ -118,7 +117,6 @@ void loop()
 
     if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
         writeDfuPacket(_rxBuffer, sizeof(DFUPacket) + 1);
-
 
         uint8_t ack = requestDfuPacketAck();
         if(DEBUG){
