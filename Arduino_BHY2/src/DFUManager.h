@@ -21,8 +21,7 @@ struct __attribute__((packed)) DFUPacket {
     uint16_t index: 15;
     uint16_t remaining: 15;
   };
-  //uint8_t data[64];
-  uint8_t data[8];
+  uint8_t data[64];
 };
 
 class DFUManager {

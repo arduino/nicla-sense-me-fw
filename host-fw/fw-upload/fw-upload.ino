@@ -6,7 +6,7 @@
 #define ESLOV_DEFAULT_ADDRESS 0x55
 
 #define ESLOV_DELAY (100)
-#define ESLOV_DFU_CHUNK_SIZE (8)
+#define ESLOV_DFU_CHUNK_SIZE (64)
 
 enum EslovOpcode {
   ESLOV_DFU_INTERNAL_OPCODE,
