@@ -20,7 +20,7 @@ import (
 var crc8bit byte
 var Ack = (byte)(0x0F)
 var Nack = (byte)(0x00)
-var packSize = 8
+var packSize = 64
 var FullPackSize = packSize + 4
 
 func check(e error) {
