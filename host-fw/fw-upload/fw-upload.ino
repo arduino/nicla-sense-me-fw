@@ -5,7 +5,7 @@
 
 #define ESLOV_DEFAULT_ADDRESS 0x55
 
-#define ESLOV_DELAY (1)
+#define ESLOV_DELAY (10)
 #define ESLOV_DFU_CHUNK_SIZE (64)
 
 enum EslovOpcode {
@@ -53,6 +53,13 @@ uint8_t requestDfuPacketAck()
   writeStateChange(ESLOV_DFU_ACK_STATE);
   uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
   if (!ret) return 0;
+  return Wire.read();
+
+  //uint8_t ret = 0;
+  //while (!ret) {
+    //ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
+    //Serial.println(ret);
+  //}
   return Wire.read();
 }
 
