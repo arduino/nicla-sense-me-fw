@@ -25,22 +25,23 @@ void DFUManager::begin()
 void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
 {
   DFUPacket* packet = (DFUPacket*)data;
-  Serial.println("process packet");
-  _acknowledgment = DFUAck;
+  //Serial.print("packet: ");
+  //Serial.println(packet->index);
 
   if (packet->index == 0) {
-    Serial.println("first packet");
-    //if (dfuType == DFU_INTERNAL) {
-      //_target = fopen("/fs/UPDATE.BIN", "wb");
-    //} else {
-      //_target = fopen("/fs/BH104.BIN", "wb");
-    //}
+    if (dfuType == DFU_INTERNAL) {
+      _target = fopen("/fs/UPDATE.BIN", "wb");
+    } else {
+      _target = fopen("/fs/BH104.BIN", "wb");
+    }
   }
 
   if (_target != NULL) {
-    //int ret = fwrite(packet->data, packet->last ? packet->remaining : sizeof(packet->data), 1, _target);
-    //if (ret < 0) _acknowledgment = DFUNack;
-    //else _acknowledgment = DFUAck;
+    int ret = fwrite(&packet->data, packet->last ? packet->remaining : sizeof(packet->data), 1, _target);
+    //Serial.println(ret);
+    // Set the acknowledgment flag according to the write return value
+    if (ret > 0) _acknowledgment = DFUAck;
+    else _acknowledgment = DFUNack;
   }
 
   if (packet->last) {
@@ -48,15 +49,21 @@ void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
     _target = NULL;
     if (dfuType == DFU_INTERNAL) {
       // reboot
+      //Serial.println("done");
     } else {
       //apply bosch update
+      //Serial.println("done");
     }
   }
 }
 
+// acknowledgment flag is reset when read
 uint8_t DFUManager::acknowledgment()
 {
-  return _acknowledgment;
+  uint8_t ack = _acknowledgment;
+  // Reset acknowledgment
+  _acknowledgment = DFUNack;
+  return ack;
 }
 
 DFUManager dfuManager;
