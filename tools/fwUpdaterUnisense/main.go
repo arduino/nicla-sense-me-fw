@@ -52,7 +52,7 @@ func main() {
 	oc16 := (uint16)(oc)
 	opcode := make([]byte, 2)
 
-	binary.BigEndian.PutUint16(opcode, oc16)
+	binary.LittleEndian.PutUint16(opcode, oc16)
 
 	last := make([]byte, 1)
 	idx := make([]byte, 2)
@@ -98,13 +98,13 @@ func main() {
 		if n == nChunks { //Last packet
 			last[0] = 1
 			//Add 8-bit CRC to len
-			binary.BigEndian.PutUint16(idx, (spareBytes + 1))
+			binary.LittleEndian.PutUint16(idx, (spareBytes + 1))
 			//Add CRC to data
 			buf[spareBytes] = crc8bit
 		} else {
 			last[0] = 0
 			index := (uint16)(n)
-			binary.BigEndian.PutUint16(idx, index)
+			binary.LittleEndian.PutUint16(idx, index)
 		}
 
 		fmt.Printf("opcode: %d\n", opcode[1:])
