@@ -29,6 +29,7 @@ LittleFileSystem fs(MOUNT_PATH);
 FlashIAP flash;
 
 DigitalIn* boot_rst_n;
+DigitalOut* hostboot;
 Timer timer_rst_n;
 
 int try_fail_safe(int timeout);
@@ -308,15 +309,29 @@ int fwupdate_bhi260(void)
 
     uint8_t hintr_ctrl, hif_ctrl, boot_status;
 
+    hostboot = new DigitalOut(BHI_HOSTBOOT);
+    *hostboot = 0;
+    ThisThread::sleep_for(5ms);
+
+    DigitalOut* reset = new DigitalOut(RESET_BHI260);
+    *reset = 0;
+    ThisThread::sleep_for(5ms);
+    *reset = 1;
+
+    ThisThread::sleep_for(100ms);
+
     setup_interfaces(true, BHY2_SPI_INTERFACE); /* Perform a power on reset */
 
     rslt = bhy2_init(BHY2_SPI_INTERFACE, bhy2_spi_read, bhy2_spi_write, bhy2_delay_us, MAX_READ_WRITE_LEN, NULL, &bhy2);
     print_api_error(rslt, &bhy2);
 
-    rslt = bhy2_soft_reset(&bhy2);
+    rslt = bhy2_get_product_id(&product_id, &bhy2);
     print_api_error(rslt, &bhy2);
 
     rslt = bhy2_get_product_id(&product_id, &bhy2);
+    print_api_error(rslt, &bhy2);
+
+    rslt = bhy2_soft_reset(&bhy2);
     print_api_error(rslt, &bhy2);
 
     /* Check for a valid product ID */
@@ -348,7 +363,7 @@ int fwupdate_bhi260(void)
     {
         uint8_t sensor_error;
         int8_t temp_rslt;
-        printf("Loading firmware.\r\n");
+        printf("Loading firmware. Boot status: %02X\r\n", boot_status);
 
         /* If loading firmware to flash, erase the relevant section */
 #ifdef UPLOAD_FIRMWARE_TO_FLASH
@@ -403,7 +418,7 @@ int fwupdate_bhi260(void)
     }
     else
     {
-        printf("Host interface not ready. Exiting\r\n");
+        printf("Host interface not ready. Exiting. Boot status: %02X\r\n", boot_status);
 
         close_interfaces();
 
@@ -451,7 +466,7 @@ static int8_t upload_firmware(struct bhy2_dev *dev)
         rslt = bhy2_upload_firmware_to_ram_partly(&bhy2_firmware_image[i], len, i, incr, dev);
 #endif
 
-        printf("%.2f%% complete\r", (float)(i + incr) / (float)len * 100.0f);
+        printf("%d%% complete\r", (i + incr) * 100 / len);
     }
     printf("\n");
 
