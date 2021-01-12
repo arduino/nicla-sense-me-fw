@@ -35,6 +35,10 @@ void EslovHandler::onRequest()
 
 void EslovHandler::requestEvent()
 {
+  if (_debug) {
+    _debug->print("Wire Request event. State: ");
+    _debug->println(_state);
+  }
 
   if (_state == ESLOV_AVAILABLE_SENSOR_STATE) {
     uint8_t availableData = sensortec.availableSensorData();
@@ -47,6 +51,10 @@ void EslovHandler::requestEvent()
 
   } else if (_state == ESLOV_DFU_ACK_STATE) {
     uint8_t ack = dfuManager.acknowledgment();
+    if (_debug) {
+      _debug->print("Ack: ");
+      _debug->println(ack);
+    }
     Wire.write(ack);
     
   }
@@ -54,7 +62,11 @@ void EslovHandler::requestEvent()
 
 void EslovHandler::receiveEvent(int length)
 {
-  while(Wire.available()) 
+  if (_debug) {
+    _debug->println("Wire Receive event.");
+  }
+
+  while(Wire.available())
   {
     _rxBuffer[_rxIndex++] = Wire.read(); 
     //Serial.println(_rxBuffer[_rxIndex-1]);

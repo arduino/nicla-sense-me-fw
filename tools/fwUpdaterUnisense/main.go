@@ -140,10 +140,12 @@ func main() {
 				if bytesAck == 1 {
 					if ackBuf[0] == Ack { //Unisense correctly received the packet
 						ackReceived = true
+						fmt.Printf("ACK %x received!\n", ackBuf[0])
 						break
 					}
 					if ackBuf[0] == Nack { //Unisense did NOT correctly received the packet
 						//keep ackReceived = false and resend
+						fmt.Printf("NACK %x received!\n", ackBuf[0])
 						break
 					}
 					fmt.Printf("ERROR! Unknows ACK format: %x\n", ackBuf[0])
