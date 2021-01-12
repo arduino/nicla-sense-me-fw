@@ -36,9 +36,9 @@ void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
 
   if (packet->index == 0) {
     if (dfuType == DFU_INTERNAL) {
-      _target = fopen("/fs/UPDATE.BIN", "wb");
+      _target = fopen("/fs/ANNA_UPDATE.BIN", "wb");
     } else {
-      _target = fopen("/fs/BH104.BIN", "wb");
+      _target = fopen("/fs/UPDATE.BIN", "wb");
     }
   }
 
