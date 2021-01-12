@@ -3,6 +3,8 @@
 
 #include "Arduino.h"
 
+#define TARGET_ANNA
+
 #if defined (TARGET_ANNA)
 #include "SPIFBlockDevice.h"
 #else
