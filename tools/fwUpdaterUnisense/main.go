@@ -150,7 +150,7 @@ func main() {
 						fmt.Printf("NACK %x received!\n", ackBuf[0])
 						break
 					}
-					fmt.Printf("ERROR! Unknows ACK format: %x\n", ackBuf[0])
+					fmt.Printf("ERROR! Unknown ACK format: %x\n", ackBuf[0])
 					break
 				}
 			}
