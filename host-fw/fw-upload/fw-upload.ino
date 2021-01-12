@@ -33,8 +33,7 @@ void writeDfuPacket(uint8_t *data, uint8_t length)
     Serial1.write(ret);
     Serial1.println();
   }
-  Wire.endTransmission();
-  delay(ESLOV_DELAY);
+  Wire.endTransmission(false);
 }
 
 uint8_t requestDfuPacketAck()
