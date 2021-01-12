@@ -95,21 +95,23 @@ func main() {
 			CRC8(buf)
 		}
 
+		index := (uint16)(n)
+
 		if n == nChunks { //Last packet
 			last[0] = 1
 			//Add 8-bit CRC to len
 			binary.LittleEndian.PutUint16(idx, (spareBytes + 1))
+			index = spareBytes + 1
 			//Add CRC to data
 			buf[spareBytes] = crc8bit
 		} else {
 			last[0] = 0
-			index := (uint16)(n)
 			binary.LittleEndian.PutUint16(idx, index)
 		}
 
 		fmt.Printf("opcode: %d\n", opcode[1:])
 		fmt.Printf("lastPack: %d\n", last)
-		fmt.Printf("index: %d\n", idx[:2])
+		fmt.Printf("index: %d\n", index)
 		for j := 0; j < packSize; j++ {
 			fmt.Printf("%x, ", buf[j])
 		}
