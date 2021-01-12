@@ -23,8 +23,8 @@ void setup()
   // debug port
   Serial.begin(115200);           
 
-  BHY2.begin();
   BHY2.debug(Serial);
+  BHY2.begin();
 }
 
 void loop()
