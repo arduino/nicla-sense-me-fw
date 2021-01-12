@@ -46,11 +46,19 @@ void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
     int ret = fwrite(&packet->data, packet->last ? packet->remaining : sizeof(packet->data), 1, _target);
     //Serial.println(ret);
     // Set the acknowledgment flag according to the write return value
+    if(_debug) {
+      _debug->print("ret: ");
+      _debug->println(ret);
+    }
     if (ret > 0) _acknowledgment = DFUAck;
     else _acknowledgment = DFUNack;
   }
 
   if (packet->last) {
+    if(_debug) {
+      _debug->print("Last packet received. Remaining: ");
+      _debug->println(packet->remaining);
+    }
     fclose(_target);
     _target = NULL;
     if (dfuType == DFU_INTERNAL) {
@@ -70,6 +78,12 @@ uint8_t DFUManager::acknowledgment()
   // Reset acknowledgment
   _acknowledgment = DFUNack;
   return ack;
+}
+
+void DFUManager::debug(Stream &stream)
+{
+  _debug = &stream;
+
 }
 
 DFUManager dfuManager;
