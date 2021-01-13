@@ -37,7 +37,8 @@ void writeDfuPacket(uint8_t *data, uint8_t length)
 }
 
 uint8_t requestDfuPacketAck()
-{  
+{ 
+  delay(10);
   uint8_t ret = 0;
   while(!ret) {
     ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
