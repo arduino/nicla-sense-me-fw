@@ -159,7 +159,7 @@ func main() {
 
 		if n != nChunks {
 			//Adjust pointer to fw binary file
-			p := (int64)((n+1)*packSize + 1)
+			p := (int64)((n + 1) * packSize)
 			_, err = f.Seek(p, 0)
 			check(err)
 		}
