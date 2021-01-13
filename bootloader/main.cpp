@@ -503,12 +503,12 @@ int main()
     leds.powerUp();
 
     fwupdate_bhi260();
-
+    /*
     while (1) {
         leds.ledBlink(green, 1000);
         ThisThread::sleep_for(1s);
     }
-
+    */
     if(forced_reboot) {
 
         if(try_fail_safe(3000)) {
