@@ -68,34 +68,32 @@ void loop()
 {
   while (Serial.available()) {
     _rxBuffer[_rxIndex++] = Serial.read();
-  }
-  
-  if (_rxIndex == sizeof(DFUPacket) + 1) {
-
-#if (DEBUG)
-    Serial1.write("Received: ");
-    for(int n=0; n<_rxIndex; n++) {
-      Serial1.write(_rxBuffer[n]);
-      Serial1.write(", ");
-    }
-    Serial1.println();
-#endif
-
     if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
-        writeDfuPacket(_rxBuffer, sizeof(DFUPacket) + 1);
+      if (_rxIndex == sizeof(DFUPacket) + 1) {
 
+        writeDfuPacket(_rxBuffer, sizeof(DFUPacket) + 1);
         uint8_t ack = requestDfuPacketAck();
+
 #if (DEBUG)
-        Serial1.write("Sent Ack: ");
-        Serial1.write(ack);
-        Serial1.write(" back to PC");
-        Serial1.println();
+        { // dump rx buffer
+          Serial1.write("Received: ");
+          for(int n=0; n<_rxIndex; n++) {
+            Serial1.write(_rxBuffer[n]);
+            Serial1.write(", ");
+          }
+          Serial1.println();
+        }
+        { // print ack received
+          Serial1.write("Sent Ack: ");
+          Serial1.write(ack);
+          Serial1.write(" back to PC");
+          Serial1.println();
+        }
 #endif
         
         Serial.write(ack);
-
         _rxIndex = 0;
-
+      }
     }
   }
 }
