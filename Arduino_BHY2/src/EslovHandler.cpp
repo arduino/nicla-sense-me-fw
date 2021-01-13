@@ -56,8 +56,6 @@ void EslovHandler::requestEvent()
       _debug->println(ack);
     }
     Wire1.write(ack);
-
-    _state = ESLOV_AVAILABLE_SENSOR_STATE;
     
   }
 }
