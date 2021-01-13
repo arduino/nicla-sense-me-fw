@@ -17,9 +17,9 @@ EslovHandler::~EslovHandler()
 
 void EslovHandler::begin()
 {
-  Wire.begin(ESLOV_DEFAULT_ADDRESS);                
-  Wire.onReceive(EslovHandler::onReceive); 
-  Wire.onRequest(EslovHandler::onRequest); 
+  Wire1.begin(ESLOV_DEFAULT_ADDRESS);                
+  Wire1.onReceive(EslovHandler::onReceive); 
+  Wire1.onRequest(EslovHandler::onRequest); 
 }
 
 // Ugly and.. does it work?
@@ -42,12 +42,12 @@ void EslovHandler::requestEvent()
 
   if (_state == ESLOV_AVAILABLE_SENSOR_STATE) {
     uint8_t availableData = sensortec.availableSensorData();
-    Wire.write(availableData);
+    Wire1.write(availableData);
 
   } else if (_state == ESLOV_READ_SENSOR_STATE) {
     SensorDataPacket data;
     sensortec.readSensorData(data);
-    Wire.write((uint8_t*)&data, sizeof(SensorDataPacket));
+    Wire1.write((uint8_t*)&data, sizeof(SensorDataPacket));
 
   } else if (_state == ESLOV_DFU_ACK_STATE) {
     uint8_t ack = dfuManager.acknowledgment();
@@ -55,7 +55,7 @@ void EslovHandler::requestEvent()
       _debug->print("Ack: ");
       _debug->println(ack);
     }
-    Wire.write(ack);
+    Wire1.write(ack);
 
     _state = ESLOV_AVAILABLE_SENSOR_STATE;
     
@@ -68,9 +68,9 @@ void EslovHandler::receiveEvent(int length)
     _debug->println("Wire Receive event.");
   }
 
-  while(Wire.available())
+  while(Wire1.available())
   {
-    _rxBuffer[_rxIndex++] = Wire.read(); 
+    _rxBuffer[_rxIndex++] = Wire1.read(); 
     //Serial.println(_rxBuffer[_rxIndex-1]);
   }
 
