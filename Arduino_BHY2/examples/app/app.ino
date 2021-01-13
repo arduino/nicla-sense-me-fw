@@ -17,7 +17,7 @@ void injectSensorData()
 void setup()
 {
   // for test
-  randomSeed(analogRead(0));
+  //randomSeed(analogRead(0));
   ///////
 
   // debug port
