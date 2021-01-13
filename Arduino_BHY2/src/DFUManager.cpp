@@ -25,6 +25,10 @@ void DFUManager::begin()
   int err = _fs.mount(&_bd);
   if (err) {
     err = _fs.reformat(&_bd);
+    if(_debug) {
+      _debug->print("Error mounting file system: ");
+      _debug->println(err);
+    }
   }
 }
 
@@ -39,6 +43,12 @@ void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
       _target = fopen("/fs/ANNA_UPDATE.BIN", "wb");
     } else {
       _target = fopen("/fs/UPDATE.BIN", "wb");
+    }
+
+    if(_debug) {
+      bool target_found = (_target != NULL);
+      _debug->print("target_found = ");
+      _debug->println(target_found);
     }
   }
 
