@@ -72,63 +72,63 @@ void EslovHandler::receiveEvent(int length)
   {
     _rxBuffer[_rxIndex++] = Wire1.read(); 
     //Serial.println(_rxBuffer[_rxIndex-1]);
+
+    // Check if packet is complete depending on its opcode
+    if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
+      if (_rxIndex == sizeof(DFUPacket) + 1) {
+        dfuManager.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
+
+        _state = ESLOV_DFU_ACK_STATE;
+
+        dump();
+        _rxIndex = 0;
+      }
+
+    } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
+      if (_rxIndex == sizeof(DFUPacket) + 1) {
+        dfuManager.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
+
+        _state = ESLOV_DFU_ACK_STATE;
+
+        dump();
+        _rxIndex = 0;
+      }
+
+    } else if (_rxBuffer[0] == ESLOV_SENSOR_CONFIG_OPCODE) {
+      if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
+        SensorConfigurationPacket *config = (SensorConfigurationPacket*)&_rxBuffer[1];
+        sensortec.configureSensor(config);
+
+        dump();
+        _rxIndex = 0;
+      }
+
+    } else if (_rxBuffer[0] == ESLOV_SENSOR_STATE_OPCODE) {
+      if (_rxIndex == 2) {
+        _state = (EslovState)_rxBuffer[1];
+
+        dump();
+        _rxIndex = 0;
+      }
+
+    } else {
+      // Not valid opcode. Discarding packet
+      if (_debug) {
+        _debug->println("discard");
+      }
+
+      _rxIndex = 0;
+    }
+
+    if (_rxIndex == ESLOV_MAX_LENGTH) {
+      if (_debug) {
+        _debug->println("discard");
+      }
+      // Packet too long. Discarding it
+
+      _rxIndex = 0;
+    }
   }
-
-  if (_debug && _rxIndex > 0) {
-    _debug->print("Opcode = ");
-    _debug->println(_rxBuffer[0]);
-  }
-
-  // Check if packet is complete depending on its opcode
-  if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
-    if (_rxIndex == sizeof(DFUPacket) + 1) {
-      dfuManager.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
-
-      dump();
-
-      _state = ESLOV_DFU_ACK_STATE;
-    }
-
-  } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
-    if (_rxIndex == sizeof(DFUPacket) + 1) {
-      dfuManager.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
-
-      dump();
-
-      _state = ESLOV_DFU_ACK_STATE;
-    }
-
-  } else if (_rxBuffer[0] == ESLOV_SENSOR_CONFIG_OPCODE) {
-    if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
-      SensorConfigurationPacket *config = (SensorConfigurationPacket*)&_rxBuffer[1];
-      sensortec.configureSensor(config);
-
-      dump();
-    }
-
-  } else if (_rxBuffer[0] == ESLOV_SENSOR_STATE_OPCODE) {
-    if (_rxIndex == 2) {
-      _state = (EslovState)_rxBuffer[1];
-
-      dump();
-    }
-
-  } else {
-    // Not valid opcode. Discarding packet
-    if (_debug) {
-      _debug->println("discard");
-    }
-  }
-
-  if (_rxIndex == ESLOV_MAX_LENGTH) {
-    if (_debug) {
-      _debug->println("discard");
-    }
-    // Packet too long. Discarding it
-  }
-
-  _rxIndex = 0;
-
 }
 
 void EslovHandler::debug(Stream &stream)
