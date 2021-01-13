@@ -21,9 +21,9 @@ void setup()
   ///////
 
   // debug port
-  //Serial.begin(115200);
+  Serial.begin(115200);
 
-  //BHY2.debug(Serial);
+  BHY2.debug(Serial);
   BHY2.begin();
 }
 

@@ -3,6 +3,7 @@
 #include "BoschSensortec.h"
 #include "BLEHandler.h"
 #include "EslovHandler.h"
+#include "DFUManager.h"
 
 Arduino_BHY2::Arduino_BHY2()
 {
