@@ -59,14 +59,14 @@ void IS31FL3194::init()// configure rgb led function
 void IS31FL3194::ledBlink(uint8_t color, uint32_t duration)
 {
   if(color == green) {
-  _out1 = 0xFF;
-  _out2 = 0x00;
+  _out1 = 0x00;
+  _out2 = 0xFF;
   _out3 = 0x00;
   }
 
   if(color == blue) {
-  _out1 = 0x00;
-  _out2 = 0xFF;
+  _out1 = 0xFF;
+  _out2 = 0x00;
   _out3 = 0x00;
   }
 
@@ -83,14 +83,14 @@ void IS31FL3194::ledBlink(uint8_t color, uint32_t duration)
   }
 
   if(color == magenta) {
-  _out1 = 0x00;
-  _out2 = 0x20;
+  _out1 = 0x20;
+  _out2 = 0x00;
   _out3 = 0x20;
   }
 
   if(color == yellow) {
-  _out1 = 0x20;
-  _out2 = 0x00;
+  _out1 = 0x00;
+  _out2 = 0x20;
   _out3 = 0x20;
   }
 
