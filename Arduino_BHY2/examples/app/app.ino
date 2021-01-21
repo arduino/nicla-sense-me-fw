@@ -25,16 +25,29 @@ void setup()
 
   BHY2.debug(Serial);
   BHY2.begin();
+
+
+  delay(200);
+  // debug purpose
+  #define BHY2_SENSOR_ID_MAX                      UINT8_C(200)
+  SensorConfigurationPacket config;
+  config.sampleRate = 1;
+  config.latency = 0;
+  for (uint8_t i = 1; i < BHY2_SENSOR_ID_MAX; i++)
+  {
+    config.sensorId = i;
+    BHY2.configureSensor(&config);
+  }
 }
 
 void loop()
 {
   // test purpose: inject random sensor data
-  static auto time = millis();
-  if (millis() - time >= 200) {
-    injectSensorData();
-    time = millis();
-  }
+  //static auto time = millis();
+  //if (millis() - time >= 200) {
+    //injectSensorData();
+    //time = millis();
+  //}
   
   BHY2.update();
 }
