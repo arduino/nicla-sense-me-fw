@@ -46,10 +46,25 @@ func CRC8(buf []byte, last_pack bool) {
 }
 
 func main() {
+	argCount := len(os.Args[1:])
+	if argCount < 4 {
+		fmt.Printf("Usage: ./fwUpdaterUnisense PATH_TO_BIN USB_PORT UPDATE_OPCODE DEBUG\n")
+		fmt.Printf("                           PATH_TO_BIN: full path to Firmware Update Binary File\n")
+		fmt.Printf("                           USB_PORT: USB port with 115200 baude rate connected to PC\n")
+		fmt.Printf("                           UPDATE_OPCODE: 0 for ANNA fw update - 1 for BHY2 fw update\n")
+		fmt.Printf("                           DEBUG: 1 print debug messages - 0 print only main messages\n")
+		panic("Missing one or more input parameters!")
+	}
 	bin_path := os.Args[1]
 	USBport := os.Args[2]
-	baud_rate, _ := strconv.Atoi(os.Args[3])
-	oc, _ := strconv.Atoi(os.Args[4])
+	oc, _ := strconv.Atoi(os.Args[3])
+	if oc > 1 {
+		panic("Invalid UPDATE_OPCODE parameter")
+	}
+	debug, _ := strconv.Atoi(os.Args[4])
+	if debug > 1 {
+		panic("Invalid DEBUG parameter")
+	}
 
 	oc16 := (uint16)(oc)
 	opcode := make([]byte, 2)
@@ -60,7 +75,7 @@ func main() {
 	idx := make([]byte, 2)
 
 	mode := &serial.Mode{
-		BaudRate: baud_rate,
+		BaudRate: 115200,
 		Parity:   serial.NoParity,
 		DataBits: 8,
 		StopBits: serial.OneStopBit,
@@ -117,11 +132,13 @@ func main() {
 			binary.LittleEndian.PutUint16(idx, index)
 		}
 
-		fmt.Printf("opcode: %d\n", opcode[1:])
-		fmt.Printf("lastPack: %d\n", last)
-		fmt.Printf("index: %d\n", index)
-		for j := 0; j < packSize; j++ {
-			fmt.Printf("%x, ", buf[j])
+		if debug == 1 {
+			fmt.Printf("opcode: %d\n", opcode[1:])
+			fmt.Printf("lastPack: %d\n", last)
+			fmt.Printf("index: %d\n", index)
+			for j := 0; j < packSize; j++ {
+				fmt.Printf("%x, ", buf[j])
+			}
 		}
 
 		header := make([]byte, 3)
@@ -136,7 +153,9 @@ func main() {
 		for ackReceived == false {
 			_, err = port.Write(packet)
 			check(err)
-			fmt.Printf("Packet sent to MKR\n")
+			if debug == 1 {
+				fmt.Printf("Packet sent to MKR\n")
+			}
 
 			ackBuf := make([]byte, 1)
 
@@ -150,15 +169,21 @@ func main() {
 				if bytesAck == 1 {
 					if ackBuf[0] == Ack { //Unisense correctly received the packet
 						ackReceived = true
-						fmt.Printf("ACK %x received!\n", ackBuf[0])
+						if debug == 1 {
+							fmt.Printf("ACK %x received!\n", ackBuf[0])
+						}
 						break
 					}
 					if ackBuf[0] == Nack { //Unisense did NOT correctly received the packet
 						//keep ackReceived = false and resend
-						fmt.Printf("NACK %x received!\n", ackBuf[0])
+						if debug == 1 {
+							fmt.Printf("NACK %x received!\n", ackBuf[0])
+						}
 						break
 					}
-					fmt.Printf("ERROR! Unknown ACK format: %x\n", ackBuf[0])
+					if debug == 1 {
+						fmt.Printf("ERROR! Unknown ACK format: %x\n", ackBuf[0])
+					}
 					break
 				}
 			}
