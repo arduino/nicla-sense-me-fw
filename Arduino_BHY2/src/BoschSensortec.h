@@ -1,6 +1,7 @@
 #ifndef BOSCH_SENSORTEC_H_
 #define BOSCH_SENSORTEC_H_
 
+#include "Arduino.h"
 #include "mbed.h"
 
 #include "bosch/common/common.h"
@@ -49,6 +50,11 @@ private:
   SensorConfigurationPacket* _savedConfig;
   
   struct bhy2_dev _bhy2;
+
+private:
+  friend class Arduino_BHY2;
+  void debug(Stream &stream);
+  Stream *_debug;
 };
 
 extern BoschSensortec sensortec;

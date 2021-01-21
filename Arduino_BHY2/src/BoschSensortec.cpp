@@ -2,7 +2,8 @@
 
 BoschSensortec::BoschSensortec() : 
   _hasNewData(false), 
-  _savedConfig(NULL)
+  _savedConfig(NULL),
+  _debug(NULL)
 {
 }
 
@@ -62,6 +63,11 @@ void BoschSensortec::update()
   if (_hasNewData) {
     bhy2_get_and_process_fifo(_workBuffer, WORK_BUFFER_SIZE, &_bhy2);
   }
+}
+
+void BoschSensortec::debug(Stream &stream)
+{
+  _debug = &stream;
 }
 
 
