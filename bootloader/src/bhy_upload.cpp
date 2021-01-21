@@ -176,6 +176,7 @@ void install_callbacks(struct bhy2_dev* bhy2) {
         bhy2_register_fifo_parse_callback(i, parse_generic, &parse_table, bhy2);
     }
     bhy2_register_fifo_parse_callback(BHY2_SYS_ID_META_EVENT, parse_meta_event, &parse_table, bhy2);
+    bhy2_register_fifo_parse_callback(BHY2_SYS_ID_META_EVENT_WU, parse_meta_event, &parse_table, bhy2);
     bhy2_register_fifo_parse_callback(BHY2_SYS_ID_DEBUG_MSG, parse_debug_message, &parse_table, bhy2);
 }
 
@@ -235,7 +236,8 @@ int fwupdate_bhi260(void)
     }
 
     /* Check the interrupt pin and FIFO configurations. Disable status and debug */
-    hintr_ctrl = BHY2_ICTL_DISABLE_STATUS_FIFO | BHY2_ICTL_DISABLE_DEBUG;
+    //hintr_ctrl = BHY2_ICTL_DISABLE_STATUS_FIFO | BHY2_ICTL_DISABLE_DEBUG;
+    hintr_ctrl = 0;
 
     rslt = bhy2_set_host_interrupt_ctrl(hintr_ctrl, &bhy2);
     print_api_error(rslt, &bhy2);
