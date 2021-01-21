@@ -36,12 +36,9 @@ public:
   bool readSensorData(SensorDataPacket &data);
 
   // ANNA <-> BOSCH interface
-  static void interruptHandler();
   void addSensorData(const SensorDataPacket &sensorData);
 
 private:
-  bool _hasNewData;
-
   mbed::CircularBuffer<SensorDataPacket, SENSOR_QUEUE_SIZE, uint8_t> _sensorQueue;
 
   uint8_t _workBuffer[WORK_BUFFER_SIZE];

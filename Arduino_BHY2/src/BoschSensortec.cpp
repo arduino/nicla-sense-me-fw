@@ -2,7 +2,6 @@
 #include "BoschParser.h"
 
 BoschSensortec::BoschSensortec() : 
-  _hasNewData(false), 
   _savedConfig(NULL),
   _debug(NULL)
 {
@@ -10,11 +9,6 @@ BoschSensortec::BoschSensortec() :
 
 BoschSensortec::~BoschSensortec() 
 {
-}
-
-void BoschSensortec::interruptHandler() 
-{
-  sensortec._hasNewData = true; 
 }
 
 void BoschSensortec::begin()
@@ -50,7 +44,7 @@ void BoschSensortec::addSensorData(const SensorDataPacket &sensorData)
 
 void BoschSensortec::update()
 {
-  if (_hasNewData) {
+  if (get_interrupt_status()) {
     bhy2_get_and_process_fifo(_workBuffer, WORK_BUFFER_SIZE, &_bhy2);
   }
 }
