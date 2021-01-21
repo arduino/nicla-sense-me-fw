@@ -3,7 +3,7 @@
 
 #include "mbed.h"
 
-#include "SPIChannel.h"
+#include "bosch/common/common.h"
 #include "SensorTypes.h"
 
 #ifdef __cplusplus
@@ -17,6 +17,8 @@ extern "C"
 
 #define SENSOR_QUEUE_SIZE   10
 #define WORK_BUFFER_SIZE    2048
+
+#define MAX_READ_WRITE_LEN 256
 
 // This will use the BHY functions for configuring sensors and retrieving data
 class BoschSensortec {
