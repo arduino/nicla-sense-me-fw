@@ -124,8 +124,11 @@ int apply_update(FILE *file, uint32_t address, bool fail_safe)
     printf("Firmware size is %ld bytes\r\n", len);
 
     //read by chunks of 256 bytes
-    uint8_t iterations = len/256;
+    uint16_t iterations = len/256;
     uint8_t spare_bytes = len%256;
+
+    printf("Iterations: %ld bytes\r\n", iterations);
+    printf("Spare bytes: %ld bytes\r\n", spare_bytes);
 
     char buffer[256];
     char crc_file;
