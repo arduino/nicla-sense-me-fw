@@ -41,7 +41,6 @@ public:
   void processPacket(DFUType dfuType, const uint8_t* data);
 
   uint8_t acknowledgment();
-  void debug(Stream &stream);
 
 private:
 #if defined (TARGET_ANNA)
@@ -51,9 +50,13 @@ private:
 #endif
   static mbed::LittleFileSystem _fs;
   FILE* _target;
-  Stream *_debug;
 
   uint8_t _acknowledgment;
+
+private:
+  friend class Arduino_BHY2;
+  void debug(Stream &stream);
+  Stream *_debug;
 };
 
 extern DFUManager dfuManager;

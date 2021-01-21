@@ -51,6 +51,7 @@ void Arduino_BHY2::debug(Stream &stream)
 {
   eslovHandler.debug(stream);
   sensortec.debug(stream);
+  dfuManager.debug(stream);
 }
 
 Arduino_BHY2 BHY2;
