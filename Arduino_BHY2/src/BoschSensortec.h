@@ -37,7 +37,6 @@ public:
 
   // ANNA <-> BOSCH interface
   static void interruptHandler();
-  static void parseBhyData(const struct bhy2_fifo_parse_data_info *data, void *arg);
   void addSensorData(const SensorDataPacket &sensorData);
 
 private:

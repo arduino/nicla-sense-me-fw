@@ -1,4 +1,5 @@
 #include "BoschSensortec.h"
+#include "BoschParser.h"
 
 BoschSensortec::BoschSensortec() : 
   _hasNewData(false), 
@@ -23,7 +24,7 @@ void BoschSensortec::begin()
 
 void BoschSensortec::configureSensor(SensorConfigurationPacket *config)
 {
-  bhy2_register_fifo_parse_callback(config->sensorId, parseBhyData, NULL, &_bhy2);
+  bhy2_register_fifo_parse_callback(config->sensorId, BoschParser::parseData, NULL, &_bhy2);
   bhy2_update_virtual_sensor_list(&_bhy2);
   bhy2_set_virt_sensor_cfg(config->sensorId, config->sampleRate, config->latency, &_bhy2);
 }
@@ -36,17 +37,6 @@ uint8_t BoschSensortec::availableSensorData()
 bool BoschSensortec::readSensorData(SensorDataPacket &data)
 {
   return _sensorQueue.pop(data);
-}
-
-// Retrieve data and store it in the Sensortec's queue
-void BoschSensortec::parseBhyData(const struct bhy2_fifo_parse_data_info *fifoData, void *arg)
-{
-  SensorDataPacket sensorData;
-  sensorData.sensorId = fifoData->sensor_id;
-  memcpy(&sensorData.data, fifoData->data_ptr, sizeof(fifoData->data_size));
-  sensorData.size = fifoData->data_size;
-
-  sensortec.addSensorData(sensorData);
 }
 
 void BoschSensortec::addSensorData(const SensorDataPacket &sensorData)
