@@ -1,6 +1,7 @@
 #include "Arduino_BHY2.h"
 
 #include "BoschSensortec.h"
+#include "BoschParser.h"
 #include "BLEHandler.h"
 #include "EslovHandler.h"
 #include "DFUManager.h"
@@ -50,6 +51,9 @@ bool Arduino_BHY2::readSensorData(SensorDataPacket &data)
 void Arduino_BHY2::debug(Stream &stream)
 {
   eslovHandler.debug(stream);
+  sensortec.debug(stream);
+  dfuManager.debug(stream);
+  BoschParser::debug(stream);
 }
 
 Arduino_BHY2 BHY2;

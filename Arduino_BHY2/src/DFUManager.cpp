@@ -12,7 +12,8 @@ mbed::LittleFileSystem DFUManager::_fs("fs");
 
 DFUManager::DFUManager() :
   _target(NULL),
-  _acknowledgment(DFUNack)
+  _acknowledgment(DFUNack),
+  _debug(NULL)
 {
 }
 
@@ -93,7 +94,6 @@ uint8_t DFUManager::acknowledgment()
 void DFUManager::debug(Stream &stream)
 {
   _debug = &stream;
-
 }
 
 DFUManager dfuManager;

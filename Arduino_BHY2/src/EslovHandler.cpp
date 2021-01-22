@@ -132,8 +132,6 @@ void EslovHandler::receiveEvent(int length)
 void EslovHandler::debug(Stream &stream)
 {
   _debug = &stream;
-  dfuManager.debug(stream);
-
 }
 
 void EslovHandler::dump() 
