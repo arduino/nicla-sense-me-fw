@@ -94,4 +94,11 @@ void BLEHandler::update()
   }
 }
 
+void BLEHandler::debug(Stream &stream)
+{
+  _debug = &stream;
+  BLE.debug(stream);
+
+}
+
 BLEHandler bleHandler;

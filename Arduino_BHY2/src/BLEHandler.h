@@ -13,8 +13,10 @@ public:
 
   void begin();
   void update();
+  void debug(Stream &stream);
 
 private:
+  Stream *_debug;
   void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic);
   static void receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic);
   static void receivedExternalDFU(BLEDevice central, BLECharacteristic characteristic);
