@@ -27,18 +27,17 @@ struct __attribute__((packed)) DFUPacket {
   uint8_t data[DFU_CHUNK_SIZE];
 };
 
-//static uint8_t testFw[sizeof(DFUPacket)+1] = {
-//0x01, 0x00, 0x00, 0x00,
-//0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-//0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-//0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-//0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-//0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-//0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-//0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-//0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
-//};
-
+static uint8_t testFw[sizeof(DFUPacket)] = {
+  0x00, 0x00, 0x00,
+  0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+  0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
+};
 
 BLECharacteristic dfuAckCharacteristic;
 BLECharacteristic dfuIntCharacteristic;
@@ -51,14 +50,20 @@ void writeDfuPacket(uint8_t *data, uint8_t len)
   while (!peripheral.connected());
 
   //Send packet with BLE
-  uint8_t bytes_written = 0;
+  uint8_t write_ret = 0;
   //OPCODE must not be sent
-  uint8_t oc = _rxBuffer[0];
+  uint8_t oc = data[0];
+
   if (oc == ESLOV_DFU_INTERNAL_OPCODE) {
-    bytes_written = dfuIntCharacteristic.writeValue(&data, len);
+    write_ret = dfuIntCharacteristic.writeValue(&data[1], len);
   } else if (oc == ESLOV_DFU_EXTERNAL_OPCODE) {
-    bytes_written = dfuExtCharacteristic.writeValue(&data, len);
+    write_ret = dfuExtCharacteristic.writeValue(&data[1], len);
   }
+
+#if (DEBUG)
+  Serial1.print("writeValue returned: ");
+  Serial1.println(write_ret);
+#endif
 
 }
 
@@ -67,20 +72,20 @@ uint8_t requestDfuPacketAck()
 {
   while (!peripheral.connected());
 
-  uint8_t ack = 0;
+  byte ack = 0;
 
   //Request ack
-  if (dfuAckCharacteristic.valueUpdated()) { //o while?
-    if (dfuAckCharacteristic.readValue(&ack, 1) == 1) {
+  int read_ret = dfuAckCharacteristic.readValue(ack);
+  if (read_ret == 1) {
 #if (DEBUG)
-      Serial1.print("Ack received: ");
-      Serial1.println(ack);
+    Serial1.print("Ack received: ");
+    Serial1.println(ack);
 #endif
-    } else {
+  } else {
 #if (DEBUG)
-      Serial1.println("Error reading ack");
+    Serial1.print("Error reading ack! ReadValue returned: ");
+    Serial1.println(read_ret);
 #endif
-    }
   }
 
   return ack;
@@ -144,8 +149,8 @@ void setup()
 #endif
         peripheral.disconnect();
       }
-    
-      dfuAckCharacteristic = peripheral.characteristic("34c2e3b8-34aa-11eb-adc1-0242ac120002");
+
+      dfuAckCharacteristic = peripheral.characteristic("34c2e3be-34aa-11eb-adc1-0242ac120002");
       dfuIntCharacteristic = peripheral.characteristic("34c2e3b9-34aa-11eb-adc1-0242ac120002");
       dfuExtCharacteristic = peripheral.characteristic("34c2e3ba-34aa-11eb-adc1-0242ac120002");
       if ((!dfuAckCharacteristic) && (!dfuIntCharacteristic)) {
@@ -172,7 +177,6 @@ void setup()
 #if (DEBUG)
   Serial1.println("Setup completed");
 #endif
-
 }
 
 
@@ -184,27 +188,24 @@ void loop()
 
       if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
 
+        writeDfuPacket(_rxBuffer, sizeof(DFUPacket));
+
 #if (DEBUG)
-        Serial1.write("Received: ");
+        Serial1.print("Received: ");
         for (int n = 0; n < _rxIndex; n++) {
-          Serial1.write(_rxBuffer[n]);
-          Serial1.write(", ");
+          Serial1.print(_rxBuffer[n], HEX);
+          Serial1.print(", ");
         }
         Serial1.println();
 #endif
 
-        writeDfuPacket(_rxBuffer + 1, sizeof(DFUPacket));
-
         uint8_t ack = requestDfuPacketAck();
 
         Serial.write(ack);
+        _rxIndex = 0;
 
-      } else {
-#if (DEBUG)
-        Serial1.println("Wrong opcode!!!");
-#endif
       }
-      _rxIndex = 0;
     }
   }
+
 }
