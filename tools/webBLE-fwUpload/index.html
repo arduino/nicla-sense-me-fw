@@ -1,0 +1,69 @@
+<button id="connect">Connect with the BLE device</button>
+
+<script>
+var deviceName = 'UNISENSE'
+const dfuService = '34c2e3b8-34aa-11eb-adc1-0242ac120002';
+const dfuAckCharacteristic = '34c2e3be-34aa-11eb-adc1-0242ac120002';
+const dfuInternalCharacteristic = '34c2e3b9-34aa-11eb-adc1-0242ac120002';
+var bleDevice
+var gattService
+var gattAckCharacteristic
+var gattInternalCharacteristic
+
+  document.querySelector('#connect').addEventListener('click', function() {
+    if (isWebBluetoothEnabled()) { connect() }
+  })
+
+  function isWebBluetoothEnabled() {
+    if (!navigator.bluetooth) {
+      console.log('Web Bluetooth is NOT available!')
+      return false
+    }
+
+    console.log('Web Bluetooth is available!')
+    return true
+  }
+
+
+  function connect() {
+
+    console.log('Requesting BLE device info...')
+    navigator.bluetooth.requestDevice({
+      filters: [{name: deviceName}],
+      optionalServices: [dfuService]
+    }).then(device => {
+      bleDevice = device
+      console.log("device:", device)
+      return device.gatt.connect()
+    }).then(server => {
+      console.log("Getting server:", server)
+      return server.getPrimaryService(dfuService)
+    })
+    .then(service => {
+      console.log("Getting service:", service)
+      return service.getCharacteristic(dfuInternalCharacteristic)
+    })
+    .then(characteristic => {
+      console.log("Looking for characteristic")
+      gattInternalCharacteristic = characteristic
+
+      console.log("gattInternalCharacteristic:", gattInternalCharacteristic)
+
+      const bytesArray = new Uint8Array(67);
+      bytesArray[0] = 0;
+      bytesArray[1] = 0;
+      bytesArray[2] = 0;
+      var i;
+      for (i = 3; i < 67; i++) {
+        bytesArray[i] = i%8;
+      }
+
+      console.log('Writing 67 bytes array...')
+      return characteristic.writeValue(bytesArray);
+    })
+    .catch(error => {
+      console.log('Argh! ' + error);
+    });
+
+  }
+</script>
