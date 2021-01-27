@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"arduino/bhy/dfu"
 )
 
 func main() {
@@ -40,6 +41,7 @@ func main() {
 			dfuCommand.PrintDefaults()
 			os.Exit(1)
 		}
+		dfu.Upload(*baudRate, *opCode, *usbPort, *binPath)
 
 	case "sensor":
 		// sensor subcommand requires an additional subcommand
