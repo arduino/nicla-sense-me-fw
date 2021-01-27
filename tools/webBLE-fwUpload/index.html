@@ -24,18 +24,35 @@ var gattInternalCharacteristic
     return true
   }
 
-
-  function connect() {
+  function getDeviceInfo() {
+    let options = {
+      filters: [{ name: deviceName}],
+      optionalServices: [dfuService]
+    }
 
     console.log('Requesting BLE device info...')
-    navigator.bluetooth.requestDevice({
-      filters: [{name: deviceName}],
-      optionalServices: [dfuService]
-    }).then(device => {
+    return navigator.bluetooth.requestDevice(options).then(device => {
       bleDevice = device
-      console.log("device:", device)
-      return device.gatt.connect()
-    }).then(server => {
+    }).catch(error => {
+      console.log('Request device error: ' + error)
+    })
+  }
+
+
+  function connect() {
+    return getDeviceInfo()
+    .then(connectGATT)
+    .then(writePacket)
+    .catch(error => {
+      console.log('ERROR: ' + error);
+    });
+  }
+
+
+  function connectGATT() {
+    console.log('Connecting to BLE device...')
+    return bleDevice.gatt.connect()
+    .then(server => {
       console.log("Getting server:", server)
       return server.getPrimaryService(dfuService)
     })
@@ -48,22 +65,21 @@ var gattInternalCharacteristic
       gattInternalCharacteristic = characteristic
 
       console.log("gattInternalCharacteristic:", gattInternalCharacteristic)
-
-      const bytesArray = new Uint8Array(67);
-      bytesArray[0] = 0;
-      bytesArray[1] = 0;
-      bytesArray[2] = 0;
-      var i;
-      for (i = 3; i < 67; i++) {
-        bytesArray[i] = i%8;
-      }
-
-      console.log('Writing 67 bytes array...')
-      return characteristic.writeValue(bytesArray);
     })
-    .catch(error => {
-      console.log('Argh! ' + error);
-    });
+  }
 
+
+  function writePacket() {
+    const bytesArray = new Uint8Array(67);
+    bytesArray[0] = 0;
+    bytesArray[1] = 0;
+    bytesArray[2] = 0;
+    var i;
+    for (i = 3; i < 67; i++) {
+      bytesArray[i] = i%8;
+    }
+
+    console.log('Writing 67 bytes array...')
+    return gattInternalCharacteristic.writeValue(bytesArray)
   }
 </script>
