@@ -77,17 +77,17 @@ void loop()
 
 #if (DEBUG)
         { // dump rx buffer
-          Serial1.write("Received: ");
+          Serial1.print("Received: ");
           for(int n=0; n<_rxIndex; n++) {
-            Serial1.write(_rxBuffer[n]);
-            Serial1.write(", ");
+            Serial1.print(_rxBuffer[n], HEX);
+            Serial1.print(", ");
           }
           Serial1.println();
         }
         { // print ack received
-          Serial1.write("Sent Ack: ");
-          Serial1.write(ack);
-          Serial1.write(" back to PC");
+          Serial1.print("Sent Ack: ");
+          Serial1.print(ack, HEX);
+          Serial1.print(" back to PC");
           Serial1.println();
         }
 #endif
