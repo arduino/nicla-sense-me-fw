@@ -1,85 +1,111 @@
 package main
 
 import (
+	"arduino/bhy/dfu"
 	"flag"
 	"fmt"
-	"os"
-	"arduino/bhy/dfu"
 	"go.bug.st/serial/enumerator"
 	"log"
+	"os"
 )
 
 func main() {
-	// commands subcommands and flags definition
-	// dfu command is used for uploading firmware to unisense
-	dfuCommand := flag.NewFlagSet("dfu", flag.ExitOnError)
-	// upload flags
-	baudRate := dfuCommand.Int("baud", 115200, "baud rate")
-	opCode := dfuCommand.Int("o", 0, "op code")
-	usbPort := dfuCommand.String("p", "", "usb port")
-	binPath := dfuCommand.String("bin", "", "binary path")
-
-	// sensor command is used to control bhy sensors
-	sensorCommand := flag.NewFlagSet("sensor", flag.ExitOnError)
-	// sensor subcommands
-	readCommand := flag.NewFlagSet("read", flag.ExitOnError)
-	configureCommand := flag.NewFlagSet("configure", flag.ExitOnError)
-	// sensor configuration flags
-	sensorId := configureCommand.Int("sensor", 0, "Sensor ID to configure")
-	sensorRate := configureCommand.Float64("rate", 0, "Rate of sample")
-	sensorLatency := configureCommand.Float64("latency", 0, "Latency")
-
 	// Check if a subcommand has been passed
 	if len(os.Args) < 2 {
 		commandError()
+		return
 	}
-
 	// Parse the subcommand
 	switch os.Args[1] {
-
 	case "list":
-		printSerialPorts()
-
+		listCommand()
 	case "dfu":
-		dfuCommand.Parse(os.Args[2:])
-		ret := dfuCheck(*baudRate, *opCode, *usbPort, *binPath)
-		if !ret {
-			dfuCommand.PrintDefaults()
-			os.Exit(1)
-		}
-		dfu.Upload(*baudRate, *opCode, *usbPort, *binPath)
-
+		dfuCommand()
 	case "sensor":
-		// sensor subcommand requires an additional subcommand
-		if len(os.Args) < 3 {
-			sensorError()
-		}
-		// parse the additional subcommand
-		switch os.Args[2] {
-		case "read":
-			readCommand.Parse(os.Args[3:])
-
-		case "configure":
-			// Check that at least one flag is passed - only sensor id is mandatory
-			if len(os.Args) < 4 { 
-				configureCommand.PrintDefaults()
-				os.Exit(1)
-			}
-			configureCommand.Parse(os.Args[3:])
-			sensor(*sensorId, *sensorRate, *sensorLatency)
-
-		default:
-			sensorCommand.PrintDefaults()
-			sensorError()
-		}
-
+		sensorCommand()
 	default:
 		commandError()
-		os.Exit(1)
 	}
 }
 
-func printSerialPorts() {
+func dfuCommand() {
+	// dfu command is used for uploading firmware to unisense
+	dfuFlags := flag.NewFlagSet("dfu", flag.ExitOnError)
+	usbPort := dfuFlags.String("p", "", "usb port")
+	baudRate := dfuFlags.Int("baud", 115200, "baud rate")
+	opCode := dfuFlags.Int("o", 0, "op code")
+	binPath := dfuFlags.String("bin", "", "binary path")
+
+	dfuFlags.Parse(os.Args[2:])
+
+	ret := dfuCheckFlags(*baudRate, *opCode, *usbPort, *binPath)
+	if !ret {
+		dfuFlags.PrintDefaults()
+		return
+	}
+
+	dfu.Upload(*baudRate, *opCode, *usbPort, *binPath)
+}
+
+func sensorCommand() {
+	// sensor subcommand requires an additional subcommand
+	if len(os.Args) < 3 {
+		sensorError()
+		return
+	}
+	// parse the additional subcommand
+	switch os.Args[2] {
+	case "read":
+		sensorReadCommand()
+	case "config":
+		sensorConfigureCommand()
+	default:
+		sensorError()
+	}
+}
+
+func mockSensorRead(usbPort string, baudRate int) {
+}
+
+func mockSensorConfig(usbPort string, baudRate int, id int, rate float64, lat float64) {
+}
+
+func sensorReadCommand() {
+	readFlags := flag.NewFlagSet("read", flag.ExitOnError)
+	usbPort := readFlags.String("p", "", "usb port")
+	baudRate := readFlags.Int("baud", 115200, "baud rate")
+
+	readFlags.Parse(os.Args[3:])
+
+	ret := sensorCheckFlags(*usbPort)
+	if !ret {
+		readFlags.PrintDefaults()
+		return
+	}
+
+	mockSensorRead(*usbPort, *baudRate)
+}
+
+func sensorConfigureCommand() {
+	configureFlags := flag.NewFlagSet("configure", flag.ExitOnError)
+	usbPort := configureFlags.String("p", "", "usb port")
+	baudRate := configureFlags.Int("baud", 115200, "baud rate")
+	sensorId := configureFlags.Int("sensor", 0, "Sensor ID to configure")
+	sensorRate := configureFlags.Float64("rate", 0, "Rate of sample")
+	sensorLatency := configureFlags.Float64("latency", 0, "Latency")
+
+	configureFlags.Parse(os.Args[3:])
+
+	ret := sensorCheckFlags(*usbPort)
+	if !ret {
+		configureFlags.PrintDefaults()
+		return
+	}
+
+	mockSensorConfig(*usbPort, *baudRate, *sensorId, *sensorRate, *sensorLatency)
+}
+
+func listCommand() {
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
 		log.Fatal(err)
@@ -97,7 +123,7 @@ func printSerialPorts() {
 	}
 }
 
-func dfuCheck(baudRate int, opCode int, usbPort string, binPath string) bool {
+func dfuCheckFlags(baudRate int, opCode int, usbPort string, binPath string) bool {
 	if binPath == "" {
 		fmt.Println("")
 		fmt.Println(" missing -bin parameter, provide a valid binary path")
@@ -120,8 +146,14 @@ func dfuCheck(baudRate int, opCode int, usbPort string, binPath string) bool {
 	return true
 }
 
-func sensor(id int, lat float64, rate float64) {
-
+func sensorCheckFlags(usbPort string) bool {
+	if usbPort == "" {
+		fmt.Println("")
+		fmt.Println(" missing -p parameter, provide a valid serial port")
+		fmt.Println("")
+		return false
+	}
+	return true
 }
 
 func commandError() {
@@ -132,7 +164,6 @@ func commandError() {
 	fmt.Println("		to upload new firmware for unisense or bhy")
 	fmt.Println("	list")
 	fmt.Println("		list available serial ports")
-	os.Exit(1)
 }
 
 func sensorError() {
@@ -141,5 +172,4 @@ func sensorError() {
 	fmt.Println("		to read last sensor data")
 	fmt.Println("	config")
 	fmt.Println("		to configure a bhy sensor")
-	os.Exit(1)
 }
