@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"arduino/bhy/dfu"
+	"go.bug.st/serial/enumerator"
+	"log"
 )
 
 func main() {
@@ -34,6 +36,10 @@ func main() {
 
 	// Parse the subcommand
 	switch os.Args[1] {
+
+	case "list":
+		printSerialPorts()
+
 	case "dfu":
 		dfuCommand.Parse(os.Args[2:])
 		ret := dfuCheck(*baudRate, *opCode, *usbPort, *binPath)
@@ -73,6 +79,24 @@ func main() {
 	}
 }
 
+func printSerialPorts() {
+	ports, err := enumerator.GetDetailedPortsList()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if len(ports) == 0 {
+		fmt.Println("No serial ports found!")
+		return
+	}
+	for _, port := range ports {
+		fmt.Printf("Found port: %s\n", port.Name)
+		if port.IsUSB {
+			fmt.Printf("   USB ID     %s:%s\n", port.VID, port.PID)
+			fmt.Printf("   USB serial %s\n", port.SerialNumber)
+		}
+	}
+}
+
 func dfuCheck(baudRate int, opCode int, usbPort string, binPath string) bool {
 	if binPath == "" {
 		fmt.Println("")
@@ -106,6 +130,8 @@ func commandError() {
 	fmt.Println("		to control bhy sensors")
 	fmt.Println("	dfu")
 	fmt.Println("		to upload new firmware for unisense or bhy")
+	fmt.Println("	list")
+	fmt.Println("		list available serial ports")
 	os.Exit(1)
 }
 
