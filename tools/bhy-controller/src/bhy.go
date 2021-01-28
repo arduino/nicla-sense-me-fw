@@ -2,6 +2,7 @@ package main
 
 import (
 	"arduino/bhy/dfu"
+	"arduino/bhy/sensor"
 	"flag"
 	"fmt"
 	"go.bug.st/serial/enumerator"
@@ -64,12 +65,6 @@ func sensorCommand() {
 	}
 }
 
-func mockSensorRead(usbPort string, baudRate int) {
-}
-
-func mockSensorConfig(usbPort string, baudRate int, id int, rate float64, lat float64) {
-}
-
 func sensorReadCommand() {
 	readFlags := flag.NewFlagSet("read", flag.ExitOnError)
 	usbPort := readFlags.String("p", "", "usb port")
@@ -83,7 +78,7 @@ func sensorReadCommand() {
 		return
 	}
 
-	mockSensorRead(*usbPort, *baudRate)
+	sensor.Read(*usbPort, *baudRate)
 }
 
 func sensorConfigureCommand() {
@@ -102,7 +97,7 @@ func sensorConfigureCommand() {
 		return
 	}
 
-	mockSensorConfig(*usbPort, *baudRate, *sensorId, *sensorRate, *sensorLatency)
+	sensor.Configure(*usbPort, *baudRate, *sensorId, *sensorRate, *sensorLatency)
 }
 
 func listCommand() {
