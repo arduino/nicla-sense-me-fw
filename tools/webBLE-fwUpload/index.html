@@ -14,6 +14,7 @@ var gattInternalCharacteristic
     if (isWebBluetoothEnabled()) { connect() }
   })
 
+
   function isWebBluetoothEnabled() {
     if (!navigator.bluetooth) {
       console.log('Web Bluetooth is NOT available!')
@@ -41,15 +42,17 @@ var gattInternalCharacteristic
 
   function connect() {
     return getDeviceInfo()
-    .then(connectGATT)
+    .then(connectGATTdfu)
+    .then(connectGATTack)
     .then(writePacket)
+    .then(readAck)
     .catch(error => {
       console.log('ERROR: ' + error);
     });
   }
 
 
-  function connectGATT() {
+  function connectGATTdfu() {
     console.log('Connecting to BLE device...')
     return bleDevice.gatt.connect()
     .then(server => {
@@ -57,14 +60,30 @@ var gattInternalCharacteristic
       return server.getPrimaryService(dfuService)
     })
     .then(service => {
+      gattService = service
       console.log("Getting service:", service)
       return service.getCharacteristic(dfuInternalCharacteristic)
     })
     .then(characteristic => {
-      console.log("Looking for characteristic")
+      console.log("Looking for characteristic...")
       gattInternalCharacteristic = characteristic
-
       console.log("gattInternalCharacteristic:", gattInternalCharacteristic)
+    })
+  }
+
+
+  function connectGATTack() {
+    return gattService.getCharacteristic(dfuAckCharacteristic)
+    .then(characteristic => {
+      gattAckCharacteristic = characteristic
+      console.log("gattAckCharacteristic:", gattAckCharacteristic)
+      characteristic.startNotifications()
+    })
+    .then(_ => {
+      console.log('Notifications on ack enabled')
+    })
+    .catch(error => {
+      console.log('[ERROR] Start: ' + error)
     })
   }
 
@@ -81,5 +100,14 @@ var gattInternalCharacteristic
 
     console.log('Writing 67 bytes array...')
     return gattInternalCharacteristic.writeValue(bytesArray)
+  }
+
+
+  function readAck() {
+    return gattAckCharacteristic.readValue()
+    .then(value =>  {
+      ack = value.getUint8(0)
+      console.log('Ack is: ', ack)
+    })
   }
 </script>
