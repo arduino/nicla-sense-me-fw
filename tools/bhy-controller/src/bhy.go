@@ -87,7 +87,7 @@ func sensorConfigureCommand() {
 	baudRate := configureFlags.Int("baud", 115200, "baud rate")
 	sensorId := configureFlags.Int("sensor", 0, "Sensor ID to configure")
 	sensorRate := configureFlags.Float64("rate", 0, "Rate of sample")
-	sensorLatency := configureFlags.Float64("latency", 0, "Latency")
+	sensorLatency := configureFlags.Int("latency", 0, "Latency")
 
 	configureFlags.Parse(os.Args[3:])
 

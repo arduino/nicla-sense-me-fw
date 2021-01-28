@@ -5,6 +5,7 @@ import (
 	"log"
 	"go.bug.st/serial"
 	"encoding/binary"
+	"math"
 )
 
 type SensorData struct{
@@ -79,8 +80,32 @@ func Read(usbPort string, baudRate int) {
 	port.Close()
 }
 
-func Configure(usbPort string, baudRate int, id int, rate float64, latency float64) {
+func Configure(usbPort string, baudRate int, id int, rate float64, latency int) {
 	port := openPort(usbPort, baudRate)
 	fmt.Printf("Connected - port: %s - baudrate: %d\n", usbPort, baudRate)
+
+	// Fill a configuration struct just for clarity
+	var config SensorConfig
+	config.id = uint8(id)
+	config.sampleRate = rate
+	config.latency = uint32(latency)
+	// Prepare configuration packet to send
+	opCode := []byte{3}
+	cId := []byte{config.id}
+	cSample := make([]byte, 8)
+	binary.LittleEndian.PutUint64(cSample[:], math.Float64bits(config.sampleRate))
+	cLatency := make([]byte, 4)
+	binary.LittleEndian.PutUint32(cLatency, config.latency)
+	var packet []byte
+	packet = append(opCode, cId...)
+	packet = append(packet, cSample...)
+	packet = append(packet, cLatency...)
+
+	fmt.Printf("Sending configuration: sensor %d	rate %f	latency %d", config.id, config.sampleRate, config.latency)
+	//fmt.Println(packet)
+	n, err := port.Write(packet)
+	errCheck(err)
+	fmt.Printf("Sent %v bytes\n", n)
+	
 	port.Close()
 }
