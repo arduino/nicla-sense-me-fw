@@ -5,9 +5,10 @@ import (
 	"arduino/bhy/sensor"
 	"flag"
 	"fmt"
-	"go.bug.st/serial/enumerator"
 	"log"
 	"os"
+
+	"go.bug.st/serial/enumerator"
 )
 
 func main() {

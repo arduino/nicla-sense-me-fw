@@ -41,6 +41,7 @@ func openPort(usbPort string, baudRate int) serial.Port {
 
 func Read(usbPort string, baudRate int) {
 	port := openPort(usbPort, baudRate)
+	defer port.Close()
 	fmt.Printf("Connected - port: %s - baudrate: %d\n", usbPort, baudRate)
 
 	// Send read opcode
@@ -58,7 +59,6 @@ func Read(usbPort string, baudRate int) {
 	availableData := int(buff[0])
 	if n == 0 || availableData == 0 {
 		fmt.Println("no available data")
-		port.Close()
 		return
 	}
 	// Else query all the available data
@@ -78,11 +78,11 @@ func Read(usbPort string, baudRate int) {
 		}
 		availableData--
 	}
-	port.Close()
 }
 
 func Configure(usbPort string, baudRate int, id int, rate float64, latency int) {
 	port := openPort(usbPort, baudRate)
+	defer port.Close()
 	fmt.Printf("Connected - port: %s - baudrate: %d\n", usbPort, baudRate)
 
 	// Fill a configuration struct just for clarity
@@ -107,6 +107,4 @@ func Configure(usbPort string, baudRate int, id int, rate float64, latency int) 
 	n, err := port.Write(packet)
 	errCheck(err)
 	fmt.Printf("Sent %v bytes\n", n)
-
-	port.Close()
 }
