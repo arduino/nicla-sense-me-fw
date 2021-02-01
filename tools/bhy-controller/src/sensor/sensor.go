@@ -45,6 +45,21 @@ func openPort(usbPort string, baudRate int) serial.Port {
 	return port
 }
 
+func readSensorData(buffer []byte, port serial.Port) {
+	n, err := port.Read(buffer)
+	errCheck(err)
+	if n != sensorDataSize {
+		fmt.Println("data not valid")
+	} else {
+		// Print the received sensor data
+		var data SensorData
+		data.id = uint8(buffer[0])
+		data.size = uint8(buffer[1])
+		data.data = uint64(binary.LittleEndian.Uint64(buffer[2:10]))
+		fmt.Printf("sensor: %d	size: %d	data: %d\n", data.id, data.size, data.data)
+	}
+}
+
 func Read(usbPort string, baudRate int) {
 	port := openPort(usbPort, baudRate)
 	defer port.Close()
@@ -70,18 +85,7 @@ func Read(usbPort string, baudRate int) {
 	// Else query all the available data
 	fmt.Printf("available data: %d\n", availableData)
 	for availableData > 0 {
-		n, err := port.Read(buff)
-		errCheck(err)
-		if n != sensorDataSize {
-			fmt.Println("data not valid")
-		} else {
-			// Print the received sensor data
-			var data SensorData
-			data.id = uint8(buff[0])
-			data.size = uint8(buff[1])
-			data.data = uint64(binary.LittleEndian.Uint64(buff[2:10]))
-			fmt.Printf("sensor: %d	size: %d	data: %d\n", data.id, data.size, data.data)
-		}
+		readSensorData(buff, port)
 		availableData--
 	}
 }
