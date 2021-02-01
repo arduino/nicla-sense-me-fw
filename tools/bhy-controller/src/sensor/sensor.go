@@ -9,6 +9,12 @@ import (
 	"go.bug.st/serial"
 )
 
+const (
+	eslovReadOpcode   = 2
+	eslovConfigOpcode = 3
+	sensorDataSize    = 10
+)
+
 type SensorData struct {
 	id   uint8
 	size uint8
@@ -45,7 +51,7 @@ func Read(usbPort string, baudRate int) {
 	fmt.Printf("Connected - port: %s - baudrate: %d\n", usbPort, baudRate)
 
 	// Send read opcode
-	packet := []byte{2}
+	packet := []byte{eslovReadOpcode}
 	n, err := port.Write(packet)
 	errCheck(err)
 	fmt.Printf("Sent %v bytes\n", n)
@@ -66,7 +72,7 @@ func Read(usbPort string, baudRate int) {
 	for availableData > 0 {
 		n, err := port.Read(buff)
 		errCheck(err)
-		if n != 10 {
+		if n != sensorDataSize {
 			fmt.Println("data not valid")
 		} else {
 			// Print the received sensor data
@@ -91,7 +97,7 @@ func Configure(usbPort string, baudRate int, id int, rate float64, latency int) 
 	config.sampleRate = float32(rate)
 	config.latency = uint32(latency)
 	// Prepare configuration packet to send
-	opCode := []byte{3}
+	opCode := []byte{eslovConfigOpcode}
 	cId := []byte{config.id}
 	cSample := make([]byte, 4)
 	binary.LittleEndian.PutUint32(cSample[:], math.Float32bits(config.sampleRate))
@@ -103,7 +109,6 @@ func Configure(usbPort string, baudRate int, id int, rate float64, latency int) 
 	packet = append(packet, cLatency...)
 
 	fmt.Printf("Sending configuration: sensor %d	rate %f	latency %d", config.id, config.sampleRate, config.latency)
-	//fmt.Println(packet)
 	n, err := port.Write(packet)
 	errCheck(err)
 	fmt.Printf("Sent %v bytes\n", n)
