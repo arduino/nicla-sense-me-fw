@@ -25,11 +25,11 @@ void writeStateChange(EslovState state)
 void writeConfigPacket(SensorConfigurationPacket* config)
 {
   delay(10);
-  uint8_t packet[sizeof(config) + 1]; 
+  uint8_t packet[sizeof(SensorConfigurationPacket) + 1]; 
   packet[0] = ESLOV_SENSOR_CONFIG_OPCODE;
-  memcpy(&packet[1], config, sizeof(config));
+  memcpy(&packet[1], config, sizeof(SensorConfigurationPacket));
   Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
-  Wire.write(packet, sizeof(packet));
+  Wire.write(packet, sizeof(SensorConfigurationPacket) + 1);
   Wire.endTransmission();
   delay(10);
 }
