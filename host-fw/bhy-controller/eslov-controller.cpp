@@ -5,8 +5,8 @@ void writeDfuPacket(uint8_t *data, uint8_t length)
   Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
   int ret = Wire.write(data, length);
 #if (DEBUG)
-  Serial1.write("Write returned: ");
-  Serial1.write(ret);
+  Serial1.print("Write returned: ");
+  Serial1.print(ret);
   Serial1.println();
 #endif
   Wire.endTransmission(false);
@@ -42,7 +42,7 @@ uint8_t requestDfuPacketAck()
     ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
 #if (DEBUG)
     Serial1.print("Request returned: ");
-    Serial1.write(ret);
+    Serial1.print(ret);
     Serial1.println();
 #endif
   }

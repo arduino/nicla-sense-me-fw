@@ -13,7 +13,7 @@ void setup()
 #if (DEBUG)
   Serial1.begin(115200);
 delay(2000);
-  Serial1.write("ok\n");
+  Serial1.println("ok");
 #endif
 }
 
@@ -23,10 +23,8 @@ void loop()
     _rxBuffer[_rxIndex++] = Serial.read();
 
 #if (DEBUG)
-    Serial1.write(_rxBuffer[_rxIndex-1]);
-    Serial1.write("\n");
-    Serial1.write(_rxBuffer[0]);
-    Serial1.write("\n");
+    Serial1.println(_rxBuffer[_rxIndex-1]);
+    //Serial1.println(_rxBuffer[0]);
 #endif
 
     if (_rxBuffer[0] == HOST_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == HOST_DFU_INTERNAL_OPCODE) {
@@ -37,17 +35,17 @@ void loop()
 
 #if (DEBUG)
         { // dump rx buffer
-          Serial1.write("Received: ");
+          Serial1.print("Received: ");
           for(int n=0; n<_rxIndex; n++) {
-            Serial1.write(_rxBuffer[n]);
-            Serial1.write(", ");
+            Serial1.print(_rxBuffer[n]);
+            Serial1.print(", ");
           }
           Serial1.println();
         }
         { // print ack received
-          Serial1.write("Sent Ack: ");
-          Serial1.write(ack);
-          Serial1.write(" back to PC");
+          Serial1.print("Sent Ack: ");
+          Serial1.print(ack);
+          Serial1.print(" back to PC");
           Serial1.println();
         }
 #endif
@@ -59,7 +57,7 @@ void loop()
     } else if (_rxBuffer[0] == HOST_READ_SENSOR_OPCODE) {
 
 #if (DEBUG)
-      Serial1.write("received read sensor opcode\n");
+      Serial1.print("received read sensor opcode\r\n");
 #endif
       uint8_t availableData = requestAvailableData();
       writeStateChange(ESLOV_READ_SENSOR_STATE);
@@ -77,7 +75,7 @@ void loop()
 
     } else if (_rxBuffer[0] == HOST_CONFIG_SENSOR_OPCODE) {
 #if (DEBUG)
-      Serial1.write("config");
+      Serial1.print("config");
 #endif
       if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
         SensorConfigurationPacket* config = (SensorConfigurationPacket*)&_rxBuffer[1];
@@ -88,7 +86,7 @@ void loop()
       
     } else {
 #if (DEBUG)
-      Serial1.write("no opcode: ");
+      Serial1.println("no opcode");
 #endif
       _rxIndex = 0;
     }

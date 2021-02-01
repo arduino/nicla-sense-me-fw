@@ -29,8 +29,8 @@ void writeDfuPacket(uint8_t *data, uint8_t length)
   Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
   int ret = Wire.write(data, length);
 #if (DEBUG)
-  Serial1.write("Write returned: ");
-  Serial1.write(ret);
+  Serial1.print("Write returned: ");
+  Serial1.print(ret);
   Serial1.println();
 #endif
   Wire.endTransmission(false);
@@ -44,7 +44,7 @@ uint8_t requestDfuPacketAck()
     ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
 #if (DEBUG)
     Serial1.print("Request returned: ");
-    Serial1.write(ret);
+    Serial1.print(ret);
     Serial1.println();
 #endif
   }
@@ -77,17 +77,17 @@ void loop()
 
 #if (DEBUG)
         { // dump rx buffer
-          Serial1.write("Received: ");
+          Serial1.print("Received: ");
           for(int n=0; n<_rxIndex; n++) {
-            Serial1.write(_rxBuffer[n]);
-            Serial1.write(", ");
+            Serial1.print(_rxBuffer[n]);
+            Serial1.print(", ");
           }
           Serial1.println();
         }
         { // print ack received
-          Serial1.write("Sent Ack: ");
-          Serial1.write(ack);
-          Serial1.write(" back to PC");
+          Serial1.print("Sent Ack: ");
+          Serial1.print(ack);
+          Serial1.print(" back to PC");
           Serial1.println();
         }
 #endif
