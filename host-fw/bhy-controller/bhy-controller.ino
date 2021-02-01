@@ -24,7 +24,6 @@ void loop()
 
 #if (DEBUG)
     Serial1.println(_rxBuffer[_rxIndex-1]);
-    //Serial1.println(_rxBuffer[0]);
 #endif
 
     if (_rxBuffer[0] == HOST_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == HOST_DFU_INTERNAL_OPCODE) {
@@ -74,11 +73,15 @@ void loop()
       _rxIndex = 0;
 
     } else if (_rxBuffer[0] == HOST_CONFIG_SENSOR_OPCODE) {
-#if (DEBUG)
-      Serial1.print("config");
-#endif
       if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
         SensorConfigurationPacket* config = (SensorConfigurationPacket*)&_rxBuffer[1];
+#if (DEBUG)
+        Serial1.print("received config: ");
+        Serial1.println(config->sensorId);
+        Serial1.println(config->sampleRate);
+        Serial1.println(config->latency);
+        Serial1.println();
+#endif
         writeConfigPacket(config);
 
         _rxIndex = 0;
