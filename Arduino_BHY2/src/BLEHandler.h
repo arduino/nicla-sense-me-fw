@@ -19,8 +19,9 @@ public:
 private:
   static Stream *_debug;
 
-  void DFUAcknowledgment();
+  void writeDFUAcknowledgment();
   void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic);
+
   static void receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic);
   static void receivedExternalDFU(BLEDevice central, BLECharacteristic characteristic);
   static void receivedSensorConfig(BLEDevice central, BLECharacteristic characteristic);
