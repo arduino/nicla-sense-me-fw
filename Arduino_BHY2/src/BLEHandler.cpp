@@ -30,7 +30,7 @@ void BLEHandler::DFUAcknowledgment()
 {
   uint8_t ack = dfuManager.acknowledgment();
   if (dfuAckCharacteristic.subscribed()) {
-    dfuAckCharacteristic.writeValue(ack, 1);
+    dfuAckCharacteristic.writeValue(ack);
   }
 }
 
