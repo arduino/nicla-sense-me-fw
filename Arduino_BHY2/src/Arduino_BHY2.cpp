@@ -50,7 +50,7 @@ bool Arduino_BHY2::readSensorData(SensorDataPacket &data)
 void Arduino_BHY2::debug(Stream &stream)
 {
   eslovHandler.debug(stream);
-  bleHandler.debug(stream);
+  BLEHandler::debug(stream);
 }
 
 Arduino_BHY2 BHY2;

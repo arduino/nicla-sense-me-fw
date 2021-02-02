@@ -18,6 +18,8 @@ auto sensorConfigUuid = "34c2e3bd-34aa-11eb-adc1-0242ac120002";
 BLECharacteristic sensorDataCharacteristic(sensorDataUuid, (BLERead | BLENotify), sizeof(SensorDataPacket));
 BLECharacteristic sensorConfigCharacteristic(sensorConfigUuid, BLEWrite, sizeof(SensorConfigurationPacket));
 
+Stream* BLEHandler::_debug = NULL;
+
 BLEHandler::BLEHandler()
 {
 }
@@ -39,15 +41,19 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
 {
   uint8_t data[sizeof(DFUPacket)];
   characteristic.readValue(data, sizeof(data));
-  Serial.print("Size of data: ");
-  Serial.println(sizeof(data));
+  if (_debug) {
+    _debug->print("Size of data: ");
+    _debug->println(sizeof(data));
+  }
   dfuManager.processPacket(dfuType, data);
   bleHandler.DFUAcknowledgment();
 }
 
 void BLEHandler::receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic)
 {
-  Serial.println("receivedInternalDFU");
+  if (_debug) {
+    _debug->println("receivedInternalDFU");
+  }
   bleHandler.processDFUPacket(DFU_INTERNAL, characteristic);
 }
 
@@ -113,7 +119,6 @@ void BLEHandler::debug(Stream &stream)
 {
   _debug = &stream;
   BLE.debug(stream);
-
 }
 
 BLEHandler bleHandler;
