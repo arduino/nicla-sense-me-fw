@@ -15,9 +15,12 @@ var arrayFW
 var fwLen
 bytesArray = new Uint8Array(67);
 var value
-var iterations
-var spareBytes
-var repeat = true
+var iterations = 0;
+var spareBytes = 0;
+var updateIndex = 0;
+var ackReceived = false;
+var ack = false;
+var dfuTimeout;
 
   document.querySelector('#connect').addEventListener('click', function() {
     if (isWebBluetoothEnabled()) { connect() }
@@ -46,37 +49,13 @@ var repeat = true
 
   document.querySelector('#update').addEventListener('click', function() {
     if (isWebBluetoothEnabled()) { 
-
       iterations = fwLen/64;
       spareBytes = fwLen%64;
-
-      var i;
-      for (i = 0; i < 2; i++) {
-        console.log('Inside for')
-
-        //let repeat = true;
-
-        while(repeat == true) {
-          update(i)
-          /*
-          .then(ack => {
-            if (ack == 15) {
-              console.log('Ack received!')
-              repeat = false
-            } else {
-              console.log('Nack received! Resend same packet');
-            }
-          })
-          */
-        }
-
-        repeat = true
-
-      }
+      if (spareBytes > 0) iterations++;
+      updateIndex = 0;
+      update(updateIndex);
     }
   })
-
-
 
   function isWebBluetoothEnabled() {
     if (!navigator.bluetooth) {
@@ -143,8 +122,8 @@ var repeat = true
     .then(characteristic => {
       gattAckCharacteristic = characteristic
       console.log("gattAckCharacteristic:", gattAckCharacteristic)
-      gattAckCharacteristic.addEventListener('characteristicvaluechanged', handleAckValue)
-      //characteristic.startNotifications()
+      //gattAckCharacteristic.addEventListener('characteristicvaluechanged', handleAckEvent)
+      //gattAckCharacteristic.startNotifications();
     })
     /*
     .then(_ => {
@@ -157,48 +136,70 @@ var repeat = true
   }
 
 
-  function handleAckValue(event) {
-    let value = event.target.value.getUint8(0)
-    console.log('Value is '+ value)
-    if (value == 15) {
-      console.log('Ack received!')
-      repeat = false
-    } else {
-      console.log('Nack received! Resend same packet')
-    }
+function readAck() {
+  console.log('Reading Ack/Nack...')
+  gattAckCharacteristic.readValue()
+  .then(value => {
+    var ack = value.getUint8(0)
+    console.log('AckVal is: ', ack)
+    handleAck(ack);
+  });
+}
+
+function handleAck(value) {
+  console.log('Value is '+ value);
+  if (value == 15) {
+    console.log('Ack received!');
+    updateIndex++;
+  } else {
+    console.log('Nack received! Resend same packet');
   }
-
-
-  function update(index) {
-    filePtr = 64*index
-    bytesArray[0] = 0
-    index_byte = new Uint8Array([
-                (index & 0xff00) >> 8,
-                (index & 0x00ff)
-    ])
-    bytesArray.set(index_byte,1)
-    bytesArray.set(arrayFW.slice(filePtr, (filePtr+64)),3)
-    console.hex(arrayFW.slice(filePtr, (filePtr+64)))
-    console.log('Writing 67 bytes array...')
-    gattInternalCharacteristic.writeValue(bytesArray)
-    //return writePacket(bytesArray)
-    console.log('After write...')
-    gattAckCharacteristic.readValue()
-    .then(_ => {
-      Promise.resolve()
-    })
-    //return Promise.all([
-    /*
-    readAck()
-    .then(ack => {
-      console.log('ack: ', ack)
-      return ack
-    })
-    */
-    
-    //])
+  if (updateIndex == iterations) {
+    console.log('firmware sent');
+    return;
   }
+  //update(updateIndex);
+  setTimeout(_ => {update(updateIndex);}, 1);
+}
 
+function handleAckEvent(event) {
+  //clearTimeout(dfuTimeout);
+  let value = event.target.value.getUint8(0);
+  handleAck(value);
+}
+
+function update(index) {
+  //clearTimeout(dfuTimeout);
+  console.log(index);
+  filePtr = 64 * index;
+  bytesArray[0] = 0;
+  index_byte = new Uint8Array([
+              (index & 0xff00) >> 8,
+              (index & 0x00ff) ]);
+  bytesArray.set(index_byte, 1);
+  if (index == iterations - 1 && spareBytes > 0) {
+    lastBytes = new Uint8Array(64 - spareBytes).fill(0);
+    bytesArray.set(arrayFW.slice(filePtr, (filePtr + spareBytes)), 3);
+    bytesArray.set(lastBytes, filePtr + spareBytes);
+  } else {
+    bytesArray.set(arrayFW.slice(filePtr, (filePtr + 64)), 3);
+  }
+  //console.hex(bytesArray);
+  //console.log('Writing 67 bytes array...');
+  gattInternalCharacteristic.writeValue(bytesArray)
+  .then(_ => {  
+    //dfuTimeout = setTimeout(handleTimeout, 1000); 
+    setTimeout(readAck, 1); 
+    console.log('Written');
+  });
+  //console.log('Written');
+}
+
+function handleTimeout() {
+  console.log('Ack did not arrive in time');
+  //updateIndex = 0;
+  update(updateIndex);
+}
 
   function writePacket(packet) {
     console.log('Writing 67 bytes array...')
@@ -208,18 +209,6 @@ var repeat = true
     })
   }
 
-
-  function readAck() {
-    console.log('Reading Ack/Nack...')
-    //gattAckCharacteristic.addEventListener('readAck', handleAck);
-    //return Promise.all([
-    return gattAckCharacteristic.readValue()
-    .then(value => {
-      const ack = value.getUint8(0)
-      console.log('AckVal is: ', ack)
-      return ack
-    })
-  }
 
   /*
   function handleAck(event) {
