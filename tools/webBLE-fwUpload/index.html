@@ -160,8 +160,8 @@ function handleAck(value) {
     console.log('firmware sent');
     return;
   }
-  //update(updateIndex);
-  setTimeout(_ => {update(updateIndex);}, 1);
+  update(updateIndex);
+  //setTimeout(_ => {update(updateIndex);}, 1);
 }
 
 function handleAckEvent(event) {
@@ -182,7 +182,7 @@ function update(index) {
   if (index == iterations - 1 && spareBytes > 0) {
     lastBytes = new Uint8Array(64 - spareBytes).fill(0);
     bytesArray.set(arrayFW.slice(filePtr, (filePtr + spareBytes)), 3);
-    bytesArray.set(lastBytes, filePtr + spareBytes);
+    bytesArray.set(lastBytes, spareBytes);
   } else {
     bytesArray.set(arrayFW.slice(filePtr, (filePtr + 64)), 3);
   }
