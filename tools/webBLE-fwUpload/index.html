@@ -21,6 +21,7 @@ var updateIndex = 0;
 var ackReceived = false;
 var ack = false;
 var dfuTimeout;
+var debug = false;
 
   document.querySelector('#connect').addEventListener('click', function() {
     if (isWebBluetoothEnabled()) { connect() }
@@ -51,9 +52,11 @@ var dfuTimeout;
     if (isWebBluetoothEnabled()) { 
       iterations = Math.floor(fwLen/64);
       spareBytes = fwLen%64;
+      if (debug == true) {
+        console.log("Iterations: ", iterations)
+        console.log("Spare bytes: ", spareBytes)
+      }
       if (spareBytes > 0) iterations++;
-      console.log(iterations);
-      console.log(spareBytes);
       updateIndex = 0;
       update(updateIndex);
     }
@@ -139,19 +142,27 @@ var dfuTimeout;
 
 
 function readAck() {
-  console.log('Reading Ack/Nack...')
+  if (debug == true) {
+    console.log('Reading Ack/Nack...')
+  }
   gattAckCharacteristic.readValue()
   .then(value => {
     var ack = value.getUint8(0)
-    console.log('AckVal is: ', ack)
+    if (debug == true) {
+      console.log('AckVal is: ', ack)
+    }
     handleAck(ack);
   });
 }
 
 function handleAck(value) {
-  console.log('Value is '+ value);
+  if (debug == true) {
+    console.log('Value is '+ value);
+  }
   if (value == 15) {
-    console.log('Ack received!');
+    if (debug == true) {
+      console.log('Ack received!');
+    }
     updateIndex++;
   } else {
     console.log('Nack received! Resend same packet');
@@ -172,7 +183,9 @@ function handleAckEvent(event) {
 
 function update(index) {
   //clearTimeout(dfuTimeout);
-  console.log(index);
+  if (debug == true) {
+    console.log(index);
+  }
   filePtr = 64 * index;
   bytesArray[0] = 0;
   index_byte = new Uint8Array([
@@ -191,10 +204,11 @@ function update(index) {
   gattInternalCharacteristic.writeValue(bytesArray)
   .then(_ => {  
     //dfuTimeout = setTimeout(handleTimeout, 1000); 
-    setTimeout(readAck, 1); 
-    console.log('Written');
+    setTimeout(readAck, 1);
+    if (debug == true) {
+      console.log('Written');
+    }
   });
-  //console.log('Written');
 }
 
 function handleTimeout() {
