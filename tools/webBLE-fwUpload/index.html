@@ -57,12 +57,13 @@ document.querySelector('#fileItem').addEventListener('change', function() {
     arrayFW = new Uint8Array(arrayBuffer);
     fwLen = arrayFW.length;
 
-    console.log("Update fw length: ", fwLen);
-    console.log(arrayFW);
-    console.log("Computing 8-bit CRC...");
+    console.log("Binary file length: ", fwLen);
+    if (debug == true) {
+      console.log(arrayFW);
+    }
     crc8();
-    console.log(crc8bit);
-    console.log('Press "Update FW" button to start a fw update');
+    console.log("Computed 8-bit CRC: ", crc8bit);
+    console.log('Press "Update FW" button to start the fw update');
 
     document.querySelector('#update').disabled = false;
   }
@@ -79,8 +80,10 @@ document.querySelector('#update').addEventListener('click', function() {
       console.log("Spare bytes: ", spareBytes);
     }
     if (spareBytes == 0) {
-      console.log("No remaining bytes in last packet to write CRC.");
-      console.log("CRC will be sent alone in a new packet");
+      if (debug == true) {
+        console.log("No remaining bytes in last packet to write CRC.");
+        console.log("CRC will be sent alone in a new packet");
+      }
       onlyCRCleft = true;
     }
     updateIndex = 0;
@@ -91,10 +94,14 @@ document.querySelector('#update').addEventListener('click', function() {
 
 function isWebBluetoothEnabled() {
   if (!navigator.bluetooth) {
-    console.log('Web Bluetooth is NOT available!');
+    if (debug == true) {
+      console.log('Web Bluetooth is NOT available!');
+    }
     return false;
   }
-  console.log('Web Bluetooth is available!');
+  if (debug == true) {
+    console.log('Web Bluetooth is available!');
+  }
   return true;
 }
 
@@ -103,7 +110,9 @@ function getDeviceInfo() {
     filters: [{ name: deviceName}],
     optionalServices: [dfuService]
   };
-  console.log('Requesting BLE device info...');
+  if (debug == true) {
+    console.log('Requesting BLE device info...');
+  }
   return navigator.bluetooth.requestDevice(options).then(device => {
     bleDevice = device;
   }).catch(error => {
@@ -123,26 +132,32 @@ function connect() {
   return getDeviceInfo()
   .then(connectGATTdfu)
   .then(connectGATTack)
-  .then(_ => { console.log('Choose file') })
+  .then(_ => { console.log('Press the button "Choose file" to select the binary file that you want to send to Unisense') })
   .catch(error => { console.log('ERROR: ' + error); });
 }
 
 function connectGATTdfu() {
-  console.log('Connecting to BLE device...')
   return bleDevice.gatt.connect()
   .then(server => {
-    console.log("Getting server:", server);
+    console.log('BLE device connected!')
+      if (debug == true) {
+        console.log("Getting server:", server)
+      }
     return server.getPrimaryService(dfuService);
   })
   .then(service => {
     gattService = service;
-    console.log("Getting service:", service);
+    if (debug == true) {
+      console.log("Getting service:", service);
+    }
     return service.getCharacteristic(dfuInternalCharacteristic);
   })
   .then(characteristic => {
-    console.log("Looking for characteristic...");
     gattInternalCharacteristic = characteristic;
-    console.log("gattInternalCharacteristic:", gattInternalCharacteristic);
+    if (debug == true) {
+      console.log("Looking for characteristic...");
+      console.log("gattInternalCharacteristic:", gattInternalCharacteristic);
+    }
   });
 }
 
@@ -150,7 +165,9 @@ function connectGATTack() {
   return gattService.getCharacteristic(dfuAckCharacteristic)
   .then(characteristic => {
     gattAckCharacteristic = characteristic;
-    console.log("gattAckCharacteristic:", gattAckCharacteristic);
+    if (debug == true) {
+      console.log("gattAckCharacteristic:", gattAckCharacteristic);
+    }
     //gattAckCharacteristic.addEventListener('characteristicvaluechanged', handleAckEvent)
     //gattAckCharacteristic.startNotifications();
   })
