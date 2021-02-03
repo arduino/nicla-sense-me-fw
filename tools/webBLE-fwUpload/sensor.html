@@ -12,78 +12,71 @@
   </head>
   <body>
 
-    <br><hr><br>
-    <h3>Connection</h3>  
-    <!--  <button id="connect">Connect with the BLE device</button> -->
-    <div class="form-group">
-      <div class="col-md-4">
-        <button id="connectButton" name="connectButton" class="btn btn-primary">Connect</button>
-      </div>
-    </div>
-    <br><hr><br>
-
-
-    <form class="form-horizontal">
-    <fieldset>
-
-
-    <!-- Form Name -->
-    <legend>Sensor Configuration</legend>
-
-    <!-- <h1>Configure a sensor</h1>  -->
-    <!-- Text input-->
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="sensorId">Sensor ID</label>  
-      <div class="col-md-2">
-      <input id="sensorId" name="sensorId" type="text" class="form-control input-md" required="">
-        
-      </div>
-    </div>
-
-    <!-- Text input-->
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="rate">Sample Rate</label>  
-      <div class="col-md-2">
-      <input id="rate" name="rate" type="text" class="form-control input-md">
-        
-      </div>
-    </div>
-
-    <!-- Text input-->
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="latency">Latency</label>  
-      <div class="col-md-2">
-      <input id="latency" name="latency" type="text" class="form-control input-md">
-        
-      </div>
-    </div>
-
-    <!-- Button -->
-    <div class="form-group">
-      <label class="col-md-4 control-label" for="configureButton"></label>
-     <!-- <div class="col-md-4"> -->
-        <!-- <button id="configureButton" name="configureButton" class="btn btn-primary" disabled>Configure</button> -->
-        <button type="button" id="configureButton" name="configureButton" class="btn btn-primary">Configure</button> 
-      </div>
-    </div>
-
-    </fieldset>
-    </form>
+    <!-- Connection form -->
 
     <br><hr><br>
-    <h3>Read sensor data</h3>  
+    <div class="container text-center">
+
+      <div class="row">
+        <!-- <div class="col-md-3 offset-md-3"> -->
+        <div class="col"> 
+          <h3>Connect to Unisense</h3>  
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col"> 
+          <button id="connectButton" name="connectButton" class="btn btn-primary">Connect</button>
+        </div>
+      </div>
+
+    </div>
+    <br><hr><br>
 
 
-    <table id="dataTable" class="table table-bordered">
-      <thead>
-        <tr>
-          <th scope="col">Sensor</th>
-          <th scope="col">Data</th>
-        </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
+    <!-- Configuration form -->
+
+    <div class="container text-center">
+
+      <h3>Sensor Configuration</h3>
+
+      <div class="row input-group">
+
+        <div class="col-md-3 input-group">
+          <span class="input-group-text" id="basic-addon1">Sensor </span>
+          <input id="sensorId" name="sensorId" type="text" class="form-control" aria-describedby="basic-addon1"> 
+        </div>
+        <div class="col-md-3 input-group">
+          <span class="input-group-text" id="basic-addon1">Sample Rate </span>
+          <input id="rate" name="rate" type="text" class="form-control input-md">
+        </div>
+        <div class="col-md-3 input-group">
+          <span class="input-group-text" id="basic-addon1">Latency </span>
+          <input id="latency" name="latency" type="text" class="form-control input-md">
+        </div>
+        <div class="col-md-3 input-group">
+          <button type="button" id="configureButton" name="configureButton" class="btn btn-primary">Configure</button> 
+        </div>
+
+      </div>
+
+    </div>
+    <br><hr><br>
+
+
+    <!-- Read sensor data form -->
+    <div class="container text-center">
+      <h3>Read sensor data</h3>  
+      <table id="dataTable" class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Sensor</th>
+            <th scope="col">Data</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
