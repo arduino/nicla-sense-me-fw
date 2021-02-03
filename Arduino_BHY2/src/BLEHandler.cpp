@@ -65,6 +65,13 @@ void BLEHandler::receivedSensorConfig(BLEDevice central, BLECharacteristic chara
 {
   SensorConfigurationPacket data;
   characteristic.readValue(&data, sizeof(data));
+  if (_debug) {
+    _debug->println("configuration received: ");
+    _debug->print("data: ");
+    _debug->println(data.sensorId);
+    _debug->println(data.sampleRate);
+    _debug->println(data.latency);
+  }
   sensortec.configureSensor(&data);
 }
 

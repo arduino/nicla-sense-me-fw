@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>Sensor page</title>
+  </head>
+  <body>
+
+    <br><hr><br>
+    <h3>Connection</h3>  
+    <!--  <button id="connect">Connect with the BLE device</button> -->
+    <div class="form-group">
+      <div class="col-md-4">
+        <button id="connectButton" name="connectButton" class="btn btn-primary">Connect</button>
+      </div>
+    </div>
+    <br><hr><br>
+
+
+    <form class="form-horizontal">
+    <fieldset>
+
+
+    <!-- Form Name -->
+    <legend>Sensor Configuration</legend>
+
+    <!-- <h1>Configure a sensor</h1>  -->
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-4 control-label" for="sensorId">Sensor ID</label>  
+      <div class="col-md-2">
+      <input id="sensorId" name="sensorId" type="text" class="form-control input-md" required="">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-4 control-label" for="rate">Sample Rate</label>  
+      <div class="col-md-2">
+      <input id="rate" name="rate" type="text" class="form-control input-md">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-4 control-label" for="latency">Latency</label>  
+      <div class="col-md-2">
+      <input id="latency" name="latency" type="text" class="form-control input-md">
+        
+      </div>
+    </div>
+
+    <!-- Button -->
+    <div class="form-group">
+      <label class="col-md-4 control-label" for="configureButton"></label>
+     <!-- <div class="col-md-4"> -->
+        <!-- <button id="configureButton" name="configureButton" class="btn btn-primary" disabled>Configure</button> -->
+        <button type="button" id="configureButton" name="configureButton" class="btn btn-primary">Configure</button> 
+      </div>
+    </div>
+
+    </fieldset>
+    </form>
+
+    <br><hr><br>
+    <h3>Read sensor data</h3>  
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  </body>
+</html>
+
+<script>
+
+document.getElementById('sensorId').value = '10';
+document.getElementById('rate').value = '0';
+document.getElementById('latency').value = '0';
+
+const deviceName = 'UNISENSE'
+const sensorServiceUuid = '34c2e3bb-34aa-11eb-adc1-0242ac120002';
+const sensorConfigCharacteristicUuid = '34c2e3bd-34aa-11eb-adc1-0242ac120002';
+const sensorDataCharacteristicUuid = '34c2e3bc-34aa-11eb-adc1-0242ac120002';
+
+var bleDevice
+var bleServer
+var sensorService
+var sensorConfigCharacteristic
+var sensorDataCharacteristic
+
+document.querySelector('#connectButton').addEventListener('click', function() {
+  if (isWebBluetoothEnabled()) { 
+    connect() 
+    .then(_ => {
+      console.log('Connected')
+      document.querySelector('#configureButton').disabled = false
+    })
+    .catch(error => {
+      console.log('ERROR: ' + error);
+    });
+  }
+});
+
+document.querySelector('#configureButton').addEventListener('click', 
+  _=> {
+    sensorId = parseInt(document.getElementById('sensorId').value);
+    sampleRate = parseFloat(document.getElementById('rate').value);
+    latency = parseInt(document.getElementById('latency').value);
+
+    configPacket = new Uint8Array(9);
+    configPacket[0] = sensorId;
+    configPacket.set(floatToBytes(sampleRate), 1);
+    configPacket.set(intToBytes(latency), 5);
+    console.log(configPacket);
+
+    sensorConfigCharacteristic.writeValue(configPacket)
+    .then(_ => {  
+      console.log('Configuration written');
+    });
+  }
+);
+
+function floatToBytes(value) {
+  var tempArray = new Float32Array(1);
+  tempArray[0] = value;
+  return new Uint8Array(tempArray.buffer);
+}
+
+function intToBytes(value) {
+  var tempArray = new Int32Array(1);
+  tempArray[0] = value;
+  return new Uint8Array(tempArray.buffer);
+}
+
+function isWebBluetoothEnabled() {
+  if (!navigator.bluetooth) {
+    console.log('Web Bluetooth is NOT available!')
+    return false
+  }
+  console.log('Web Bluetooth is available!')
+  return true
+}
+
+function getDeviceInfo() {
+  let options = {
+    filters: [{ name: deviceName}],
+    optionalServices: [sensorServiceUuid]
+  };
+  console.log('Requesting BLE device info...');
+  return navigator.bluetooth.requestDevice(options).then(device => {
+    bleDevice = device
+  }).catch(error => {
+    console.log('Request device error: ' + error)
+  });
+}
+
+function connect() {
+  return getDeviceInfo()
+  .then(connectDevice)
+  .then(getSensorCharacteristics);
+}
+
+function connectDevice() {
+  console.log('Connecting to device')
+  return bleDevice.gatt.connect()
+  .then(server => {
+    bleServer = server;
+    return bleServer.getPrimaryService(sensorServiceUuid);
+  })
+  .then(service => {
+    sensorService = service;
+  });
+}
+
+function getSensorCharacteristics() {
+  console.log('Getting sensor characteristics');
+  return sensorService.getCharacteristic(sensorConfigCharacteristicUuid)
+  .then(characteristic => {
+    sensorConfigCharacteristic = characteristic;
+  })
+  .then(_ => {
+    return sensorService.getCharacteristic(sensorDataCharacteristicUuid);
+  })
+  .then(characteristic => {
+    sensorDataCharacteristic = characteristic;
+  });
+}
+
+</script>
