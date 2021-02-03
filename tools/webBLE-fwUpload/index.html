@@ -3,172 +3,146 @@
 <button id="update" disable>Update FW</button>
 
 <script>
-var deviceName = 'UNISENSE'
+const deviceName = 'UNISENSE';
 const dfuService = '34c2e3b8-34aa-11eb-adc1-0242ac120002';
 const dfuAckCharacteristic = '34c2e3be-34aa-11eb-adc1-0242ac120002';
 const dfuInternalCharacteristic = '34c2e3b9-34aa-11eb-adc1-0242ac120002';
-var bleDevice
-var gattService
-var gattAckCharacteristic
-var gattInternalCharacteristic
-var arrayFW
-var fwLen
-bytesArray = new Uint8Array(67);
-var value
+
+var bleDevice;
+var gattService;
+var gattAckCharacteristic;
+var gattInternalCharacteristic;
+
+var arrayFW;
+var fwLen;
+var bytesArray = new Uint8Array(67);
 var iterations = 0;
 var spareBytes = 0;
 var updateIndex = 0;
-var ackReceived = false;
-var ack = false;
-var dfuTimeout;
+//var dfuTimeout;
 var debug = false;
 var crc8bit = 0;
 var onlyCRCleft = false;
 
-  document.querySelector('#connect').addEventListener('click', function() {
-    if (isWebBluetoothEnabled()) { connect() }
+document.querySelector('#connect').addEventListener('click', function() {
+  if (isWebBluetoothEnabled()) { connect(); }
+});
+
+document.querySelector('#fileItem').addEventListener('change', function() {
+  var reader = new FileReader();
+  reader.onload = function() {
+    var arrayBuffer = this.result;
+    arrayFW = new Uint8Array(arrayBuffer);
+    fwLen = arrayFW.length;
+
+    console.log("Update fw length: ", fwLen);
+    console.log(arrayFW);
+    console.log("Computing 8-bit CRC...");
+    crc8();
+    console.log(crc8bit);
+    console.log('Press "Update FW" button to start a fw update');
+
+    document.querySelector('#update').disabled = false;
+  }
+  reader.readAsArrayBuffer(this.files[0]);
+}, false);
+
+document.querySelector('#update').addEventListener('click', function() {
+  if (isWebBluetoothEnabled()) { 
+    iterations = Math.floor(fwLen/64);
+    spareBytes = fwLen%64;
+    iterations++;
+    if (debug == true) {
+      console.log("Iterations: ", iterations);
+      console.log("Spare bytes: ", spareBytes);
+    }
+    if (spareBytes == 0) {
+      console.log("No remaining bytes in last packet to write CRC.");
+      console.log("CRC will be sent alone in a new packet");
+      onlyCRCleft = true;
+    }
+    updateIndex = 0;
+    update(updateIndex);
+  }
+});
+
+function isWebBluetoothEnabled() {
+  if (!navigator.bluetooth) {
+    console.log('Web Bluetooth is NOT available!');
+    return false;
+  }
+  console.log('Web Bluetooth is available!');
+  return true;
+}
+
+function getDeviceInfo() {
+  let options = {
+    filters: [{ name: deviceName}],
+    optionalServices: [dfuService]
+  };
+  console.log('Requesting BLE device info...');
+  return navigator.bluetooth.requestDevice(options).then(device => {
+    bleDevice = device;
+  }).catch(error => {
+    console.log('Request device error: ' + error);
+  });
+}
+
+function crc8() {
+  var i;
+  for (i = 0; i < fwLen; i++) {
+    b = arrayFW[i];
+    crc8bit = crc8bit ^ b;
+  } 
+}
+
+function connect() {
+  return getDeviceInfo()
+  .then(connectGATTdfu)
+  .then(connectGATTack)
+  .then(_ => { console.log('Choose file') })
+  .catch(error => { console.log('ERROR: ' + error); });
+}
+
+function connectGATTdfu() {
+  console.log('Connecting to BLE device...')
+  return bleDevice.gatt.connect()
+  .then(server => {
+    console.log("Getting server:", server);
+    return server.getPrimaryService(dfuService);
   })
-
-  document.querySelector('#fileItem').addEventListener('change', function() {
-    var reader = new FileReader();
-    reader.onload = function() {
-
-      var arrayBuffer = this.result
-      arrayFW = new Uint8Array(arrayBuffer)
-
-      fwLen = arrayFW.length
-
-      console.log("Update fw length: ", fwLen)
-      console.log(arrayFW)
-      //console.hex(arrayFW)
-
-      console.log("Computing 8-bit CRC...")
-      crc8()
-      console.log(crc8bit)
-
-      console.log('Press "Update FW" button to start a fw update')
-
-      document.querySelector('#update').disabled = false
-
-    }
-    reader.readAsArrayBuffer(this.files[0]);
-  }, false)
-
-  document.querySelector('#update').addEventListener('click', function() {
-    if (isWebBluetoothEnabled()) { 
-      iterations = Math.floor(fwLen/64);
-      spareBytes = fwLen%64;
-      iterations++;
-      if (debug == true) {
-        console.log("Iterations: ", iterations)
-        console.log("Spare bytes: ", spareBytes)
-      }
-      if (spareBytes == 0) {
-        console.log("No remaining bytes in last packet to write CRC.")
-        console.log("CRC will be sent alone in a new packet")
-        onlyCRCleft = true
-      }
-      updateIndex = 0;
-      update(updateIndex);
-    }
+  .then(service => {
+    gattService = service;
+    console.log("Getting service:", service);
+    return service.getCharacteristic(dfuInternalCharacteristic);
   })
+  .then(characteristic => {
+    console.log("Looking for characteristic...");
+    gattInternalCharacteristic = characteristic;
+    console.log("gattInternalCharacteristic:", gattInternalCharacteristic);
+  });
+}
 
-  function isWebBluetoothEnabled() {
-    if (!navigator.bluetooth) {
-      console.log('Web Bluetooth is NOT available!')
-      return false
-    }
-
-    console.log('Web Bluetooth is available!')
-    return true
-  }
-
-  function getDeviceInfo() {
-    let options = {
-      filters: [{ name: deviceName}],
-      optionalServices: [dfuService]
-    }
-
-    console.log('Requesting BLE device info...')
-    return navigator.bluetooth.requestDevice(options).then(device => {
-      bleDevice = device
-    }).catch(error => {
-      console.log('Request device error: ' + error)
-    })
-  }
-
-  function crc8() {
-    var i;
-    for (i = 0; i < fwLen; i++) {
-      b = arrayFW[i]
-      crc8bit = crc8bit ^ b
-    } 
-  }
-
-
-  function connect() {
-    return getDeviceInfo()
-    .then(connectGATTdfu)
-    .then(connectGATTack)
-    .then(_ => {
-      console.log('Choose file')
-    })
-    //.then(writePacket)
-    //.then(readAck)
-    .catch(error => {
-      console.log('ERROR: ' + error);
-    })
-  }
-
-
-  function connectGATTdfu() {
-    console.log('Connecting to BLE device...')
-    return bleDevice.gatt.connect()
-    .then(server => {
-      console.log("Getting server:", server)
-      return server.getPrimaryService(dfuService)
-    })
-    .then(service => {
-      gattService = service
-      console.log("Getting service:", service)
-      return service.getCharacteristic(dfuInternalCharacteristic)
-    })
-    .then(characteristic => {
-      console.log("Looking for characteristic...")
-      gattInternalCharacteristic = characteristic
-      console.log("gattInternalCharacteristic:", gattInternalCharacteristic)
-    })
-  }
-
-
-  function connectGATTack() {
-    return gattService.getCharacteristic(dfuAckCharacteristic)
-    .then(characteristic => {
-      gattAckCharacteristic = characteristic
-      console.log("gattAckCharacteristic:", gattAckCharacteristic)
-      //gattAckCharacteristic.addEventListener('characteristicvaluechanged', handleAckEvent)
-      //gattAckCharacteristic.startNotifications();
-    })
-    /*
-    .then(_ => {
-      console.log('Choose file')
-    })
-    .catch(error => {
-      console.log('[ERROR] Start: ' + error)
-    })
-    */
-  }
+function connectGATTack() {
+  return gattService.getCharacteristic(dfuAckCharacteristic)
+  .then(characteristic => {
+    gattAckCharacteristic = characteristic;
+    console.log("gattAckCharacteristic:", gattAckCharacteristic);
+    //gattAckCharacteristic.addEventListener('characteristicvaluechanged', handleAckEvent)
+    //gattAckCharacteristic.startNotifications();
+  })
+}
 
 
 function readAck() {
   if (debug == true) {
-    console.log('Reading Ack/Nack...')
+    console.log('Reading Ack/Nack...');
   }
   gattAckCharacteristic.readValue()
   .then(value => {
-    var ack = value.getUint8(0)
+    var ack = value.getUint8(0);
     if (debug == true) {
-      console.log('AckVal is: ', ack)
+      console.log('AckVal is: ', ack);
     }
     handleAck(ack);
   });
@@ -207,14 +181,13 @@ function update(index) {
   }
 
   filePtr = 64 * index;
-
   if (index == iterations - 1) {
     //Last byte
     bytesArray[0] = 1;
     bytesleft = spareBytes + 1; //add CRC to the count
     if (debug == true) {
-      console.log("Packaging last byte with CRC")
-      console.log("Total bytes left: ", bytesleft)
+      console.log("Packaging last byte with CRC");
+      console.log("Total bytes left: ", bytesleft);
     }
     spare = new Uint8Array([
               (bytesleft & 0x00ff),
@@ -230,8 +203,8 @@ function update(index) {
               (crc8bit & 0x00ff) ]);
 
     if (debug == true) {
-      console.log("crc[0]: ", crc[0])
-      console.log("crc[1]: ", crc[1])
+      console.log("crc[0]: ", crc[0]);
+      console.log("crc[1]: ", crc[1]);
     }
 
     //write CRC after the spare bytes
@@ -268,25 +241,4 @@ function handleTimeout() {
   update(updateIndex);
 }
 
-  function writePacket(packet) {
-    console.log('Writing 67 bytes array...')
-    return gattInternalCharacteristic.writeValue(writePacket.arguments[0])
-    .catch(error => {
-      console.log('Error: ' + error)
-    })
-  }
-
-
-  /*
-  function handleAck(event) {
-    let ack = event.target.value.getUint8(0);
-    log('Ack is ' + ack);
-  }
-  */
-console.hex = (d) => console.log((Object(d).buffer instanceof ArrayBuffer ? new Uint8Array(d.buffer) : 
-typeof d === 'string' ? (new TextEncoder('utf-8')).encode(d) : 
-new Uint8ClampedArray(d)).reduce((p, c, i, a) => p + (i % 16 === 0 ? i.toString(16).padStart(6, 0) + '  ' : ' ') + 
-c.toString(16).padStart(2, 0) + (i === a.length - 1 || i % 16 === 15 ? 
-' '.repeat((15 - i % 16) * 3) + Array.from(a).splice(i - i % 16, 16).reduce((r, v) => 
-r + (v > 31 && v < 127 || v > 159 ? String.fromCharCode(v) : '.'), '  ') + '\n' : ''), ''));
 </script>
