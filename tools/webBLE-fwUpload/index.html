@@ -1,6 +1,27 @@
+<!DOCTYPE html>
+<html>
+<style>
+#myProgress {
+  width: 100%;
+  background-color: #ddd;
+}
+
+#myBar {
+  width: 0%;
+  height: 30px;
+  background-color: #4CAF50;
+}
+</style>
+<body>
+
+<h1>UNISENSE Fw Updater</h1>
+
 <button id="connect">Connect with the BLE device</button>
 <input id="fileItem" type="file" disable>
 <button id="update" disable>Update FW</button>
+<div id="myProgress">
+  <div id="myBar"></div>
+</div>
 
 <script>
 const deviceName = 'UNISENSE';
@@ -23,6 +44,7 @@ var updateIndex = 0;
 var debug = false;
 var crc8bit = 0;
 var onlyCRCleft = false;
+var elem;
 
 document.querySelector('#connect').addEventListener('click', function() {
   if (isWebBluetoothEnabled()) { connect(); }
@@ -62,6 +84,7 @@ document.querySelector('#update').addEventListener('click', function() {
       onlyCRCleft = true;
     }
     updateIndex = 0;
+    elem = document.getElementById("myBar");
     update(updateIndex);
   }
 });
@@ -226,7 +249,11 @@ function update(index) {
   //console.hex(bytesArray);
   //console.log('Writing 67 bytes array...');
   gattInternalCharacteristic.writeValue(bytesArray)
-  .then(_ => {  
+  .then(_ => {
+    //show on Progress bar
+    var pb = (index/(iterations-1))*100;
+    elem.style.width = Math.floor(pb) + "%";
+
     //dfuTimeout = setTimeout(handleTimeout, 1000); 
     setTimeout(readAck, 1);
     if (debug == true) {
