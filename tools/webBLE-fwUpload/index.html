@@ -49,9 +49,11 @@ var dfuTimeout;
 
   document.querySelector('#update').addEventListener('click', function() {
     if (isWebBluetoothEnabled()) { 
-      iterations = fwLen/64;
+      iterations = Math.floor(fwLen/64);
       spareBytes = fwLen%64;
       if (spareBytes > 0) iterations++;
+      console.log(iterations);
+      console.log(spareBytes);
       updateIndex = 0;
       update(updateIndex);
     }
