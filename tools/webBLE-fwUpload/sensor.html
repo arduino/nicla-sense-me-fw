@@ -74,6 +74,17 @@
     <h3>Read sensor data</h3>  
 
 
+    <table id="dataTable" class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">Sensor</th>
+          <th scope="col">Data</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
@@ -99,6 +110,8 @@ var sensorService
 var sensorConfigCharacteristic
 var sensorDataCharacteristic
 
+var sensorMap = new Map();
+
 document.querySelector('#connectButton').addEventListener('click', function() {
   if (isWebBluetoothEnabled()) { 
     connect() 
@@ -114,11 +127,11 @@ document.querySelector('#connectButton').addEventListener('click', function() {
 
 document.querySelector('#configureButton').addEventListener('click', 
   _=> {
-    sensorId = parseInt(document.getElementById('sensorId').value);
-    sampleRate = parseFloat(document.getElementById('rate').value);
-    latency = parseInt(document.getElementById('latency').value);
+    var sensorId = parseInt(document.getElementById('sensorId').value);
+    var sampleRate = parseFloat(document.getElementById('rate').value);
+    var latency = parseInt(document.getElementById('latency').value);
 
-    configPacket = new Uint8Array(9);
+    var configPacket = new Uint8Array(9);
     configPacket[0] = sensorId;
     configPacket.set(floatToBytes(sampleRate), 1);
     configPacket.set(intToBytes(latency), 5);
@@ -194,7 +207,36 @@ function getSensorCharacteristics() {
   })
   .then(characteristic => {
     sensorDataCharacteristic = characteristic;
+    sensorDataCharacteristic.startNotifications();
+    sensorDataCharacteristic.addEventListener('characteristicvaluechanged', receiveSensorData)
   });
+}
+
+function receiveSensorData(event) {
+  var value = event.target.value;
+  // Get sensor data
+  var sensor = value.getUint8(0);
+  var size = value.getUint8(1);
+  var data = value.getBigUint64(2);
+
+  var table = document.getElementById("dataTable");
+  // If sensor is already in the table -> update its value
+  if (sensorMap.has(sensor)) {
+    rowIndex = sensorMap.get(sensor);
+    var row = table.rows[rowIndex];
+    var cell = row.cells[1];
+    cell.innerHTML = data;
+
+  // If sensor is NOT in the table -> insert a new row filled with sensor data
+  } else {
+    var tableLength = table.rows.length;
+    sensorMap.set(sensor, tableLength);
+    var row = table.insertRow(tableLength);
+    var cell = row.insertCell(0);
+    cell.innerHTML = sensor;
+    cell = row.insertCell(1);
+    cell.innerHTML = data;
+  }
 }
 
 </script>
