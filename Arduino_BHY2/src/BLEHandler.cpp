@@ -87,7 +87,7 @@ void BLEHandler::begin()
   sensorService.addCharacteristic(sensorConfigCharacteristic);
   sensorService.addCharacteristic(sensorDataCharacteristic);
   BLE.addService(sensorService);
-  sensorConfigCharacteristic.setEventHandler(BLEWritten, receivedInternalDFU);
+  sensorConfigCharacteristic.setEventHandler(BLEWritten, receivedSensorConfig);
 
   //
   BLE.advertise();
