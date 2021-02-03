@@ -22,6 +22,8 @@ var ackReceived = false;
 var ack = false;
 var dfuTimeout;
 var debug = false;
+var crc8bit = 0;
+var onlyCRCleft = false;
 
   document.querySelector('#connect').addEventListener('click', function() {
     if (isWebBluetoothEnabled()) { connect() }
@@ -40,6 +42,10 @@ var debug = false;
       console.log(arrayFW)
       //console.hex(arrayFW)
 
+      console.log("Computing 8-bit CRC...")
+      crc8()
+      console.log(crc8bit)
+
       console.log('Press "Update FW" button to start a fw update')
 
       document.querySelector('#update').disabled = false
@@ -52,11 +58,16 @@ var debug = false;
     if (isWebBluetoothEnabled()) { 
       iterations = Math.floor(fwLen/64);
       spareBytes = fwLen%64;
+      iterations++;
       if (debug == true) {
         console.log("Iterations: ", iterations)
         console.log("Spare bytes: ", spareBytes)
       }
-      if (spareBytes > 0) iterations++;
+      if (spareBytes == 0) {
+        console.log("No remaining bytes in last packet to write CRC.")
+        console.log("CRC will be sent alone in a new packet")
+        onlyCRCleft = true
+      }
       updateIndex = 0;
       update(updateIndex);
     }
@@ -84,6 +95,14 @@ var debug = false;
     }).catch(error => {
       console.log('Request device error: ' + error)
     })
+  }
+
+  function crc8() {
+    var i;
+    for (i = 0; i < fwLen; i++) {
+      b = arrayFW[i]
+      crc8bit = crc8bit ^ b
+    } 
   }
 
 
@@ -186,17 +205,49 @@ function update(index) {
   if (debug == true) {
     console.log(index);
   }
+
   filePtr = 64 * index;
-  bytesArray[0] = 0;
-  index_byte = new Uint8Array([
-              (index & 0xff00) >> 8,
-              (index & 0x00ff) ]);
-  bytesArray.set(index_byte, 1);
-  if (index == iterations - 1 && spareBytes > 0) {
-    lastBytes = new Uint8Array(64 - spareBytes).fill(0);
-    bytesArray.set(arrayFW.slice(filePtr, (filePtr + spareBytes)), 3);
-    bytesArray.set(lastBytes, spareBytes);
+
+  if (index == iterations - 1) {
+    //Last byte
+    bytesArray[0] = 1;
+    bytesleft = spareBytes + 1; //add CRC to the count
+    if (debug == true) {
+      console.log("Packaging last byte with CRC")
+      console.log("Total bytes left: ", bytesleft)
+    }
+    spare = new Uint8Array([
+              (bytesleft & 0x00ff),
+              (bytesleft & 0xff00) >> 8 ]);
+    bytesArray.set(spare, 1);
+
+    if (!onlyCRCleft) {
+      bytesArray.set(arrayFW.slice(filePtr, (filePtr + spareBytes)), 3);
+    }
+
+    crc = new Uint8Array([
+              (crc8bit & 0xff00) >> 8,
+              (crc8bit & 0x00ff) ]);
+
+    if (debug == true) {
+      console.log("crc[0]: ", crc[0])
+      console.log("crc[1]: ", crc[1])
+    }
+
+    //write CRC after the spare bytes
+    bytesArray[3 + spareBytes] = crc[1];
+
+    //Fill with 0s the remaining buffer
+    lastBytes = new Uint8Array(64 - spareBytes - 1).fill(0);
+    bytesArray.set(lastBytes, 3 + spareBytes + 1);
+
   } else {
+    index_byte = new Uint8Array([
+              (index & 0x00ff),
+              (index & 0xff00) >> 8 ]);
+
+    bytesArray[0] = 0;
+    bytesArray.set(index_byte, 1);
     bytesArray.set(arrayFW.slice(filePtr, (filePtr + 64)), 3);
   }
   //console.hex(bytesArray);
