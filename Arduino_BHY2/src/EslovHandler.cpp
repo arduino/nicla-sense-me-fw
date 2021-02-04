@@ -48,6 +48,12 @@ void EslovHandler::requestEvent()
     SensorDataPacket data;
     sensortec.readSensorData(data);
     Wire1.write((uint8_t*)&data, sizeof(SensorDataPacket));
+    if (_debug) {
+      _debug->print("data: ");
+      _debug->println(data.sensorId);
+      _debug->println(data.size);
+      _debug->println(data.data);
+    }
 
   } else if (_state == ESLOV_DFU_ACK_STATE) {
     uint8_t ack = dfuManager.acknowledgment();
@@ -69,7 +75,7 @@ void EslovHandler::receiveEvent(int length)
   while(Wire1.available())
   {
     _rxBuffer[_rxIndex++] = Wire1.read(); 
-    //Serial.println(_rxBuffer[_rxIndex-1]);
+    //if(_debug) _debug->println(_rxBuffer[_rxIndex-1]);
 
     // Check if packet is complete depending on its opcode
     if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
@@ -132,8 +138,6 @@ void EslovHandler::receiveEvent(int length)
 void EslovHandler::debug(Stream &stream)
 {
   _debug = &stream;
-  dfuManager.debug(stream);
-
 }
 
 void EslovHandler::dump() 

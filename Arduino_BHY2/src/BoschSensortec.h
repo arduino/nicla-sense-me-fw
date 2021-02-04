@@ -1,9 +1,10 @@
 #ifndef BOSCH_SENSORTEC_H_
 #define BOSCH_SENSORTEC_H_
 
+#include "Arduino.h"
 #include "mbed.h"
 
-#include "SPIChannel.h"
+#include "bosch/common/common.h"
 #include "SensorTypes.h"
 
 #ifdef __cplusplus
@@ -17,6 +18,8 @@ extern "C"
 
 #define SENSOR_QUEUE_SIZE   10
 #define WORK_BUFFER_SIZE    2048
+
+#define MAX_READ_WRITE_LEN 256
 
 // This will use the BHY functions for configuring sensors and retrieving data
 class BoschSensortec {
@@ -33,13 +36,9 @@ public:
   bool readSensorData(SensorDataPacket &data);
 
   // ANNA <-> BOSCH interface
-  static void interruptHandler();
-  static void parseBhyData(const struct bhy2_fifo_parse_data_info *data, void *arg);
   void addSensorData(const SensorDataPacket &sensorData);
 
 private:
-  bool _hasNewData;
-
   mbed::CircularBuffer<SensorDataPacket, SENSOR_QUEUE_SIZE, uint8_t> _sensorQueue;
 
   uint8_t _workBuffer[WORK_BUFFER_SIZE];
@@ -47,6 +46,11 @@ private:
   SensorConfigurationPacket* _savedConfig;
   
   struct bhy2_dev _bhy2;
+
+private:
+  friend class Arduino_BHY2;
+  void debug(Stream &stream);
+  Stream *_debug;
 };
 
 extern BoschSensortec sensortec;
