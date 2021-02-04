@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+
+  <style>
+  #myProgress {
+    width: 100%;
+    background-color: #ddd;
+  }
+
+  #myBar {
+    width: 0%;
+    height: 30px;
+    background-color: #4CAF50;
+  }
+  </style>
+
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>DFU page</title>
+  </head>
+  <body>
+
+    <!-- Connection form -->
+
+    <br><hr><br>
+    <div class="container text-center">
+
+      <div class="row">
+        <!-- <div class="col-md-3 offset-md-3"> -->
+        <div class="col"> 
+          <h3>Connect to Unisense</h3>  
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col"> 
+          <button id="connect" name="connect" class="btn btn-primary">Connect</button>
+        </div>
+      </div>
+
+    </div>
+    <br><hr><br>
+
+
+    <!-- DFU form -->
+
+    <div class="container text-center">
+
+      <div class="row">
+        <div class="col">
+          <h3>Update firmware</h3>
+        </div>
+      </div>
+
+      <br>
+      
+      <div class="row">
+        <div class="col-md-4 offset-md-4 input-group">
+          <label class="input-group-text" for="targetSelect">Target</label>
+          <select class="custom-select" id="targetSelect" required>
+            <option selected>Choose...</option>
+            <option value="anna">ANNA</option>
+            <option value="bhi">BHI</option>
+          </select>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="row">
+        <div class="col-md-4 offset-md-4">
+          <input type="file" class="custom-file-input" id="fileItem" aria-describedby="inputGroupFileAddon01">
+          <label class="custom-file-label" for="inputGroupFile01">Choose binary to upload</label>
+        </div>
+
+      </div>
+
+      <br>
+
+      <div class="row"> 
+        <div class="col">
+          <button id="update" class="btn btn-info" disabled>Update</button>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="row" id="progressDiv" > 
+        <div class="col">
+          <div id="myProgress">
+            <div id="myBar"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <br><hr><br>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  </body>
+</html>
+
+<script>
+const deviceName = 'UNISENSE';
+const dfuService = '34c2e3b8-34aa-11eb-adc1-0242ac120002';
+const dfuAckCharacteristic = '34c2e3be-34aa-11eb-adc1-0242ac120002';
+const dfuInternalCharacteristic = '34c2e3b9-34aa-11eb-adc1-0242ac120002';
+const dfuExternalCharacteristic = '34c2e3ba-34aa-11eb-adc1-0242ac120002';
+
+var bleDevice;
+var gattService;
+var gattAckCharacteristic;
+var gattInternalCharacteristic;
+var gattExternalCharacteristic;
+var dfuCharacteristic;
+
+var arrayFW;
+var fwLen;
+var bytesArray = new Uint8Array(67);
+var iterations = 0;
+var spareBytes = 0;
+var updateIndex = 0;
+//var dfuTimeout;
+var debug = false;
+var crc8bit = 0;
+var onlyCRCleft = false;
+var elem;
+
+// Set ANNA as default target
+document.getElementById('targetSelect').selectedIndex = 1;
+document.getElementById("progressDiv").style.visibility = 'hidden';
+
+document.querySelector('#connect').addEventListener('click', function() {
+  if (isWebBluetoothEnabled()) { connect(); }
+});
+
+document.querySelector('#fileItem').addEventListener('change', function() {
+  var reader = new FileReader();
+  reader.onload = function() {
+    var arrayBuffer = this.result;
+    arrayFW = new Uint8Array(arrayBuffer);
+    fwLen = arrayFW.length;
+
+    console.log("Binary file length: ", fwLen);
+    if (debug == true) {
+      console.log(arrayFW);
+    }
+    crc8();
+    console.log("Computed 8-bit CRC: ", crc8bit);
+    console.log('Press "Update FW" button to start the fw update');
+
+    document.querySelector('#update').disabled = false;
+  }
+  reader.readAsArrayBuffer(this.files[0]);
+  // Update label file name
+  var fileName = $(this).val().replace('C:\\fakepath\\', " ");
+  $(this).next('.custom-file-label').html(fileName);
+}, false);
+
+document.querySelector('#update').addEventListener('click', function() {
+  if (isWebBluetoothEnabled()) { 
+    iterations = Math.floor(fwLen/64);
+    spareBytes = fwLen%64;
+    iterations++;
+    if (debug == true) {
+      console.log("Iterations: ", iterations);
+      console.log("Spare bytes: ", spareBytes);
+    }
+    if (spareBytes == 0) {
+      if (debug == true) {
+        console.log("No remaining bytes in last packet to write CRC.");
+        console.log("CRC will be sent alone in a new packet");
+      }
+      onlyCRCleft = true;
+    }
+    updateIndex = 0;
+    // Show progress bar
+    document.getElementById("progressDiv").style.visibility = 'visible';
+    elem = document.getElementById("myBar");
+    // Take selected dfu characteristic
+    target = document.getElementById("targetSelect").value;
+    if (target == "anna") {
+      dfuCharacteristic = gattInternalCharacteristic;
+    } else {
+      dfuCharacteristic = gattExternalCharacteristic;
+    }
+    update(updateIndex);
+  }
+});
+
+function isWebBluetoothEnabled() {
+  if (!navigator.bluetooth) {
+    if (debug == true) {
+      console.log('Web Bluetooth is NOT available!');
+    }
+    return false;
+  }
+  if (debug == true) {
+    console.log('Web Bluetooth is available!');
+  }
+  return true;
+}
+
+function getDeviceInfo() {
+  let options = {
+    filters: [{ name: deviceName}],
+    optionalServices: [dfuService]
+  };
+  if (debug == true) {
+    console.log('Requesting BLE device info...');
+  }
+  return navigator.bluetooth.requestDevice(options).then(device => {
+    bleDevice = device;
+  }).catch(error => {
+    console.log('Request device error: ' + error);
+  });
+}
+
+function crc8() {
+  var i;
+  for (i = 0; i < fwLen; i++) {
+    b = arrayFW[i];
+    crc8bit = crc8bit ^ b;
+  } 
+}
+
+function connect() {
+  return getDeviceInfo()
+  .then(connectGATTdfu)
+  .then(connectGATTack)
+  .then(_ => { console.log('Press the button "Choose file" to select the binary file that you want to send to Unisense') })
+  .catch(error => { console.log('ERROR: ' + error); });
+}
+
+function connectGATTdfu() {
+  return bleDevice.gatt.connect()
+  .then(server => {
+    console.log('BLE device connected!')
+      if (debug == true) {
+        console.log("Getting server:", server)
+      }
+    return server.getPrimaryService(dfuService);
+  })
+  .then(service => {
+    gattService = service;
+    if (debug == true) {
+      console.log("Getting service:", service);
+    }
+    return service.getCharacteristic(dfuInternalCharacteristic);
+  })
+  .then(characteristic => {
+    gattInternalCharacteristic = characteristic;
+    if (debug == true) {
+      console.log("Looking for characteristic...");
+      console.log("dfu internal characteristic:", gattInternalCharacteristic);
+    }
+  })
+  .then(_ => {
+    return gattService.getCharacteristic(dfuExternalCharacteristic);
+  })
+  .then(characteristic => {
+    gattExternalCharacteristic = characteristic;
+    if (debug == true) {
+      console.log("Looking for characteristic...");
+      console.log("dfu external characteristic:", gattExternalCharacteristic);
+    }
+  });
+}
+
+function connectGATTack() {
+  return gattService.getCharacteristic(dfuAckCharacteristic)
+  .then(characteristic => {
+    gattAckCharacteristic = characteristic;
+    if (debug == true) {
+      console.log("gattAckCharacteristic:", gattAckCharacteristic);
+    }
+    //gattAckCharacteristic.addEventListener('characteristicvaluechanged', handleAckEvent)
+    //gattAckCharacteristic.startNotifications();
+  })
+}
+
+
+function readAck() {
+  if (debug == true) {
+    console.log('Reading Ack/Nack...');
+  }
+  gattAckCharacteristic.readValue()
+  .then(value => {
+    var ack = value.getUint8(0);
+    if (debug == true) {
+      console.log('AckVal is: ', ack);
+    }
+    handleAck(ack);
+  });
+}
+
+function handleAck(value) {
+  if (debug == true) {
+    console.log('Value is '+ value);
+  }
+  if (value == 15) {
+    if (debug == true) {
+      console.log('Ack received!');
+    }
+    updateIndex++;
+  } else {
+    console.log('Nack received! Resend same packet');
+  }
+  if (updateIndex == iterations) {
+    console.log('firmware sent');
+    return;
+  }
+  update(updateIndex);
+  //setTimeout(_ => {update(updateIndex);}, 1);
+}
+
+function handleAckEvent(event) {
+  //clearTimeout(dfuTimeout);
+  let value = event.target.value.getUint8(0);
+  handleAck(value);
+}
+
+function update(index) {
+  //clearTimeout(dfuTimeout);
+  if (debug == true) {
+    console.log(index);
+  }
+
+  filePtr = 64 * index;
+  if (index == iterations - 1) {
+    //Last byte
+    bytesArray[0] = 1;
+    bytesleft = spareBytes + 1; //add CRC to the count
+    if (debug == true) {
+      console.log("Packaging last byte with CRC");
+      console.log("Total bytes left: ", bytesleft);
+    }
+    spare = new Uint8Array([
+              (bytesleft & 0x00ff),
+              (bytesleft & 0xff00) >> 8 ]);
+    bytesArray.set(spare, 1);
+
+    if (!onlyCRCleft) {
+      bytesArray.set(arrayFW.slice(filePtr, (filePtr + spareBytes)), 3);
+    }
+
+    crc = new Uint8Array([
+              (crc8bit & 0xff00) >> 8,
+              (crc8bit & 0x00ff) ]);
+
+    if (debug == true) {
+      console.log("crc[0]: ", crc[0]);
+      console.log("crc[1]: ", crc[1]);
+    }
+
+    //write CRC after the spare bytes
+    bytesArray[3 + spareBytes] = crc[1];
+
+    //Fill with 0s the remaining buffer
+    lastBytes = new Uint8Array(64 - spareBytes - 1).fill(0);
+    bytesArray.set(lastBytes, 3 + spareBytes + 1);
+
+  } else {
+    index_byte = new Uint8Array([
+              (index & 0x00ff),
+              (index & 0xff00) >> 8 ]);
+
+    bytesArray[0] = 0;
+    bytesArray.set(index_byte, 1);
+    bytesArray.set(arrayFW.slice(filePtr, (filePtr + 64)), 3);
+  }
+  //console.log(bytesArray);
+  //console.log('Writing 67 bytes array...');
+  dfuCharacteristic.writeValue(bytesArray)
+  .then(_ => {
+    //show on Progress bar
+    var pb = (index/(iterations-1))*100;
+    elem.style.width = Math.floor(pb) + "%";
+
+    //dfuTimeout = setTimeout(handleTimeout, 1000); 
+    setTimeout(readAck, 1);
+    if (debug == true) {
+      console.log('Written');
+    }
+  });
+}
+
+function handleTimeout() {
+  console.log('Ack did not arrive in time');
+  //updateIndex = 0;
+  update(updateIndex);
+}
+
+</script>

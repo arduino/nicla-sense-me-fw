@@ -79,14 +79,14 @@ void loop()
         { // dump rx buffer
           Serial1.print("Received: ");
           for(int n=0; n<_rxIndex; n++) {
-            Serial1.print(_rxBuffer[n]);
+            Serial1.print(_rxBuffer[n], HEX);
             Serial1.print(", ");
           }
           Serial1.println();
         }
         { // print ack received
           Serial1.print("Sent Ack: ");
-          Serial1.print(ack);
+          Serial1.print(ack, HEX);
           Serial1.print(" back to PC");
           Serial1.println();
         }

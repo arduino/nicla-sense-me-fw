@@ -51,6 +51,7 @@ bool Arduino_BHY2::readSensorData(SensorDataPacket &data)
 void Arduino_BHY2::debug(Stream &stream)
 {
   eslovHandler.debug(stream);
+  BLEHandler::debug(stream);
   sensortec.debug(stream);
   dfuManager.debug(stream);
   BoschParser::debug(stream);
