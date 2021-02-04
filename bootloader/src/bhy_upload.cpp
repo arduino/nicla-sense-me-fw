@@ -346,14 +346,78 @@ static void print_api_error(int8_t rslt, struct bhy2_dev *dev)
     }
 }
 
+static char computeBHYCRC(FILE *file, long len) {
+  char buffer[256];
+  char crc;
+
+  //read by chunks of 256 bytes
+  uint16_t iterations = len/256;
+  uint8_t spare_bytes = len%256;
+
+  int buffer_index = 2;
+
+  //copy the file content by chunks of 256 bytes into a buffer of chars
+  for (int i = 0; i < iterations; i++) {
+    //read 256 bytes into buffer
+    fread(buffer, 1, 256, file);
+
+    if (i==0) {
+        //we are at the beginning of the file, so we must compute the first xor between bytes
+        crc = buffer[0]^buffer[1];
+    }
+
+    for(int i=buffer_index; i<256; i++) {
+        crc = crc^buffer[i];
+    }
+
+    buffer_index = 0;
+
+  }
+
+  if (spare_bytes) {
+    //read the spare bytes, without the CRC
+    fread(buffer, 1, spare_bytes, file);
+
+    for(int i=0; i<spare_bytes; i++) {
+        crc = crc^buffer[i];
+    }
+  }
+
+  return crc;
+}
+
 static int8_t upload_firmware(struct bhy2_dev *dev)
 {
-    FILE *file = fopen(BHY_UPDATE_FILE_PATH, "rb");
+    int8_t rslt = BHY2_OK;
+
+    FILE *file_bhy = fopen(BHY_UPDATE_FILE_PATH, "rb");
+    fseek(file_bhy, 0, SEEK_END);
+    //Decrement len by 1 to remove the CRC from the count
+    long len_bhy = ftell(file_bhy) - 1;
+    fseek(file_bhy, 0, SEEK_SET);
+
+    printf("BHY Firmware size is %ld bytes\r\n", len_bhy);
+
+    fseek(file_bhy, len_bhy, SEEK_SET);
+    char crc_bhy_file;
+    fread(&crc_bhy_file, 1, 1, file_bhy);
+    printf("CRC written in BHY file is %x \r\n", crc_bhy_file);
+
+    fseek(file_bhy, 0, SEEK_SET);
+
+    char crc_bhy = computeBHYCRC(file_bhy, len_bhy);
+
+    if (crc_bhy!=crc_bhy_file) {
+        printf("Wrong CRC! The computed CRC is %x, while it should be %x \r\n", crc_bhy, crc_bhy_file);
+        //should return an error
+        rslt = BHY2_E_NULL_PTR;
+        return rslt;
+    }
+
     uint8_t bhy2_firmware_image[256];
     uint32_t incr = 256; /* Max command packet size */
     // hardwired just for easy debug;
     uint32_t len = 123504;
-    int8_t rslt = BHY2_OK;
 
     if ((incr % 4) != 0) /* Round off to higher 4 bytes */
     {
@@ -363,7 +427,7 @@ static int8_t upload_firmware(struct bhy2_dev *dev)
     for (uint32_t i = 0; (i < len) && (rslt == BHY2_OK); i += incr)
     {
         //memset(bhy2_firmware_image, 0, 256);
-        int size_read = fread(bhy2_firmware_image, 1, 256, file);
+        int size_read = fread(bhy2_firmware_image, 1, 256, file_bhy);
         if (incr > (len - i)) /* If last payload */
         {
             incr = len - i;
@@ -381,6 +445,8 @@ static int8_t upload_firmware(struct bhy2_dev *dev)
         printf("%d%% complete\r", (i + incr) * 100 / len);
     }
     printf("\n");
+
+    fclose(file_bhy);
 
     return rslt;
 }
