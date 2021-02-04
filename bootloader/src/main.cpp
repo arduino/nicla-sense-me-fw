@@ -6,6 +6,7 @@
 #include "SPIFBlockDevice.h"
 #include "IS31FL3194.h"
 #include "LittleFileSystem.h"
+#include "file_utils.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -116,65 +117,21 @@ int try_fail_safe(int timeout)
 
 int apply_update(FILE *file, uint32_t address, bool fail_safe)
 {
-    fseek(file, 0, SEEK_END);
-    long len = ftell(file);
+    long len = getFileLen(file);
 
     if (len == 0) {
         //No valid firmware update found, the main application can start
         return 1;
     }
 
-    printf("Firmware update found\r\n");
-
-    len = len - 1;     //the last byte contains the CRC
     printf("Firmware size is %ld bytes\r\n", len);
 
-    //read by chunks of 256 bytes
-    uint16_t iterations = len/256;
-    uint8_t spare_bytes = len%256;
-
-    printf("Iterations: %ld bytes\r\n", iterations);
-    printf("Spare bytes: %ld bytes\r\n", spare_bytes);
-
-    char buffer[256];
-    char crc_file;
-
-    fseek(file, len, SEEK_SET);
-    //read CRC written at the end of the file
-    fread(&crc_file, 1, 1, file);
+    char crc_file = getFileCRC(file);
     printf("CRC written in file is %x \r\n", crc_file);
 
     fseek(file, 0, SEEK_SET);
 
-    char crc;
-    int buffer_index = 2;
-
-    //copy the file content by chunks of 256 bytes into a buffer of chars
-    for (int i = 0; i < iterations; i++) {
-        //read 256 bytes into buffer
-        fread(buffer, 1, 256, file);
-
-        if (i==0) {
-            //we are at the beginning of the file, so we must compute the first xor between bytes
-            crc = buffer[0]^buffer[1];
-        }
-
-        for(int i=buffer_index; i<256; i++) {
-            crc = crc^buffer[i];
-        }
-
-        buffer_index = 0;
-
-    }
-
-    if (spare_bytes) {
-        //read the spare bytes, without the CRC
-        fread(buffer, 1, spare_bytes, file);
-
-        for(int i=0; i<spare_bytes; i++) {
-            crc = crc^buffer[i];
-        }
-    }
+    char crc = computeCRC(file);
 
     if (crc!=crc_file) {
         if (!fail_safe) {
