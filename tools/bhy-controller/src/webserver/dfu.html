@@ -107,6 +107,10 @@
         </div>
       </div>
 
+      <br>
+
+      <p id="endPrint"></p>
+
     </div>
     <br><hr><br>
 
@@ -341,6 +345,9 @@ function handleAck(value) {
   }
   if (updateIndex == iterations) {
     console.log('firmware sent');
+    elem.style.width = 100 + "%";
+    elem.style.backgroundColor = "#18b31d";
+    document.getElementById("endPrint").innerHTML = "Fw upload completed!";
     return;
   }
   update(updateIndex);
