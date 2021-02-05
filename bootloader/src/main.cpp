@@ -36,6 +36,8 @@ FlashIAP flash;
 
 IS31FL3194 leds;
 
+FileUtils files;
+
 DigitalIn* boot_rst_n;
 Timer timer_rst_n;
 
@@ -117,7 +119,7 @@ int try_fail_safe(int timeout)
 
 int apply_update(FILE *file, uint32_t address, bool fail_safe)
 {
-    long len = getFileLen(file);
+    long len = files.getFileLen(file);
 
     if (len == 0) {
         //No valid firmware update found, the main application can start
@@ -126,12 +128,12 @@ int apply_update(FILE *file, uint32_t address, bool fail_safe)
 
     printf("Firmware size is %ld bytes\r\n", len);
 
-    char crc_file = getFileCRC(file);
+    char crc_file = files.getFileCRC(file);
     printf("CRC written in file is %x \r\n", crc_file);
 
     fseek(file, 0, SEEK_SET);
 
-    char crc = computeCRC(file);
+    char crc = files.computeCRC(file);
 
     if (crc!=crc_file) {
         if (!fail_safe) {

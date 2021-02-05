@@ -4,6 +4,7 @@
 
 #include "SPIFBlockDevice.h"
 #include "LittleFileSystem.h"
+#include "file_utils.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,6 +41,7 @@ static int8_t upload_firmware(struct bhy2_dev *dev);
 struct parse_ref parse_table;
 DigitalOut* hostboot;
 
+FileUtils bhyfile;
 
 static void time_to_s_ns(uint64_t time_ticks, uint32_t *s, uint32_t *ns)
 {
@@ -346,46 +348,6 @@ static void print_api_error(int8_t rslt, struct bhy2_dev *dev)
     }
 }
 
-static char computeBHYCRC(FILE *file, long len) {
-  char buffer[256];
-  char crc;
-
-  //read by chunks of 256 bytes
-  uint16_t iterations = len/256;
-  uint8_t spare_bytes = len%256;
-
-  int buffer_index = 2;
-
-  //copy the file content by chunks of 256 bytes into a buffer of chars
-  for (int i = 0; i < iterations; i++) {
-    //read 256 bytes into buffer
-    fread(buffer, 1, 256, file);
-
-    if (i==0) {
-        //we are at the beginning of the file, so we must compute the first xor between bytes
-        crc = buffer[0]^buffer[1];
-    }
-
-    for(int i=buffer_index; i<256; i++) {
-        crc = crc^buffer[i];
-    }
-
-    buffer_index = 0;
-
-  }
-
-  if (spare_bytes) {
-    //read the spare bytes, without the CRC
-    fread(buffer, 1, spare_bytes, file);
-
-    for(int i=0; i<spare_bytes; i++) {
-        crc = crc^buffer[i];
-    }
-  }
-
-  return crc;
-}
-
 static int8_t upload_firmware(struct bhy2_dev *dev)
 {
     int8_t rslt = BHY2_OK;
@@ -398,21 +360,15 @@ static int8_t upload_firmware(struct bhy2_dev *dev)
         return rslt;
     }
 
-    fseek(file_bhy, 0, SEEK_END);
-    //Decrement len by 1 to remove the CRC from the count
-    long len_bhy = ftell(file_bhy) - 1;
-    fseek(file_bhy, 0, SEEK_SET);
-
+    long len_bhy = bhyfile.getFileLen(file_bhy);
     printf("BHY Firmware size is %ld bytes\r\n", len_bhy);
 
-    fseek(file_bhy, len_bhy, SEEK_SET);
-    char crc_bhy_file;
-    fread(&crc_bhy_file, 1, 1, file_bhy);
+    char crc_bhy_file = bhyfile.getFileCRC(file_bhy);
     printf("CRC written in BHY file is %x \r\n", crc_bhy_file);
 
     fseek(file_bhy, 0, SEEK_SET);
 
-    char crc_bhy = computeBHYCRC(file_bhy, len_bhy);
+    char crc_bhy = bhyfile.computeCRC(file_bhy);
 
     if (crc_bhy!=crc_bhy_file) {
         printf("Wrong CRC! The computed CRC is %x, while it should be %x \r\n", crc_bhy, crc_bhy_file);
