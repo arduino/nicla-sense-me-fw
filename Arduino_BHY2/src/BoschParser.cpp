@@ -21,7 +21,7 @@ void BoschParser::parseData(const struct bhy2_fifo_parse_data_info *fifoData, vo
 {
   SensorDataPacket sensorData;
   sensorData.sensorId = fifoData->sensor_id;
-  memcpy(&sensorData.data, fifoData->data_ptr, sizeof(fifoData->data_size));
+  memcpy(&sensorData.data, fifoData->data_ptr, fifoData->data_size);
   sensorData.size = fifoData->data_size;
 
   if (_debug) {
