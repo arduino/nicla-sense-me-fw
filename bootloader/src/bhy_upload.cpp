@@ -391,6 +391,13 @@ static int8_t upload_firmware(struct bhy2_dev *dev)
     int8_t rslt = BHY2_OK;
 
     FILE *file_bhy = fopen(BHY_UPDATE_FILE_PATH, "rb");
+
+    if (file_bhy == NULL) {
+        printf("No BHY UPDATE file found!");
+        rslt = BHY2_E_NULL_PTR;
+        return rslt;
+    }
+
     fseek(file_bhy, 0, SEEK_END);
     //Decrement len by 1 to remove the CRC from the count
     long len_bhy = ftell(file_bhy) - 1;
@@ -412,25 +419,27 @@ static int8_t upload_firmware(struct bhy2_dev *dev)
         //should return an error
         rslt = BHY2_E_NULL_PTR;
         return rslt;
+    } else {
+        printf("CRC check passed!\r\n");
     }
+
+    fseek(file_bhy, 0, SEEK_SET);
 
     uint8_t bhy2_firmware_image[256];
     uint32_t incr = 256; /* Max command packet size */
-    // hardwired just for easy debug;
-    uint32_t len = 123504;
 
     if ((incr % 4) != 0) /* Round off to higher 4 bytes */
     {
         incr = ((incr >> 2) + 1) << 2;
     }
 
-    for (uint32_t i = 0; (i < len) && (rslt == BHY2_OK); i += incr)
+    for (uint32_t i = 0; (i < len_bhy) && (rslt == BHY2_OK); i += incr)
     {
         //memset(bhy2_firmware_image, 0, 256);
         int size_read = fread(bhy2_firmware_image, 1, 256, file_bhy);
-        if (incr > (len - i)) /* If last payload */
+        if (incr > (len_bhy - i)) /* If last payload */
         {
-            incr = len - i;
+            incr = len_bhy - i;
             if ((incr % 4) != 0) /* Round off to higher 4 bytes */
             {
                 incr = ((incr >> 2) + 1) << 2;
@@ -439,12 +448,14 @@ static int8_t upload_firmware(struct bhy2_dev *dev)
 #ifdef UPLOAD_FIRMWARE_TO_FLASH
         rslt = bhy2_upload_firmware_to_flash_partly(&bhy2_firmware_image[i], i, incr, dev);
 #else
-        rslt = bhy2_upload_firmware_to_ram_partly(bhy2_firmware_image, len, i, incr, dev);
+        rslt = bhy2_upload_firmware_to_ram_partly(bhy2_firmware_image, len_bhy, i, incr, dev);
 #endif
 
-        printf("%d%% complete\r", (i + incr) * 100 / len);
+        printf("%d%% complete\r", (i + incr) * 100 / len_bhy);
     }
-    printf("\n");
+    printf("%d%% complete\r\n", 100);
+
+
 
     fclose(file_bhy);
 
