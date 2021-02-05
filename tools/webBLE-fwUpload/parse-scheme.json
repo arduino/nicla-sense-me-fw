@@ -1,0 +1,76 @@
+{
+  "types": 
+  [
+
+    {
+      "id": 0,
+      "type": "temperature",
+      "parse-scheme": 
+      [
+        {"name": "val", "type": "float", "size": 2, "scale-factor": 0.001}
+      ]
+    },
+
+    {
+      "id": 1,
+      "type": "humidity",
+      "parse-scheme": 
+      [
+        {"name": "val", "type": "float", "size": 1, "scale-factor": 1}
+      ]
+    },
+
+    {
+      "id": 2,
+      "type": "pressure",
+      "parse-scheme": 
+      [
+        {"name": "val", "type": "float", "size": 3, "scale-factor": 0.008}
+      ]
+    },
+
+    {
+      "id": 3,
+      "type": "altitude",
+      "parse-scheme": 
+      [
+        {"name": "val", "type": "float", "size": 4, "scale-factor": 1}
+      ]
+    },
+
+    {
+      "id": 4,
+      "type": "quaternion",
+      "parse-scheme": 
+      [
+        {"name": "x", "type": "int16", "size": 2, "scale-factor": 1},
+        {"name": "y", "type": "int16", "size": 2, "scale-factor": 1},
+        {"name": "z", "type": "int16", "size": 2, "scale-factor": 1},
+        {"name": "w", "type": "int16", "size": 2, "scale-factor": 1}
+      ]
+    },
+
+    {
+      "id": 5,
+      "type": "xyz",
+      "parse-scheme": 
+      [
+        {"name": "x", "type": "int16", "size": 2, "scale-factor": 1},
+        {"name": "y", "type": "int16", "size": 2, "scale-factor": 1},
+        {"name": "z", "type": "int16", "size": 2, "scale-factor": 1}
+      ]
+    },
+
+    {
+      "id": 6,
+      "type": "orientation",
+      "parse-scheme": 
+      [
+        {"name": "heading", "type": "int16", "size": 2, "scale-factor": 1},
+        {"name": "pitch", "type": "int16", "size": 2, "scale-factor": 1},
+        {"name": "roll", "type": "int16", "size": 2, "scale-factor": 1}
+      ]
+    }
+
+  ]
+}
