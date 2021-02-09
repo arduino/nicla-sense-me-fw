@@ -52,7 +52,6 @@ void EslovHandler::requestEvent()
       _debug->print("data: ");
       _debug->println(data.sensorId);
       _debug->println(data.size);
-      _debug->println(data.data);
     }
 
   } else if (_state == ESLOV_DFU_ACK_STATE) {

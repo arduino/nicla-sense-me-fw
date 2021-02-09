@@ -12,13 +12,13 @@ import (
 const (
 	eslovReadOpcode   = 2
 	eslovConfigOpcode = 3
-	sensorDataSize    = 10
+	sensorDataSize    = 12
 )
 
 type SensorData struct {
 	id   uint8
 	size uint8
-	data uint64
+	data []byte
 }
 
 type SensorConfig struct {
@@ -55,8 +55,11 @@ func readSensorData(buffer []byte, port serial.Port) {
 		var data SensorData
 		data.id = uint8(buffer[0])
 		data.size = uint8(buffer[1])
-		data.data = uint64(binary.LittleEndian.Uint64(buffer[2:10]))
-		fmt.Printf("sensor: %d	size: %d	data: %d\n", data.id, data.size, data.data)
+		//data.data = uint64(binary.LittleEndian.Uint64(buffer[2:10]))
+		data.data = buffer[2:(2 + data.size)]
+		//copy(data.data[:], buffer[2:(2+data.size)])
+		fmt.Printf("sensor: %d	size: %d	data: ", data.id, data.size)
+		fmt.Println(data.data)
 	}
 }
 

@@ -28,7 +28,10 @@ void BoschParser::parseData(const struct bhy2_fifo_parse_data_info *fifoData, vo
     _debug->print("Sensor: ");
     _debug->print(sensorData.sensorId);
     _debug->print("  value: ");
-    _debug->print(sensorData.data, sensorData.size);
+    for (uint8_t i = 0; i < (fifoData->data_size - 1); i++)
+    {
+        _debug->print(sensorData.data[i], HEX);
+    }
     _debug->print("  ");
     for (uint8_t i = 0; i < (fifoData->data_size - 1); i++)
     {
