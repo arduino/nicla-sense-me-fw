@@ -227,7 +227,6 @@ function receiveSensorData(event) {
   // Get sensor data
   var sensor = value.getUint8(0);
   var size = value.getUint8(1);
-  console.log(data);
   console.log(value)
   var parsedData = parseData(sensor, value);
 
