@@ -229,14 +229,18 @@ function receiveSensorData(event) {
   var size = value.getUint8(1);
   console.log(value)
   var parsedData = parseData(sensor, value);
+  parsedName = parsedData[0]
+  parsedValue = parsedData[1]
 
   var table = document.getElementById("dataTable");
   // If sensor is already in the table -> update its value
   if (sensorMap.has(sensor)) {
     rowIndex = sensorMap.get(sensor);
     var row = table.rows[rowIndex];
-    var cell = row.cells[1];
-    cell.innerHTML = parsedData;
+    var cell = row.cells[0];
+    cell.innerHTML = parsedName;
+    cell = row.cells[1];
+    cell.innerHTML = parsedValue;
 
   // If sensor is NOT in the table -> insert a new row filled with sensor data
   } else {
@@ -252,6 +256,7 @@ function receiveSensorData(event) {
 
 function parseData(sensor, data) {
   var type = sensorTypes[sensor].type;
+  var sensorName = sensorTypes[sensor].name;
   var scheme = parseScheme["types"][type]["parse-scheme"];
   var result = "";
 
@@ -272,7 +277,7 @@ function parseData(sensor, data) {
     console.log(dataIndex);
     dataIndex += element['size'];
   });
-  return result;
+  return [sensorName, result];
 }
 
 </script>
