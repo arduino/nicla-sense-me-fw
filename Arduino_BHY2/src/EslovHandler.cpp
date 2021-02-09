@@ -6,7 +6,8 @@
 EslovHandler::EslovHandler() :
   _rxIndex(0),
   _rxBuffer(),
-  _state(ESLOV_AVAILABLE_SENSOR_STATE)
+  _state(ESLOV_AVAILABLE_SENSOR_STATE),
+  _debug(NULL)
 {
 
 }
