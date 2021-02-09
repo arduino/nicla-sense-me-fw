@@ -5,12 +5,6 @@
 
 #define SENSOR_DATA_FIXED_LENGTH (10)
 
-struct __attribute__((packed)) SensorDataPacket {
-  uint8_t sensorId;
-  uint8_t size;
-  uint8_t data[SENSOR_DATA_FIXED_LENGTH];
-};
-
 struct __attribute__((packed)) SensorConfigurationPacket {
   uint8_t sensorId;
   // sample rate is used also to enable/disable the sensor
@@ -20,6 +14,76 @@ struct __attribute__((packed)) SensorConfigurationPacket {
   // before a notification to the host is sent via interrupt
   // expressed in 24 bit
   uint32_t latency;
+};
+
+struct __attribute__((packed)) SensorDataPacket {
+  uint8_t sensorId;
+  uint8_t size;
+  uint8_t data[SENSOR_DATA_FIXED_LENGTH];
+
+  float getFloat(uint8_t index) {
+    float result = 0;
+    uint8_t length = sizeof(result);
+    if (index + length > SENSOR_DATA_FIXED_LENGTH) {
+      length = SENSOR_DATA_FIXED_LENGTH - index;
+    }
+    memcpy(&result, &data[index], sizeof(result));
+    return result;
+  }
+
+  uint8_t getUint8(uint8_t index) {
+    if (index >= SENSOR_DATA_FIXED_LENGTH) {
+      return 0;
+    }
+    return data[index];
+  }
+
+  uint16_t getUint16(uint8_t index) {
+    uint16_t result = 0;
+    uint8_t length = sizeof(result);
+    if (index + length > SENSOR_DATA_FIXED_LENGTH) {
+      length = SENSOR_DATA_FIXED_LENGTH - index;
+    }
+    memcpy(&result, &data[index], length);
+    return result;
+  }
+
+  uint32_t getUint32(uint8_t index) {
+    uint32_t result = 0;
+    uint8_t length = sizeof(result);
+    if (index + length > SENSOR_DATA_FIXED_LENGTH) {
+      length = SENSOR_DATA_FIXED_LENGTH - index;
+    }
+    memcpy(&result, &data[index], length);
+    return result;
+  }
+
+  int8_t getInt8(uint8_t index) {
+    if (index >= SENSOR_DATA_FIXED_LENGTH) {
+      return 0;
+    }
+    return data[index];
+  }
+
+  int16_t getInt16(uint8_t index) {
+    int16_t result = 0;
+    uint8_t length = sizeof(result);
+    if (index + length > SENSOR_DATA_FIXED_LENGTH) {
+      length = SENSOR_DATA_FIXED_LENGTH - index;
+    }
+    memcpy(&result, &data[index], length);
+    return result;
+  }
+
+  int32_t getInt32(uint8_t index) {
+    int32_t result = 0;
+    uint8_t length = sizeof(result);
+    if (index + length > SENSOR_DATA_FIXED_LENGTH) {
+      length = SENSOR_DATA_FIXED_LENGTH - index;
+    }
+    memcpy(&result, &data[index], length);
+    return result;
+  }
 };
 
 #endif

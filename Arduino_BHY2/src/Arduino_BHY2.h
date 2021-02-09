@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "SensorTypes.h"
+#include "DataParser.h"
 
 class Arduino_BHY2 {
 public:
@@ -18,6 +19,10 @@ public:
   void addSensorData(const SensorDataPacket &sensorData);
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);
+
+  void parse(SensorDataPacket& data, DataXYZ& vector);
+  void parse(SensorDataPacket& data, DataOrientation& vector);
+  void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
 
   void debug(Stream &stream);
 };

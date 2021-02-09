@@ -42,6 +42,21 @@ bool Arduino_BHY2_HOST::readSensorData(SensorDataPacket &data)
   return eslovHandler.requestSensorData(data);
 }
 
+void Arduino_BHY2_HOST::parse(SensorDataPacket& data, DataXYZ& vector)
+{
+  DataParser::parse(data, vector);
+}
+
+void Arduino_BHY2_HOST::parse(SensorDataPacket& data, DataOrientation& vector)
+{
+  DataParser::parse(data, vector);
+}
+
+void Arduino_BHY2_HOST::parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor)
+{
+  DataParser::parse(data, vector, scaleFactor);
+}
+
 void Arduino_BHY2_HOST::debug(Stream &stream)
 {
   eslovHandler.debug(stream);
