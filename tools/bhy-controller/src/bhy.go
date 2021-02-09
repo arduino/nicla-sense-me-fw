@@ -70,6 +70,7 @@ func sensorReadCommand() {
 	readFlags := flag.NewFlagSet("read", flag.ExitOnError)
 	usbPort := readFlags.String("p", "", "usb port")
 	baudRate := readFlags.Int("baud", 115200, "baud rate")
+	liveFlag := readFlags.Bool("live", false, "live session")
 
 	readFlags.Parse(os.Args[3:])
 
@@ -79,7 +80,7 @@ func sensorReadCommand() {
 		return
 	}
 
-	sensor.Read(*usbPort, *baudRate)
+	sensor.Read(*usbPort, *baudRate, *liveFlag)
 }
 
 func sensorConfigureCommand() {

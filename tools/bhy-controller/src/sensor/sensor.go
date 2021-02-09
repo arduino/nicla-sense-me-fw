@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"time"
 
 	"go.bug.st/serial"
 )
@@ -64,16 +65,21 @@ func readSensorData(buffer []byte, port serial.Port) {
 	}
 }
 
-func Read(usbPort string, baudRate int) {
-	port := openPort(usbPort, baudRate)
-	defer port.Close()
-	fmt.Printf("Connected - port: %s - baudrate: %d\n", usbPort, baudRate)
+func liveRead(port serial.Port) {
+	for {
+		singleRead(port, false)
+		time.Sleep(300 * time.Millisecond)
+	}
+}
 
+func singleRead(port serial.Port, printEnable bool) {
 	// Send read opcode
 	packet := []byte{eslovReadOpcode}
 	n, err := port.Write(packet)
 	errCheck(err)
-	fmt.Printf("Sent %v bytes\n", n)
+	if printEnable {
+		fmt.Printf("Sent %v bytes\n", n)
+	}
 
 	// Read bhy available data
 	buff := make([]byte, 100)
@@ -83,14 +89,30 @@ func Read(usbPort string, baudRate int) {
 	// If no available data, just return
 	availableData := int(buff[0])
 	if n == 0 || availableData == 0 {
-		fmt.Println("no available data")
+		if printEnable {
+			fmt.Println("no available data")
+		}
 		return
 	}
 	// Else query all the available data
-	fmt.Printf("available data: %d\n", availableData)
+	if printEnable {
+		fmt.Printf("available data: %d\n", availableData)
+	}
 	for availableData > 0 {
 		readSensorData(buff, port)
 		availableData--
+	}
+}
+
+func Read(usbPort string, baudRate int, liveFlag bool) {
+	port := openPort(usbPort, baudRate)
+	defer port.Close()
+	fmt.Printf("Connected - port: %s - baudrate: %d\n", usbPort, baudRate)
+
+	if liveFlag {
+		liveRead(port)
+	} else {
+		singleRead(port, true)
 	}
 }
 
