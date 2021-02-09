@@ -58,8 +58,9 @@ func readSensorData(buffer []byte, port serial.Port) {
 		//data.data = uint64(binary.LittleEndian.Uint64(buffer[2:10]))
 		data.data = buffer[2:(2 + data.size)]
 		//copy(data.data[:], buffer[2:(2+data.size)])
-		fmt.Printf("sensor: %d	size: %d	data: ", data.id, data.size)
-		fmt.Println(data.data)
+		//fmt.Printf("sensor: %d	size: %d	data: ", data.id, data.size)
+		//fmt.Println(data.data)
+		parseData(&data)
 	}
 }
 
