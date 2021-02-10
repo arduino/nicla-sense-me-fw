@@ -7,7 +7,7 @@
       "type": "temperature",
       "parse-scheme": 
       [
-        {"name": "val", "type": "float", "size": 2, "scale-factor": 0.001}
+        {"name": "val", "type": "int16", "scale-factor": 0.001}
       ]
     },
 
@@ -16,7 +16,7 @@
       "type": "humidity",
       "parse-scheme": 
       [
-        {"name": "val", "type": "float", "size": 1, "scale-factor": 1}
+        {"name": "val", "type": "uint8", "scale-factor": 1}
       ]
     },
 
@@ -25,7 +25,7 @@
       "type": "pressure",
       "parse-scheme": 
       [
-        {"name": "val", "type": "float", "size": 3, "scale-factor": 0.008}
+        {"name": "val", "type": "uint24", "scale-factor": 0.008}
       ]
     },
 
@@ -34,7 +34,7 @@
       "type": "altitude",
       "parse-scheme": 
       [
-        {"name": "val", "type": "float", "size": 4, "scale-factor": 1}
+        {"name": "val", "type": "float", "scale-factor": 1}
       ]
     },
 
@@ -43,10 +43,11 @@
       "type": "quaternion",
       "parse-scheme": 
       [
-        {"name": "x", "type": "int16", "size": 2, "scale-factor": 1},
-        {"name": "y", "type": "int16", "size": 2, "scale-factor": 1},
-        {"name": "z", "type": "int16", "size": 2, "scale-factor": 1},
-        {"name": "w", "type": "int16", "size": 2, "scale-factor": 1}
+        {"name": "x", "type": "int16", "scale-factor": 1},
+        {"name": "y", "type": "int16", "scale-factor": 1},
+        {"name": "z", "type": "int16", "scale-factor": 1},
+        {"name": "w", "type": "int16", "scale-factor": 1},
+        {"name": "accuracy", "type": "uint16", "scale-factor": 1}
       ]
     },
 
@@ -55,9 +56,9 @@
       "type": "xyz",
       "parse-scheme": 
       [
-        {"name": "x", "type": "int16", "size": 2, "scale-factor": 1},
-        {"name": "y", "type": "int16", "size": 2, "scale-factor": 1},
-        {"name": "z", "type": "int16", "size": 2, "scale-factor": 1}
+        {"name": "x", "type": "int16", "scale-factor": 1},
+        {"name": "y", "type": "int16", "scale-factor": 1},
+        {"name": "z", "type": "int16", "scale-factor": 1}
       ]
     },
 
@@ -66,9 +67,9 @@
       "type": "orientation",
       "parse-scheme": 
       [
-        {"name": "heading", "type": "int16", "size": 2, "scale-factor": 1},
-        {"name": "pitch", "type": "int16", "size": 2, "scale-factor": 1},
-        {"name": "roll", "type": "int16", "size": 2, "scale-factor": 1}
+        {"name": "heading", "type": "int16", "scale-factor": 0.01098},
+        {"name": "pitch", "type": "int16", "scale-factor": 0.01098},
+        {"name": "roll", "type": "int16", "scale-factor": 0.01098}
       ]
     }
 

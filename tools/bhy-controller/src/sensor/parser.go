@@ -78,12 +78,14 @@ func parseData(data *SensorData) {
 		fieldName := field["name"].(string)
 		fieldType := field["type"].(string)
 		fieldFactor := float32(field["scale-factor"].(float64))
+		var fieldSize int
 		var value float32
 		if fieldType == "int16" {
 			value = float32(int16(binary.LittleEndian.Uint16(data.data[index:index+2]))) * fieldFactor
+			fieldSize = 2
 		}
 
-		index += int(field["size"].(float64))
+		index += fieldSize
 		fmt.Printf(" %s : %f  ", fieldName, value)
 	}
 
