@@ -39,7 +39,7 @@ func startServer() {
 func Execute() {
 	go startServer()
 
-	e := browser.OpenURL("http://localhost:8000/sensor.html")
+	e := browser.OpenURL("http://localhost:8000/index.html")
 
 	errCheck(e)
 
