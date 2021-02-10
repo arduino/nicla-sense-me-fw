@@ -3,6 +3,7 @@ package main
 import (
 	"arduino/bhy/dfu"
 	"arduino/bhy/sensor"
+	"arduino/bhy/webserver"
 	"flag"
 	"fmt"
 	"log"
@@ -25,6 +26,8 @@ func main() {
 		dfuCommand()
 	case "sensor":
 		sensorCommand()
+	case "webserver":
+		webserverCommand()
 	default:
 		commandError()
 	}
@@ -47,6 +50,10 @@ func dfuCommand() {
 	}
 
 	dfu.Upload(*baudRate, *opCode, *usbPort, *binPath)
+}
+
+func webserverCommand() {
+	webserver.Execute()
 }
 
 func sensorCommand() {
@@ -161,6 +168,8 @@ func commandError() {
 	fmt.Println("		to upload new firmware for unisense or bhy")
 	fmt.Println("	list")
 	fmt.Println("		list available serial ports")
+	fmt.Println("	webserver")
+	fmt.Println("		start a local webserver and open the webserver")
 }
 
 func sensorError() {

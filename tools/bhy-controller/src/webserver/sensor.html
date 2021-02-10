@@ -268,8 +268,10 @@ function parseData(sensor, data) {
     var scale = element['scale-factor'];
     var value;
 
-    if (valueType == "float") {
-      // TODO
+    if (valueType == "uint8") {
+      value = data.getUint8(dataIndex, true) * scale; 
+    } else if (valueType == "float") {
+      value = data.getFloat32(dataIndex, true) * scale; 
     } else if (valueType == "int16") {
       value = data.getInt16(dataIndex, true) * scale; 
     }
