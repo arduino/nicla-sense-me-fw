@@ -78,11 +78,25 @@ func parseData(data *SensorData) {
 		fieldName := field["name"].(string)
 		fieldType := field["type"].(string)
 		fieldFactor := float32(field["scale-factor"].(float64))
-		var fieldSize int
-		var value float32
-		if fieldType == "int16" {
+		var fieldSize int = 0
+		var value float32 = 0
+
+		if fieldType == "uint8" {
+			value = float32(uint8(data.data[index])) * fieldFactor
+			fieldSize = 1
+		} else if fieldType == "uint24" {
+			temp := []byte{0, 0, 0, 0}
+			copy(temp[0:3], data.data[index:index+3])
+			value = float32(binary.LittleEndian.Uint32(temp)) * fieldFactor
+			fieldSize = 3
+		} else if fieldType == "int16" {
 			value = float32(int16(binary.LittleEndian.Uint16(data.data[index:index+2]))) * fieldFactor
 			fieldSize = 2
+		} else if fieldType == "float" {
+			value = float32(binary.LittleEndian.Uint32(data.data[index:index+4])) * fieldFactor
+			fieldSize = 4
+		} else {
+			panic("Unknown sensor type")
 		}
 
 		index += fieldSize
