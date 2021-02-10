@@ -70,7 +70,7 @@ func parseData(data *SensorData) {
 	typeScheme := typeMap[sensorType].(map[string]interface{})
 	fields := typeScheme["parse-scheme"].([]interface{})
 
-	fmt.Printf("Sensor %s values:", sensorName)
+	fmt.Printf("Sensor id: %d   name: %s   values:", data.id, sensorName)
 
 	index := 0
 	for i := 0; i < len(fields); i++ {

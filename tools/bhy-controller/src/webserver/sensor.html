@@ -69,7 +69,8 @@
       <table id="dataTable" class="table table-bordered" style="table-layout:fixed;"> 
         <thead>
           <tr>
-            <th scope="col">Sensor</th>
+            <th scope="col">Sensor ID</th>
+            <th scope="col">Sensor Name</th>
             <th scope="col">Data</th>
           </tr>
         </thead>
@@ -238,8 +239,10 @@ function receiveSensorData(event) {
     rowIndex = sensorMap.get(sensor);
     var row = table.rows[rowIndex];
     var cell = row.cells[0];
-    cell.innerHTML = parsedName;
+    cell.innerHTML = sensor;
     cell = row.cells[1];
+    cell.innerHTML = parsedName;
+    cell = row.cells[2];
     cell.innerHTML = parsedValue;
 
   // If sensor is NOT in the table -> insert a new row filled with sensor data
@@ -250,7 +253,9 @@ function receiveSensorData(event) {
     var cell = row.insertCell(0);
     cell.innerHTML = sensor;
     cell = row.insertCell(1);
-    cell.innerHTML = parsedData;
+    cell.innerHTML = parsedName;
+    cell = row.insertCell(2);
+    cell.innerHTML = parsedValue;
   }
 }
 
