@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
+	"path/filepath"
 	"strconv"
 )
 
@@ -23,7 +25,12 @@ type ParseField struct {
 }
 
 func loadScheme() map[string]interface{} {
-	jsonFile, err := os.Open("./sensor/parse-scheme.json")
+	// Retrieve directory of bhy executable to look for json files
+	exe, err := os.Executable()
+	errCheck(err)
+	exePath := filepath.Dir(exe)
+
+	jsonFile, err := os.Open(path.Join(exePath, "/webserver/parse-scheme.json"))
 	errCheck(err)
 	defer jsonFile.Close()
 
@@ -35,7 +42,12 @@ func loadScheme() map[string]interface{} {
 }
 
 func loadTypes() map[string]interface{} {
-	jsonFile, err := os.Open("./sensor/sensor-type-map.json")
+	// Retrieve directory of bhy executable to look for json files
+	exe, err := os.Executable()
+	errCheck(err)
+	exePath := filepath.Dir(exe)
+
+	jsonFile, err := os.Open(path.Join(exePath, "/webserver/sensor-type-map.json"))
 	errCheck(err)
 	defer jsonFile.Close()
 
