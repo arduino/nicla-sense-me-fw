@@ -18,6 +18,7 @@ public:
 
 private:
   static Stream *_debug;
+  uint8_t _last;
 
   void writeDFUAcknowledgment();
   void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic);

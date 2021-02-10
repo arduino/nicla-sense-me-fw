@@ -6,7 +6,8 @@
 EslovHandler::EslovHandler() :
   _rxIndex(0),
   _rxBuffer(),
-  _state(ESLOV_AVAILABLE_SENSOR_STATE)
+  _state(ESLOV_AVAILABLE_SENSOR_STATE),
+  _last(0)
 {
 
 }
@@ -62,7 +63,12 @@ void EslovHandler::requestEvent()
       _debug->println(ack);
     }
     Wire1.write(ack);
-    
+
+    if (_last == 1) {
+      // reboot
+      delay(500);
+      NVIC_SystemReset();
+    }
   }
 }
 
@@ -80,7 +86,7 @@ void EslovHandler::receiveEvent(int length)
     // Check if packet is complete depending on its opcode
     if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
-        dfuManager.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
+        _last = dfuManager.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
 
         _state = ESLOV_DFU_ACK_STATE;
 
@@ -90,7 +96,7 @@ void EslovHandler::receiveEvent(int length)
 
     } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
-        dfuManager.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
+        _last = dfuManager.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
 
         _state = ESLOV_DFU_ACK_STATE;
 

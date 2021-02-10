@@ -44,6 +44,7 @@ private:
   void debug(Stream &stream);
   void dump();
   Stream *_debug;
+  uint8_t _last;
 };
 
 extern EslovHandler eslovHandler;
