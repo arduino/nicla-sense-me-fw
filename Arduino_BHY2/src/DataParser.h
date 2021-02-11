@@ -28,11 +28,29 @@ struct DataOrientation {
   }
 };
 
+struct DataQuaternion {
+  int16_t x;
+  int16_t y;
+  int16_t z;
+  int16_t w;
+  uint16_t accuracy;
+
+  String toString() {
+    return (String)("Quaternion values - X: " + String(x)
+                    + "   Y: " + String(y)
+                    + "   Z: " + String(z) 
+                    + "   W: " + String(w) 
+                    + "   Accuracy: " + String(accuracy) 
+                    + "\n");
+  }
+};
+
 class DataParser {
 public:
   static void parse(SensorDataPacket& data, DataXYZ& vector);
   static void parse(SensorDataPacket& data, DataOrientation& vector);
   static void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
+  static void parse(SensorDataPacket& data, DataQuaternion& vector);
 };
 
 #endif

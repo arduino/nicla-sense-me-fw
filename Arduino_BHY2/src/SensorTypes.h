@@ -48,6 +48,16 @@ struct __attribute__((packed)) SensorDataPacket {
     return result;
   }
 
+  uint32_t getUint24(uint8_t index) {
+    uint32_t result = 0;
+    uint8_t length = 3;
+    if (index + length > SENSOR_DATA_FIXED_LENGTH) {
+      length = SENSOR_DATA_FIXED_LENGTH - index;
+    }
+    memcpy(&result, &data[index], length);
+    return result;
+  }
+
   uint32_t getUint32(uint8_t index) {
     uint32_t result = 0;
     uint8_t length = sizeof(result);

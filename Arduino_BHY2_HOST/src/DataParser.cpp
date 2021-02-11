@@ -15,3 +15,11 @@ void DataParser::parse(SensorDataPacket& data, DataOrientation& vector, float sc
 void DataParser::parse(SensorDataPacket& data, DataOrientation& vector) {
   parse(data, vector, 1.f);
 }
+
+void DataParser::parse(SensorDataPacket& data, DataQuaternion& vector) {
+  vector.x = data.getInt16(0);
+  vector.y = data.getInt16(2);
+  vector.z = data.getInt16(4);
+  vector.w = data.getInt16(6);
+  vector.accuracy = data.getUint16(8);
+}
