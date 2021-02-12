@@ -16,6 +16,7 @@ public:
 
   // Functions for controlling the BHY when PASSTHROUGH is DISABLED
   void configureSensor(SensorConfigurationPacket& config);
+  void configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency);
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);
 

@@ -29,6 +29,15 @@ void Arduino_BHY2_HOST::configureSensor(SensorConfigurationPacket& config)
   eslovHandler.writeConfigPacket(config);
 }
 
+void Arduino_BHY2_HOST::configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency)
+{
+  SensorConfigurationPacket config;
+  config.sensorId = sensorId;
+  config.sampleRate = sampleRate;
+  config.latency = latency;
+  eslovHandler.writeConfigPacket(config);
+}
+
 uint8_t Arduino_BHY2_HOST::availableSensorData()
 {
   return eslovHandler.requestAvailableData();
