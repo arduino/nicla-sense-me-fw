@@ -165,7 +165,7 @@ document.querySelector('#fileItem').addEventListener('change', function() {
     }
     crc8();
     console.log("Computed 8-bit CRC: ", crc8bit);
-    console.log('Press "Update FW" button to start the fw update');
+    console.log('Press "Update" button to start the fw update');
 
     document.querySelector('#update').disabled = false;
   }
@@ -247,7 +247,7 @@ function connect() {
   .then(connectGATTdfu)
   .then(connectGATTack)
   .then(_ => { 
-    console.log('Press the button "Choose file" to select the binary file that you want to send to Unisense');
+    console.log('Select the binary file that you want to send to Unisense');
     onConnection(); 
   })
   .catch(error => { console.log('ERROR: ' + error); });
