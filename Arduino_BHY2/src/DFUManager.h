@@ -38,7 +38,7 @@ public:
   virtual ~DFUManager();
 
   void begin();
-  void processPacket(DFUType dfuType, const uint8_t* data);
+  uint8_t processPacket(DFUType dfuType, const uint8_t* data);
 
   uint8_t acknowledgment();
 

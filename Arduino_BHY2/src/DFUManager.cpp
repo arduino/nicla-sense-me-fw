@@ -33,7 +33,7 @@ void DFUManager::begin()
   }
 }
 
-void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
+uint8_t DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
 {
   DFUPacket* packet = (DFUPacket*)data;
   //Serial.print("packet: ");
@@ -43,7 +43,7 @@ void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
     if (dfuType == DFU_INTERNAL) {
       _target = fopen("/fs/ANNA_UPDATE.BIN", "wb");
     } else {
-      _target = fopen("/fs/UPDATE.BIN", "wb");
+      _target = fopen("/fs/BHY_UPDATE.BIN", "wb");
     }
 
     if(_debug) {
@@ -72,14 +72,9 @@ void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
     }
     fclose(_target);
     _target = NULL;
-    if (dfuType == DFU_INTERNAL) {
-      // reboot
-      //Serial.println("done");
-    } else {
-      //apply bosch update
-      //Serial.println("done");
-    }
   }
+
+  return packet->last;
 }
 
 // acknowledgment flag is reset when read
