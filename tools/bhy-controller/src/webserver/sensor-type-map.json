@@ -1,0 +1,62 @@
+{
+  "1": {
+    "name": "ACC_PASS",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
+  "3": {
+    "name": "ACC_RAW",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
+  "4": {
+    "name": "ACC",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
+  "5": {
+    "name": "ACC_BIAS",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
+  "6": {
+    "name": "ACC_WU",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
+  "7": {
+    "name": "ACC_RAW_WU",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
+  "10": {
+    "name": "GYRO_PASS",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
+  "12": {
+    "name": "GYRO_RAW",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
+  "13": {
+    "name": "GYRO",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
+  "43": {
+    "name": "ORI",
+    "type": 6,
+    "type-name": "orientation"
+  }
+
+}

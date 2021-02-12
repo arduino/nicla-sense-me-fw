@@ -21,14 +21,17 @@ void BoschParser::parseData(const struct bhy2_fifo_parse_data_info *fifoData, vo
 {
   SensorDataPacket sensorData;
   sensorData.sensorId = fifoData->sensor_id;
-  memcpy(&sensorData.data, fifoData->data_ptr, sizeof(fifoData->data_size));
-  sensorData.size = fifoData->data_size;
+  sensorData.size = (fifoData->data_size > sizeof(sensorData.data)) ? sizeof(sensorData.data) : fifoData->data_size;
+  memcpy(&sensorData.data, fifoData->data_ptr, sensorData.size);
 
   if (_debug) {
     _debug->print("Sensor: ");
     _debug->print(sensorData.sensorId);
     _debug->print("  value: ");
-    _debug->print(sensorData.data, sensorData.size);
+    for (uint8_t i = 0; i < (fifoData->data_size - 1); i++)
+    {
+        _debug->print(sensorData.data[i], HEX);
+    }
     _debug->print("  ");
     for (uint8_t i = 0; i < (fifoData->data_size - 1); i++)
     {

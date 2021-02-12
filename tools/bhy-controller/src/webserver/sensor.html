@@ -66,10 +66,11 @@
     <!-- Read sensor data form -->
     <div class="container text-center">
       <h3>Read sensor data</h3>  
-      <table id="dataTable" class="table table-bordered">
+      <table id="dataTable" class="table table-bordered" style="table-layout:fixed;"> 
         <thead>
           <tr>
-            <th scope="col">Sensor</th>
+            <th scope="col">Sensor ID</th>
+            <th scope="col">Sensor Name</th>
             <th scope="col">Data</th>
           </tr>
         </thead>
@@ -104,6 +105,23 @@ var sensorConfigCharacteristic
 var sensorDataCharacteristic
 
 var sensorMap = new Map();
+var parseScheme;
+var sensorTypes;
+
+fetch("./parse-scheme.json")
+  .then(response => response.json())
+  .then(json => {
+    console.log(json);
+    parseScheme = json;
+  });
+
+//fetch("./sensor-type.json")
+fetch("./sensor-type-map.json")
+  .then(response => response.json())
+  .then(json => {
+    console.log(json);
+    sensorTypes = json;
+  });
 
 document.querySelector('#connectButton').addEventListener('click', function() {
   if (isWebBluetoothEnabled()) { 
@@ -210,15 +228,22 @@ function receiveSensorData(event) {
   // Get sensor data
   var sensor = value.getUint8(0);
   var size = value.getUint8(1);
-  var data = value.getBigUint64(2);
+  console.log(value)
+  var parsedData = parseData(sensor, value);
+  parsedName = parsedData[0]
+  parsedValue = parsedData[1]
 
   var table = document.getElementById("dataTable");
   // If sensor is already in the table -> update its value
   if (sensorMap.has(sensor)) {
     rowIndex = sensorMap.get(sensor);
     var row = table.rows[rowIndex];
-    var cell = row.cells[1];
-    cell.innerHTML = data;
+    var cell = row.cells[0];
+    cell.innerHTML = sensor;
+    cell = row.cells[1];
+    cell.innerHTML = parsedName;
+    cell = row.cells[2];
+    cell.innerHTML = parsedValue;
 
   // If sensor is NOT in the table -> insert a new row filled with sensor data
   } else {
@@ -228,8 +253,49 @@ function receiveSensorData(event) {
     var cell = row.insertCell(0);
     cell.innerHTML = sensor;
     cell = row.insertCell(1);
-    cell.innerHTML = data;
+    cell.innerHTML = parsedName;
+    cell = row.insertCell(2);
+    cell.innerHTML = parsedValue;
   }
+}
+
+function parseData(sensor, data) {
+  var type = sensorTypes[sensor].type;
+  var sensorName = sensorTypes[sensor].name;
+  var scheme = parseScheme["types"][type]["parse-scheme"];
+  var result = "";
+
+  // dataIndex start from 2 because the first bytes of the packet indicate
+  // the sensor id and the data size
+  var dataIndex = 0 + 2;
+  scheme.forEach(element => {
+    console.log(element);
+    var name = element['name'];
+    var valueType = element['type'];
+    var scale = element['scale-factor'];
+    var value = 0;
+    var size = 0;
+
+    if (valueType == "uint8") {
+      value = data.getUint8(dataIndex, true) * scale; 
+      size = 1;
+    } else if (valueType == "uint24") {
+      value = data.getUint16(index, true) + (data.getUint8(index+2, true) << 16);
+      size = 3;
+    } else if (valueType == "int16") {
+      value = data.getInt16(dataIndex, true) * scale; 
+      size = 2;
+    } else if (valueType == "float") {
+      value = data.getFloat32(dataIndex, true) * scale; 
+      size = 4;
+    } else {
+      console.log("Error: unknown type");
+    }
+    result = result + element.name + ": " + value + "   ";
+    console.log(dataIndex);
+    dataIndex += size;
+  });
+  return [sensorName, result];
 }
 
 </script>

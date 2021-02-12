@@ -7,7 +7,8 @@ EslovHandler::EslovHandler() :
   _rxIndex(0),
   _rxBuffer(),
   _state(ESLOV_AVAILABLE_SENSOR_STATE),
-  _last(0)
+  _last(0),
+  _debug(NULL)
 {
 
 }
@@ -53,7 +54,6 @@ void EslovHandler::requestEvent()
       _debug->print("data: ");
       _debug->println(data.sensorId);
       _debug->println(data.size);
-      _debug->println(data.data);
     }
 
   } else if (_state == ESLOV_DFU_ACK_STATE) {

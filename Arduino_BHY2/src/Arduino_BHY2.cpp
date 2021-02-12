@@ -48,6 +48,21 @@ bool Arduino_BHY2::readSensorData(SensorDataPacket &data)
   return sensortec.readSensorData(data);
 }
 
+void Arduino_BHY2::parse(SensorDataPacket& data, DataXYZ& vector)
+{
+  DataParser::parse(data, vector);
+}
+
+void Arduino_BHY2::parse(SensorDataPacket& data, DataOrientation& vector)
+{
+  DataParser::parse(data, vector);
+}
+
+void Arduino_BHY2::parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor)
+{
+  DataParser::parse(data, vector, scaleFactor);
+}
+
 void Arduino_BHY2::debug(Stream &stream)
 {
   eslovHandler.debug(stream);

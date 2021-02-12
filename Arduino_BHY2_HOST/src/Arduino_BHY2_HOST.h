@@ -1,22 +1,27 @@
-#ifndef ARDUINO_BHY2_H_
-#define ARDUINO_BHY2_H_
+#ifndef ARDUINO_BHY2_HOST_H_
+#define ARDUINO_BHY2_HOST_H_
 
 #include "Arduino.h"
 #include "SensorTypes.h"
 #include "DataParser.h"
 
-class Arduino_BHY2 {
+class Arduino_BHY2_HOST {
 public:
-  Arduino_BHY2();
-  virtual ~Arduino_BHY2();
+  Arduino_BHY2_HOST();
+  virtual ~Arduino_BHY2_HOST();
 
   // Necessary API. Update function should be continuously polled 
-  void begin();
+  void begin(bool passthrough = false);
+  //void beginPassthrough();
   void update();
 
-  // API for using the bosch sensortec from sketch
+  //bool bleConnect(int timeout = 1000);
+  //bool bleConfigureSensor(SensorConfigurationPacket *config);
+  //int bleAvailableSensorData();
+  //bool bleReadSensorData(SensorDataPacket &data);
+
+  // Functions for controlling the BHY when PASSTHROUGH is DISABLED
   void configureSensor(SensorConfigurationPacket *config);
-  void addSensorData(const SensorDataPacket &sensorData);
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);
 
@@ -25,8 +30,11 @@ public:
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
 
   void debug(Stream &stream);
+
+private:
+  bool _passthrough;
 };
 
-extern Arduino_BHY2 BHY2;
+extern Arduino_BHY2_HOST BHY2_HOST;
 
 #endif
