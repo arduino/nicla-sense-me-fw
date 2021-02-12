@@ -3,15 +3,16 @@
  * An host board can configure the sensors of unisense and then read their values.
  * The host board should be connected to unisense through the eslov connector.
  * 
- * In this example, the accelerometer sensor is enabled and its
+ * In this example, the orientation sensor is enabled and its
  * values are periodically read and then printed to the serial channel
 */
 
 #include "Arduino.h"
 #include "Arduino_BHY2_HOST.h"
 
-#define ACCEL_ID (4)
-DataXYZ accValue;
+#define ORI_ID (43)
+#define ORI_SCALE_FACTOR (360.0f / 32768.0f)
+DataOrientation orientation;
 
 void configureSensors()
 {
@@ -19,13 +20,12 @@ void configureSensors()
   config.sampleRate = 1;
   config.latency = 0;
 
-  config.sensorId = ACCEL_ID;
+  config.sensorId = ORI_ID;
   BHY2_HOST.configureSensor(&config);
 }
 
 void setup()
 {
-  // debug port
   Serial.begin(115200);
   while(!Serial);
 
@@ -46,9 +46,9 @@ void loop()
       SensorDataPacket data;
       BHY2_HOST.readSensorData(data);
 
-      if (data.sensorId == ACCEL_ID) {
-        Serial.print("Received accel: ");
-        BHY2_HOST.parse(data, accValue);
+      if (data.sensorId == ORI_ID) {
+        Serial.print("Received orientation: ");
+        BHY2_HOST.parse(data, orientation, ORI_SCALE_FACTOR);
       }
     }
   }
@@ -56,8 +56,8 @@ void loop()
   if (millis() - printTime >= 200) {
     printTime = millis();
 
-    Serial.print("Acceleration values: ");
-    Serial.println(accValue.toString());
+    Serial.print("Orientation values: ");
+    Serial.println(orientation.toString());
   }
 
 
