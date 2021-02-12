@@ -20,7 +20,7 @@ private:
   static Stream *_debug;
   uint8_t _last;
 
-  void writeDFUAcknowledgment();
+  void writeDFUAcknowledgment(uint8_t ack);
   void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic);
 
   static void receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic);

@@ -28,9 +28,8 @@ BLEHandler::~BLEHandler()
 {
 }
 
-void BLEHandler::writeDFUAcknowledgment()
+void BLEHandler::writeDFUAcknowledgment(uint8_t ack)
 {
-  uint8_t ack = dfuManager.acknowledgment();
   dfuAckCharacteristic.writeValue(ack);
 }
 
@@ -44,9 +43,11 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
     _debug->println(sizeof(data));
   }
   _last = dfuManager.processPacket(dfuType, data);
-  writeDFUAcknowledgment();
 
-  if (_last == 1) {
+  uint8_t ack = dfuManager.acknowledgment();
+  writeDFUAcknowledgment(ack);
+
+  if (_last == 1 && ack == DFUAck) {
     // reboot
     delay(500);
     NVIC_SystemReset();

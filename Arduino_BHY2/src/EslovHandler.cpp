@@ -62,7 +62,7 @@ void EslovHandler::requestEvent()
     }
     Wire1.write(ack);
 
-    if (_last == 1) {
+    if (_last == 1 && ack == DFUAck) {
       // reboot
       delay(500);
       NVIC_SystemReset();
