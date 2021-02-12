@@ -28,8 +28,17 @@ void Arduino_BHY2::update()
   bleHandler.update();
 }
 
-void Arduino_BHY2::configureSensor(SensorConfigurationPacket *config)
+void Arduino_BHY2::configureSensor(SensorConfigurationPacket& config)
 {
+  sensortec.configureSensor(config);
+}
+
+void Arduino_BHY2::configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency)
+{
+  SensorConfigurationPacket config;
+  config.sensorId = sensorId;
+  config.sampleRate = sampleRate;
+  config.latency = latency;
   sensortec.configureSensor(config);
 }
 

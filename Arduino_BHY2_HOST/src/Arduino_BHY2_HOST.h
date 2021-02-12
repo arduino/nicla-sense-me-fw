@@ -10,18 +10,13 @@ public:
   Arduino_BHY2_HOST();
   virtual ~Arduino_BHY2_HOST();
 
-  // Necessary API. Update function should be continuously polled 
+  // Necessary API. Update function should be continuously polled if PASSTHORUGH is ENABLED
   void begin(bool passthrough = false);
-  //void beginPassthrough();
   void update();
 
-  //bool bleConnect(int timeout = 1000);
-  //bool bleConfigureSensor(SensorConfigurationPacket *config);
-  //int bleAvailableSensorData();
-  //bool bleReadSensorData(SensorDataPacket &data);
-
   // Functions for controlling the BHY when PASSTHROUGH is DISABLED
-  void configureSensor(SensorConfigurationPacket *config);
+  void configureSensor(SensorConfigurationPacket& config);
+  void configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency);
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);
 

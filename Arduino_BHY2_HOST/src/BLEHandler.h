@@ -1,3 +1,4 @@
+#if 0
 #ifndef BLE_HANDLER_H_
 #define BLE_HANDLER_H_
 
@@ -19,5 +20,7 @@ private:
 };
 
 extern BLEHandler bleHandler;
+
+#endif
 
 #endif

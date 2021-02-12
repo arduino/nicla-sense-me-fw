@@ -28,7 +28,8 @@
 
     <!-- Connection form -->
 
-    <br><hr><br>
+    <br>
+    <!-- <hr><br> -->
     <div class="container text-center">
 
       <div class="row">
@@ -40,6 +41,14 @@
       <div class="form-group row">
         <div class="col"> 
           <button id="connect" name="connect" class="btn btn-primary">Connect</button>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="row">
+        <div class="col"> 
+          <h8> <i>Current status: </i></h8><span id="connectionStatus" class="badge rounded-pill bg-danger">Disconnected</span>
         </div>
       </div>
 
@@ -237,11 +246,15 @@ function connect() {
   return getDeviceInfo()
   .then(connectGATTdfu)
   .then(connectGATTack)
-  .then(_ => { console.log('Press the button "Choose file" to select the binary file that you want to send to Unisense') })
+  .then(_ => { 
+    console.log('Press the button "Choose file" to select the binary file that you want to send to Unisense');
+    onConnection(); 
+  })
   .catch(error => { console.log('ERROR: ' + error); });
 }
 
 function connectGATTdfu() {
+  bleDevice.addEventListener('gattserverdisconnected', onDisconnection);
   return bleDevice.gatt.connect()
   .then(server => {
     console.log('BLE device connected!')
@@ -288,6 +301,17 @@ function connectGATTack() {
   })
 }
 
+function onDisconnection(event) {
+  var status = document.getElementById("connectionStatus");
+  status.innerHTML = "Disconnected";
+  status.className = "badge rounded-pill bg-danger";
+}
+
+function onConnection() {
+  var status = document.getElementById("connectionStatus");
+  status.innerHTML = "Connected";
+  status.className = "badge rounded-pill bg-success";
+}
 
 function readAck() {
   if (debug == true) {

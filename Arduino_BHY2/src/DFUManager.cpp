@@ -36,8 +36,10 @@ void DFUManager::begin()
 uint8_t DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
 {
   DFUPacket* packet = (DFUPacket*)data;
-  //Serial.print("packet: ");
-  //Serial.println(packet->index);
+  if (_debug) {
+    _debug->print("packet: ");
+    _debug->println(packet->index);
+  }
 
   if (packet->index == 0) {
     if (dfuType == DFU_INTERNAL) {
@@ -55,7 +57,6 @@ uint8_t DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
 
   if (_target != NULL) {
     int ret = fwrite(&packet->data, packet->last ? packet->remaining : sizeof(packet->data), 1, _target);
-    //Serial.println(ret);
     // Set the acknowledgment flag according to the write return value
     if(_debug) {
       _debug->print("ret: ");

@@ -39,7 +39,7 @@ public:
 
   void writeDfuPacket(uint8_t *data, uint8_t length);
   void writeStateChange(EslovState state);
-  void writeConfigPacket(SensorConfigurationPacket* config);
+  void writeConfigPacket(SensorConfigurationPacket& config);
   uint8_t requestDfuPacketAck();
   uint8_t requestAvailableData() ;
   bool requestSensorData(SensorDataPacket &sData);

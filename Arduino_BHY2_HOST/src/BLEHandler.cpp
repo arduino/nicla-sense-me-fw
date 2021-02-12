@@ -1,3 +1,4 @@
+#if 0
 #include "BLEHandler.h"
 
 // Sensor Data channels
@@ -38,3 +39,5 @@ void BLEHandler::debug(Stream &stream)
 }
 
 BLEHandler bleHandler;
+
+#endif

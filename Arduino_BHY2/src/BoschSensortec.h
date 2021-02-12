@@ -30,7 +30,7 @@ public:
   // sketch-side API
   void begin(); 
   void update();
-  void configureSensor(SensorConfigurationPacket *config);
+  void configureSensor(SensorConfigurationPacket& config);
 
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);

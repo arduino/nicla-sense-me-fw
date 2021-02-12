@@ -51,9 +51,9 @@ void BoschSensortec::begin()
   bhy2_update_virtual_sensor_list(&_bhy2);
 }
 
-void BoschSensortec::configureSensor(SensorConfigurationPacket *config)
+void BoschSensortec::configureSensor(SensorConfigurationPacket& config)
 {
-  auto ret = bhy2_set_virt_sensor_cfg(config->sensorId, config->sampleRate, config->latency, &_bhy2);
+  auto ret = bhy2_set_virt_sensor_cfg(config.sensorId, config.sampleRate, config.latency, &_bhy2);
   if (_debug) _debug->println(get_api_error(ret));
 }
 

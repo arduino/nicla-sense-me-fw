@@ -1,6 +1,5 @@
 #include "Arduino_BHY2_HOST.h"
 
-//#include "BLEHandler.h"
 #include "EslovHandler.h"
 
 Arduino_BHY2_HOST::Arduino_BHY2_HOST() :
@@ -14,21 +13,28 @@ Arduino_BHY2_HOST::~Arduino_BHY2_HOST()
 
 void Arduino_BHY2_HOST::begin(bool passthrough)
 {
-  //bleHandler.begin();
   _passthrough = passthrough;
   eslovHandler.begin(passthrough);
 }
 
 void Arduino_BHY2_HOST::update()
 {
-  //bleHandler.update();
   if (_passthrough){
     eslovHandler.update();
   }
 }
 
-void Arduino_BHY2_HOST::configureSensor(SensorConfigurationPacket *config)
+void Arduino_BHY2_HOST::configureSensor(SensorConfigurationPacket& config)
 {
+  eslovHandler.writeConfigPacket(config);
+}
+
+void Arduino_BHY2_HOST::configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency)
+{
+  SensorConfigurationPacket config;
+  config.sensorId = sensorId;
+  config.sampleRate = sampleRate;
+  config.latency = latency;
   eslovHandler.writeConfigPacket(config);
 }
 
@@ -60,7 +66,6 @@ void Arduino_BHY2_HOST::parse(SensorDataPacket& data, DataOrientation& vector, f
 void Arduino_BHY2_HOST::debug(Stream &stream)
 {
   eslovHandler.debug(stream);
-  //BLEHandler::debug(stream);
 }
 
 Arduino_BHY2_HOST BHY2_HOST;

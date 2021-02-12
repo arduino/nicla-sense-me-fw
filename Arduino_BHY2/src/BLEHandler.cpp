@@ -78,7 +78,7 @@ void BLEHandler::receivedSensorConfig(BLEDevice central, BLECharacteristic chara
     _debug->println(data.sampleRate);
     _debug->println(data.latency);
   }
-  sensortec.configureSensor(&data);
+  sensortec.configureSensor(data);
 }
 
 void BLEHandler::begin()
@@ -114,7 +114,6 @@ void BLEHandler::update()
   if (sensorDataCharacteristic.subscribed()) {
 
     // Simulate a request for reading new sensor data
-    // Better: bypass SensorChannel
     uint8_t availableData = sensortec.availableSensorData();
     while (availableData) {
       SensorDataPacket data;
