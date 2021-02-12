@@ -104,7 +104,7 @@ void EslovHandler::receiveEvent(int length)
     } else if (_rxBuffer[0] == ESLOV_SENSOR_CONFIG_OPCODE) {
       if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
         SensorConfigurationPacket *config = (SensorConfigurationPacket*)&_rxBuffer[1];
-        sensortec.configureSensor(config);
+        sensortec.configureSensor(*config);
 
         dump();
         _rxIndex = 0;

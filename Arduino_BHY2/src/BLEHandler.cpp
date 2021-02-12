@@ -78,7 +78,7 @@ void BLEHandler::receivedSensorConfig(BLEDevice central, BLECharacteristic chara
     _debug->println(data.sampleRate);
     _debug->println(data.latency);
   }
-  sensortec.configureSensor(&data);
+  sensortec.configureSensor(data);
 }
 
 void BLEHandler::begin()

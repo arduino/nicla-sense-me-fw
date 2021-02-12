@@ -21,7 +21,7 @@ void configureSensors()
   config.latency = 0;
 
   config.sensorId = ORI_ID;
-  BHY2_HOST.configureSensor(&config);
+  BHY2_HOST.configureSensor(config);
 }
 
 void setup()

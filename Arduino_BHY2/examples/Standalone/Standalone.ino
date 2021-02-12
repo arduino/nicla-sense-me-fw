@@ -20,10 +20,10 @@ void configureSensors() {
   config.latency = 0;
 
   config.sensorId = ACCEL_ID;
-  BHY2.configureSensor(&config);
+  BHY2.configureSensor(config);
 
   config.sensorId = GYRO_ID;
-  BHY2.configureSensor(&config);
+  BHY2.configureSensor(config);
 }
 
 void setup()

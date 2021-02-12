@@ -77,7 +77,7 @@ void EslovHandler::update()
           _debug->println(config->latency);
           _debug->println();
         }
-        writeConfigPacket(config);
+        writeConfigPacket(*config);
 
         _rxIndex = 0;
       }
@@ -114,12 +114,12 @@ void EslovHandler::writeStateChange(EslovState state)
   _eslovState = state;
 }
 
-void EslovHandler::writeConfigPacket(SensorConfigurationPacket* config)
+void EslovHandler::writeConfigPacket(SensorConfigurationPacket& config)
 {
   delay(ESLOV_DELAY);
   uint8_t packet[sizeof(SensorConfigurationPacket) + 1]; 
   packet[0] = ESLOV_SENSOR_CONFIG_OPCODE;
-  memcpy(&packet[1], config, sizeof(SensorConfigurationPacket));
+  memcpy(&packet[1], &config, sizeof(SensorConfigurationPacket));
   Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
   Wire.write(packet, sizeof(SensorConfigurationPacket) + 1);
   Wire.endTransmission();

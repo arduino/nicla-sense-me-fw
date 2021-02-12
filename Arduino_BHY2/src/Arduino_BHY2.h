@@ -15,7 +15,7 @@ public:
   void update();
 
   // API for using the bosch sensortec from sketch
-  void configureSensor(SensorConfigurationPacket *config);
+  void configureSensor(SensorConfigurationPacket& config);
   void addSensorData(const SensorDataPacket &sensorData);
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);

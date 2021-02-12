@@ -28,7 +28,7 @@ void Arduino_BHY2::update()
   bleHandler.update();
 }
 
-void Arduino_BHY2::configureSensor(SensorConfigurationPacket *config)
+void Arduino_BHY2::configureSensor(SensorConfigurationPacket& config)
 {
   sensortec.configureSensor(config);
 }

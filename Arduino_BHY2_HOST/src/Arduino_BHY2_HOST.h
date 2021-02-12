@@ -15,7 +15,7 @@ public:
   void update();
 
   // Functions for controlling the BHY when PASSTHROUGH is DISABLED
-  void configureSensor(SensorConfigurationPacket *config);
+  void configureSensor(SensorConfigurationPacket& config);
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);
 

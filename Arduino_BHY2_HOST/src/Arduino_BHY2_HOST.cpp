@@ -24,7 +24,7 @@ void Arduino_BHY2_HOST::update()
   }
 }
 
-void Arduino_BHY2_HOST::configureSensor(SensorConfigurationPacket *config)
+void Arduino_BHY2_HOST::configureSensor(SensorConfigurationPacket& config)
 {
   eslovHandler.writeConfigPacket(config);
 }
