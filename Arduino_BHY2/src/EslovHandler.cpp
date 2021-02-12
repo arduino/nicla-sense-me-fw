@@ -10,7 +10,6 @@ EslovHandler::EslovHandler() :
   _last(0),
   _debug(NULL)
 {
-
 }
 
 EslovHandler::~EslovHandler()
@@ -24,7 +23,6 @@ void EslovHandler::begin()
   Wire1.onRequest(EslovHandler::onRequest); 
 }
 
-// Ugly and.. does it work?
 void EslovHandler::onReceive(int length)
 {
   eslovHandler.receiveEvent(length);
@@ -81,7 +79,6 @@ void EslovHandler::receiveEvent(int length)
   while(Wire1.available())
   {
     _rxBuffer[_rxIndex++] = Wire1.read(); 
-    //if(_debug) _debug->println(_rxBuffer[_rxIndex-1]);
 
     // Check if packet is complete depending on its opcode
     if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
