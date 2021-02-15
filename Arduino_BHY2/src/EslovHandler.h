@@ -26,6 +26,7 @@ public:
   virtual ~EslovHandler();
 
   void begin();
+  void update();
 
   static void onReceive(int length);
   static void onRequest();
@@ -45,6 +46,7 @@ private:
   void debug(Stream &stream);
   void dump();
   Stream *_debug;
+  bool _eslov_update;
 };
 
 extern EslovHandler eslovHandler;

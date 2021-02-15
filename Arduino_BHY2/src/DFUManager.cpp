@@ -71,8 +71,10 @@ uint8_t DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
       _debug->print("Last packet received. Remaining: ");
       _debug->println(packet->remaining);
     }
-    fclose(_target);
-    _target = NULL;
+    if (_acknowledgment == DFUAck) {
+      fclose(_target);
+      _target = NULL;
+    }
   }
 
   return packet->last;
@@ -85,6 +87,18 @@ uint8_t DFUManager::acknowledgment()
   // Reset acknowledgment
   _acknowledgment = DFUNack;
   return ack;
+}
+
+void DFUManager::update()
+{
+  if (update_complete) {
+    if(_debug) {
+      _debug->print("Updating FW...");
+    }
+    // reboot
+    delay(1000);
+    NVIC_SystemReset();
+  }
 }
 
 void DFUManager::debug(Stream &stream)

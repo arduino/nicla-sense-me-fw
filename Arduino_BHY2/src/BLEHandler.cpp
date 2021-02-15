@@ -48,10 +48,9 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
   writeDFUAcknowledgment(ack);
 
   if (_last == 1 && ack == DFUAck) {
-    // reboot
-    delay(500);
-    NVIC_SystemReset();
+      dfuManager.update_complete = true;
   }
+
 }
 
 void BLEHandler::receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic)
@@ -111,6 +110,18 @@ void BLEHandler::update()
 {
   BLE.poll();
 
+  if (dfuManager.update_complete == true) {
+    BLE.poll();
+    delay(1000);
+    BLE.poll();
+
+    if(_debug) {
+      _debug->print("Rebooting...");
+    }
+    // reboot
+    dfuManager.update();
+  }
+
   // This check doesn't work with more than one client at the same time
   if (sensorDataCharacteristic.subscribed()) {
 
@@ -124,6 +135,7 @@ void BLEHandler::update()
     }
 
   }
+
 }
 
 void BLEHandler::debug(Stream &stream)

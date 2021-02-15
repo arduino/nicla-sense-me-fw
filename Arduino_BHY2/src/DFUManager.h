@@ -41,6 +41,9 @@ public:
   uint8_t processPacket(DFUType dfuType, const uint8_t* data);
 
   uint8_t acknowledgment();
+  void update();
+
+  bool update_complete = false;
 
 private:
 #if defined (TARGET_ANNA)

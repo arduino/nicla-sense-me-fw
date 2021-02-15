@@ -8,7 +8,8 @@ EslovHandler::EslovHandler() :
   _rxBuffer(),
   _state(ESLOV_AVAILABLE_SENSOR_STATE),
   _last(0),
-  _debug(NULL)
+  _debug(NULL),
+  _eslov_update(false)
 {
 }
 
@@ -18,7 +19,7 @@ EslovHandler::~EslovHandler()
 
 void EslovHandler::begin()
 {
-  Wire1.begin(ESLOV_DEFAULT_ADDRESS);                
+  Wire1.begin(ESLOV_DEFAULT_ADDRESS);
   Wire1.onReceive(EslovHandler::onReceive); 
   Wire1.onRequest(EslovHandler::onRequest); 
 }
@@ -35,6 +36,8 @@ void EslovHandler::onRequest()
 
 void EslovHandler::requestEvent()
 {
+  bool last = false;
+
   if (_debug) {
     _debug->print("Wire Request event. State: ");
     _debug->println(_state);
@@ -63,9 +66,7 @@ void EslovHandler::requestEvent()
     Wire1.write(ack);
 
     if (_last == 1 && ack == DFUAck) {
-      // reboot
-      delay(500);
-      NVIC_SystemReset();
+      dfuManager.update_complete = true;
     }
   }
 }
@@ -82,6 +83,7 @@ void EslovHandler::receiveEvent(int length)
 
     // Check if packet is complete depending on its opcode
     if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
+      _eslov_update = true;
       if (_rxIndex == sizeof(DFUPacket) + 1) {
         _last = dfuManager.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
 
@@ -92,6 +94,7 @@ void EslovHandler::receiveEvent(int length)
       }
 
     } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
+      _eslov_update = true;
       if (_rxIndex == sizeof(DFUPacket) + 1) {
         _last = dfuManager.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
 

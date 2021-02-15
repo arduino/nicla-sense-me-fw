@@ -26,6 +26,7 @@ void Arduino_BHY2::update()
 {
   sensortec.update();
   bleHandler.update();
+  eslovHandler.update();
 }
 
 void Arduino_BHY2::configureSensor(SensorConfigurationPacket& config)
