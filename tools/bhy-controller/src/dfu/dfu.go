@@ -109,7 +109,7 @@ func Upload(baud_rate int, target string, USBport string, bin_path string) {
 			binary.LittleEndian.PutUint16(idx, index)
 		}
 
-		fmt.Printf("opcode: %d\n", opcode[1:])
+		fmt.Printf("opcode: %d\n", opcode[:1])
 		fmt.Printf("lastPack: %d\n", last)
 		fmt.Printf("index: %d\n", index)
 		for j := 0; j < packSize; j++ {
@@ -119,7 +119,7 @@ func Upload(baud_rate int, target string, USBport string, bin_path string) {
 		header := make([]byte, 3)
 		header = append(last, idx[:2]...)
 		opcodeHeader := make([]byte, 4)
-		opcodeHeader = append(opcode[1:], header...)
+		opcodeHeader = append(opcode[:1], header...)
 		packet := make([]byte, FullPackSize)
 		packet = append(opcodeHeader, buf...)
 
