@@ -17,21 +17,23 @@ import (
 */
 
 var crc8bit byte
+var spareBytes uint16
 var Ack = (byte)(0x0F)
 var Nack = (byte)(0x00)
 var packSize = 64
 var FullPackSize = packSize + 4
 
-func CRC8(buf []byte) {
+func CRC8(buf []byte, last_pack bool) {
 
-	b1 := buf[0]
-	b2 := buf[1]
+	buf_len := packSize
 
-	crc8bit = b1 ^ b2
+	if last_pack {
+		buf_len = (int)(spareBytes)
+	}
 
-	for i := 2; i < packSize; i++ {
-		b1 = buf[i]
-		crc8bit = crc8bit ^ b1
+	for i := 0; i < buf_len; i++ {
+		b := buf[i]
+		crc8bit = crc8bit ^ b
 	}
 
 }
@@ -73,8 +75,10 @@ func Upload(baud_rate int, target string, USBport string, bin_path string) {
 
 	nChunks := int(fw_size / ((int64)(packSize)))
 	fmt.Printf("nChunks: %d\n", nChunks)
-	spareBytes := uint16(fw_size % ((int64)(packSize)))
+	spareBytes = uint16(fw_size % ((int64)(packSize)))
 	fmt.Printf("spareBytes: %d\n", spareBytes)
+
+	crc8bit = 0
 
 	for n := 0; n <= nChunks; n++ {
 
@@ -84,7 +88,11 @@ func Upload(baud_rate int, target string, USBport string, bin_path string) {
 			check(err)
 
 			//update the CRC at each chunk of packSize bytes read
-			CRC8(buf)
+			if n == nChunks {
+				CRC8(buf, true)
+			} else {
+				CRC8(buf, false)
+			}
 		}
 
 		index := (uint16)(n)
