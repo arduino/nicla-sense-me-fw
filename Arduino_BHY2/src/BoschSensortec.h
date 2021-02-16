@@ -21,7 +21,6 @@ extern "C"
 
 #define MAX_READ_WRITE_LEN 256
 
-// This will use the BHY functions for configuring sensors and retrieving data
 class BoschSensortec {
 public:
   BoschSensortec();
