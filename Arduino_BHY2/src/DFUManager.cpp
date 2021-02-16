@@ -1,12 +1,7 @@
 #include "DFUManager.h"
 
-#if defined (TARGET_ANNA)
 SPIFBlockDevice DFUManager::_bd(SPI_PSELMOSI0, SPI_PSELMISO0,
                      SPI_PSELSCK0, CS_FLASH);
-#else
-// half the flash (512KB) is dedicated as dfu temporary storage
-FlashIAPBlockDevice DFUManager::_bd(0x80000, 0x80000);
-#endif
 
 mbed::LittleFileSystem DFUManager::_fs("fs");
 

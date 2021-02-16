@@ -3,13 +3,7 @@
 
 #include "Arduino.h"
 
-#define TARGET_ANNA
-
-#if defined (TARGET_ANNA)
 #include "SPIFBlockDevice.h"
-#else
-#include "FlashIAPBlockDevice.h"
-#endif
 
 #include "LittleFileSystem.h"
 
@@ -45,11 +39,7 @@ public:
   uint8_t acknowledgment();
 
 private:
-#if defined (TARGET_ANNA)
   static SPIFBlockDevice _bd;
-#else 
-  static FlashIAPBlockDevice _bd;
-#endif
   static mbed::LittleFileSystem _fs;
   FILE* _target;
 
