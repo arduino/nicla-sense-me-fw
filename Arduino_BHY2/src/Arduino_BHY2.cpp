@@ -6,7 +6,8 @@
 #include "EslovHandler.h"
 #include "DFUManager.h"
 
-Arduino_BHY2::Arduino_BHY2()
+Arduino_BHY2::Arduino_BHY2() :
+  _debug(NULL)
 {
 }
 
@@ -89,6 +90,7 @@ void Arduino_BHY2::parse(SensorDataPacket& data, DataOrientation& vector, float 
 
 void Arduino_BHY2::debug(Stream &stream)
 {
+  _debug = &stream;
   eslovHandler.debug(stream);
   BLEHandler::debug(stream);
   sensortec.debug(stream);
