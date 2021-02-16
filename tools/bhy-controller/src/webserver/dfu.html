@@ -73,7 +73,7 @@
           <label class="input-group-text" for="targetSelect">Target</label>
           <select class="custom-select" id="targetSelect" required>
             <option selected>Choose...</option>
-            <option value="anna">ANNA</option>
+            <option value="unisense">UNISENSE</option>
             <option value="bhi">BHI</option>
           </select>
         </div>
@@ -144,7 +144,7 @@ var crc8bit = 0;
 var onlyCRCleft = false;
 var elem;
 
-// Set ANNA as default target
+// Set UNISENSE as default target
 document.getElementById('targetSelect').selectedIndex = 1;
 document.getElementById("progressDiv").style.visibility = 'hidden';
 
@@ -197,7 +197,7 @@ document.querySelector('#update').addEventListener('click', function() {
     elem = document.getElementById("myBar");
     // Take selected dfu characteristic
     target = document.getElementById("targetSelect").value;
-    if (target == "anna") {
+    if (target == "unisense") {
       dfuCharacteristic = gattInternalCharacteristic;
     } else {
       dfuCharacteristic = gattExternalCharacteristic;

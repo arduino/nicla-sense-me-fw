@@ -38,18 +38,18 @@ func dfuCommand() {
 	dfuFlags := flag.NewFlagSet("dfu", flag.ExitOnError)
 	usbPort := dfuFlags.String("p", "", "usb port")
 	baudRate := dfuFlags.Int("baud", 115200, "baud rate")
-	opCode := dfuFlags.Int("o", 0, "op code")
+	target := dfuFlags.String("t", "", "indicate a target - ( unisense | bhi ) ")
 	binPath := dfuFlags.String("bin", "", "binary path")
 
 	dfuFlags.Parse(os.Args[2:])
 
-	ret := dfuCheckFlags(*baudRate, *opCode, *usbPort, *binPath)
+	ret := dfuCheckFlags(*baudRate, *target, *usbPort, *binPath)
 	if !ret {
 		dfuFlags.PrintDefaults()
 		return
 	}
 
-	dfu.Upload(*baudRate, *opCode, *usbPort, *binPath)
+	dfu.Upload(*baudRate, *target, *usbPort, *binPath)
 }
 
 func webserverCommand() {
@@ -127,7 +127,13 @@ func listCommand() {
 	}
 }
 
-func dfuCheckFlags(baudRate int, opCode int, usbPort string, binPath string) bool {
+func dfuCheckFlags(baudRate int, target string, usbPort string, binPath string) bool {
+	if target != "unisense" && target != "bhi" {
+		fmt.Println("")
+		fmt.Println(" -t target not valid, choose between 'unisense' or 'bhi'")
+		fmt.Println("")
+		return false
+	}
 	if binPath == "" {
 		fmt.Println("")
 		fmt.Println(" missing -bin parameter, provide a valid binary path")

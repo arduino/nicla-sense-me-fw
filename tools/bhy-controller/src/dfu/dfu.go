@@ -3,9 +3,10 @@ package dfu
 import (
 	"encoding/binary"
 	"fmt"
-	"go.bug.st/serial"
 	"log"
 	"os"
+
+	"go.bug.st/serial"
 )
 
 /*Packet format:
@@ -35,7 +36,11 @@ func CRC8(buf []byte) {
 
 }
 
-func Upload(baud_rate int, oc int, USBport string, bin_path string) {
+func Upload(baud_rate int, target string, USBport string, bin_path string) {
+	oc := 0
+	if target == "bhi" {
+		oc = 1
+	}
 	oc16 := (uint16)(oc)
 	opcode := make([]byte, 2)
 
