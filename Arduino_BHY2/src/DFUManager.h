@@ -38,8 +38,9 @@ public:
   virtual ~DFUManager();
 
   void begin();
-  void update();
   void processPacket(DFUType dfuType, const uint8_t* data);
+
+  bool isPending();
 
   uint8_t acknowledgment();
 
@@ -53,8 +54,7 @@ private:
   FILE* _target;
 
   uint8_t _acknowledgment;
-  bool _lastPacket;
-  bool _transferComplete;
+  bool _transferPending;
 
 private:
   friend class Arduino_BHY2;

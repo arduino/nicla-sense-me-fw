@@ -26,7 +26,21 @@ void Arduino_BHY2::update()
 {
   sensortec.update();
   bleHandler.update();
-  dfuManager.update();
+
+  // While updating fw, detach the library from the sketch
+  if (dfuManager.isPending()) {
+    // TODO: abort dfu
+    while (dfuManager.isPending()) {
+      bleHandler.update();
+    }
+    // Wait some time for acknowledgment retrieval
+    auto timeRef = millis();
+    while (millis() - timeRef < 1000) {
+      bleHandler.update();
+    }
+    // Reboot after fw update
+    NVIC_SystemReset();
+  }
 }
 
 void Arduino_BHY2::configureSensor(SensorConfigurationPacket& config)

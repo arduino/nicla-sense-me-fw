@@ -13,8 +13,7 @@ mbed::LittleFileSystem DFUManager::_fs("fs");
 DFUManager::DFUManager() :
   _target(NULL),
   _acknowledgment(DFUNack),
-  _lastPacket(false),
-  _transferComplete(false),
+  _transferPending(false),
   _debug(NULL)
 {
 }
@@ -35,23 +34,10 @@ void DFUManager::begin()
   }
 }
 
-void DFUManager::update()
-{
-  if (_transferComplete) {
-    if(_debug) {
-      _debug->println("Rebooting");
-    }
-    // reboot
-    delay(500);
-    NVIC_SystemReset();
-  }
-}
-
 void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
 {
   DFUPacket* packet = (DFUPacket*)data;
-  _lastPacket = false;
-  _transferComplete = false;
+  _transferPending = true;
 
   if (_debug) {
     _debug->print("packet: ");
@@ -91,9 +77,14 @@ void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
     if (_acknowledgment == DFUAck) {
       fclose(_target);
       _target = NULL;
+      _transferPending = false;
     }
-    _lastPacket = true;
   }
+}
+
+bool DFUManager::isPending()
+{
+  return _transferPending;
 }
 
 // acknowledgment flag is reset when read
@@ -102,9 +93,6 @@ uint8_t DFUManager::acknowledgment()
   uint8_t ack = _acknowledgment;
   // Reset acknowledgment
   _acknowledgment = DFUNack;
-  if (_lastPacket && ack == DFUAck) {
-    _transferComplete = true;
-  }
   return ack;
 }
 
