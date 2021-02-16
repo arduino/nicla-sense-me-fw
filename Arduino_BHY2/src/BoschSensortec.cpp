@@ -69,11 +69,13 @@ bool BoschSensortec::readSensorData(SensorDataPacket &data)
 
 void BoschSensortec::addSensorData(const SensorDataPacket &sensorData)
 {
-  if (!_sensorQueue.full()) {
-    _sensorQueue.push(sensorData);
-  } else {
-    // handle the queue by storing it in flash if full
-  }
+  // Overwrites oldest data when fifo is full 
+  _sensorQueue.push(sensorData);
+  // TODO: handle the queue by storing it in flash if full
+  //if (!_sensorQueue.full()) {
+    //_sensorQueue.push(sensorData);
+  //} else {
+  //}
 }
 
 void BoschSensortec::update()
