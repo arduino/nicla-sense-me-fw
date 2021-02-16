@@ -30,6 +30,7 @@ void Arduino_BHY2::update()
 
   // While updating fw, detach the library from the sketch
   if (dfuManager.isPending()) {
+    if (_debug) _debug->println("Start DFU procedure. Sketch execution is stopped.");
     // TODO: abort dfu
     while (dfuManager.isPending()) {
       bleHandler.update();
@@ -40,6 +41,7 @@ void Arduino_BHY2::update()
       bleHandler.update();
     }
     // Reboot after fw update
+    if (_debug) _debug->println("DFU procedure terminated. Rebooting.");
     NVIC_SystemReset();
   }
 }
