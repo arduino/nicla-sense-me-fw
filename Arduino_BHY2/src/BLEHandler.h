@@ -18,9 +18,8 @@ public:
 
 private:
   static Stream *_debug;
-  uint8_t _last;
 
-  void writeDFUAcknowledgment(uint8_t ack);
+  void writeDFUAcknowledgment();
   void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic);
 
   static void receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic);

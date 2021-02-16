@@ -28,8 +28,9 @@ BLEHandler::~BLEHandler()
 {
 }
 
-void BLEHandler::writeDFUAcknowledgment(uint8_t ack)
+void BLEHandler::writeDFUAcknowledgment()
 {
+  uint8_t ack = dfuManager.acknowledgment();
   dfuAckCharacteristic.writeValue(ack);
 }
 
@@ -42,15 +43,9 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
     _debug->print("Size of data: ");
     _debug->println(sizeof(data));
   }
-  _last = dfuManager.processPacket(dfuType, data);
+  dfuManager.processPacket(dfuType, data);
 
-  uint8_t ack = dfuManager.acknowledgment();
-  writeDFUAcknowledgment(ack);
-
-  if (_last == 1 && ack == DFUAck) {
-      dfuManager.update_complete = true;
-  }
-
+  writeDFUAcknowledgment();
 }
 
 void BLEHandler::receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic)
@@ -109,18 +104,6 @@ void BLEHandler::begin()
 void BLEHandler::update()
 {
   BLE.poll();
-
-  if (dfuManager.update_complete == true) {
-    BLE.poll();
-    delay(1000);
-    BLE.poll();
-
-    if(_debug) {
-      _debug->print("Rebooting...");
-    }
-    // reboot
-    dfuManager.update();
-  }
 
   // This check doesn't work with more than one client at the same time
   if (sensorDataCharacteristic.subscribed()) {

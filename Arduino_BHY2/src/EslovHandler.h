@@ -26,7 +26,6 @@ public:
   virtual ~EslovHandler();
 
   void begin();
-  void update();
 
   static void onReceive(int length);
   static void onRequest();
@@ -39,14 +38,12 @@ private:
   uint8_t _rxBuffer[ESLOV_MAX_LENGTH];
 
   EslovState _state;
-  uint8_t _last;
 
 private:
   friend class Arduino_BHY2;
   void debug(Stream &stream);
   void dump();
   Stream *_debug;
-  bool _eslov_update;
 };
 
 extern EslovHandler eslovHandler;

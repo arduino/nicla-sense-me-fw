@@ -13,6 +13,8 @@ mbed::LittleFileSystem DFUManager::_fs("fs");
 DFUManager::DFUManager() :
   _target(NULL),
   _acknowledgment(DFUNack),
+  _lastPacket(false),
+  _transferComplete(false),
   _debug(NULL)
 {
 }
@@ -33,9 +35,24 @@ void DFUManager::begin()
   }
 }
 
-uint8_t DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
+void DFUManager::update()
+{
+  if (_transferComplete) {
+    if(_debug) {
+      _debug->println("Rebooting");
+    }
+    // reboot
+    delay(500);
+    NVIC_SystemReset();
+  }
+}
+
+void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
 {
   DFUPacket* packet = (DFUPacket*)data;
+  _lastPacket = false;
+  _transferComplete = false;
+
   if (_debug) {
     _debug->print("packet: ");
     _debug->println(packet->index);
@@ -75,9 +92,8 @@ uint8_t DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
       fclose(_target);
       _target = NULL;
     }
+    _lastPacket = true;
   }
-
-  return packet->last;
 }
 
 // acknowledgment flag is reset when read
@@ -86,19 +102,10 @@ uint8_t DFUManager::acknowledgment()
   uint8_t ack = _acknowledgment;
   // Reset acknowledgment
   _acknowledgment = DFUNack;
-  return ack;
-}
-
-void DFUManager::update()
-{
-  if (update_complete) {
-    if(_debug) {
-      _debug->print("Updating FW...");
-    }
-    // reboot
-    delay(1000);
-    NVIC_SystemReset();
+  if (_lastPacket && ack == DFUAck) {
+    _transferComplete = true;
   }
+  return ack;
 }
 
 void DFUManager::debug(Stream &stream)

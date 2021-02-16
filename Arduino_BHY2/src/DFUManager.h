@@ -38,12 +38,10 @@ public:
   virtual ~DFUManager();
 
   void begin();
-  uint8_t processPacket(DFUType dfuType, const uint8_t* data);
+  void update();
+  void processPacket(DFUType dfuType, const uint8_t* data);
 
   uint8_t acknowledgment();
-  void update();
-
-  bool update_complete = false;
 
 private:
 #if defined (TARGET_ANNA)
@@ -55,6 +53,8 @@ private:
   FILE* _target;
 
   uint8_t _acknowledgment;
+  bool _lastPacket;
+  bool _transferComplete;
 
 private:
   friend class Arduino_BHY2;
