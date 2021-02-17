@@ -43,14 +43,9 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
     _debug->print("Size of data: ");
     _debug->println(sizeof(data));
   }
-  _last = dfuManager.processPacket(dfuType, data);
-  writeDFUAcknowledgment();
+  dfuManager.processPacket(dfuType, data);
 
-  if (_last == 1) {
-    // reboot
-    delay(500);
-    NVIC_SystemReset();
-  }
+  writeDFUAcknowledgment();
 }
 
 void BLEHandler::receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic)
@@ -123,6 +118,7 @@ void BLEHandler::update()
     }
 
   }
+
 }
 
 void BLEHandler::debug(Stream &stream)

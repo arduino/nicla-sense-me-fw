@@ -16,6 +16,7 @@ void BoschSensortec::begin()
   auto ret = bhy2_init(BHY2_SPI_INTERFACE, bhy2_spi_read, bhy2_spi_write, bhy2_delay_us, MAX_READ_WRITE_LEN, NULL, &_bhy2);
   if (_debug) _debug->println(get_api_error(ret));
 
+  // Print bhi status 
   uint8_t stat;
   ret = bhy2_get_boot_status(&stat, &_bhy2);
   if (_debug) {
@@ -23,7 +24,6 @@ void BoschSensortec::begin()
     _debug->print("Boot status: ");
     _debug->println(stat, HEX);
   }
-
   ret = bhy2_get_host_interrupt_ctrl(&stat, &_bhy2);
   if (_debug) {
     _debug->println(get_api_error(ret));
@@ -44,6 +44,7 @@ void BoschSensortec::begin()
   ret = bhy2_get_and_process_fifo(_workBuffer, WORK_BUFFER_SIZE, &_bhy2);
   if (_debug) _debug->println(get_api_error(ret));
 
+  // All sensors' data are handled in the same generic way
   for (uint8_t i = 1; i < BHY2_SENSOR_ID_MAX; i++) {
     bhy2_register_fifo_parse_callback(i, BoschParser::parseData, NULL, &_bhy2);
   }
@@ -69,11 +70,9 @@ bool BoschSensortec::readSensorData(SensorDataPacket &data)
 
 void BoschSensortec::addSensorData(const SensorDataPacket &sensorData)
 {
-  if (!_sensorQueue.full()) {
-    _sensorQueue.push(sensorData);
-  } else {
-    // handle the queue by storing it in flash if full
-  }
+  // Overwrites oldest data when fifo is full 
+  _sensorQueue.push(sensorData);
+  // Alternative: handle the full queue by storing it in flash 
 }
 
 void BoschSensortec::update()

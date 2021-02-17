@@ -3,13 +3,7 @@
 
 #include "Arduino.h"
 
-#define TARGET_ANNA
-
-#if defined (TARGET_ANNA)
 #include "SPIFBlockDevice.h"
-#else
-#include "FlashIAPBlockDevice.h"
-#endif
 
 #include "LittleFileSystem.h"
 
@@ -38,20 +32,19 @@ public:
   virtual ~DFUManager();
 
   void begin();
-  uint8_t processPacket(DFUType dfuType, const uint8_t* data);
+  void processPacket(DFUType dfuType, const uint8_t* data);
+
+  bool isPending();
 
   uint8_t acknowledgment();
 
 private:
-#if defined (TARGET_ANNA)
   static SPIFBlockDevice _bd;
-#else 
-  static FlashIAPBlockDevice _bd;
-#endif
   static mbed::LittleFileSystem _fs;
   FILE* _target;
 
   uint8_t _acknowledgment;
+  bool _transferPending;
 
 private:
   friend class Arduino_BHY2;

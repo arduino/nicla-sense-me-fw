@@ -1,18 +1,14 @@
 #include "DFUManager.h"
 
-#if defined (TARGET_ANNA)
 SPIFBlockDevice DFUManager::_bd(SPI_PSELMOSI0, SPI_PSELMISO0,
                      SPI_PSELSCK0, CS_FLASH);
-#else
-// half the flash (512KB) is dedicated as dfu temporary storage
-FlashIAPBlockDevice DFUManager::_bd(0x80000, 0x80000);
-#endif
 
 mbed::LittleFileSystem DFUManager::_fs("fs");
 
 DFUManager::DFUManager() :
   _target(NULL),
   _acknowledgment(DFUNack),
+  _transferPending(false),
   _debug(NULL)
 {
 }
@@ -33,9 +29,11 @@ void DFUManager::begin()
   }
 }
 
-uint8_t DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
+void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
 {
   DFUPacket* packet = (DFUPacket*)data;
+  _transferPending = true;
+
   if (_debug) {
     _debug->print("packet: ");
     _debug->println(packet->index);
@@ -71,11 +69,17 @@ uint8_t DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
       _debug->print("Last packet received. Remaining: ");
       _debug->println(packet->remaining);
     }
-    fclose(_target);
-    _target = NULL;
+    if (_acknowledgment == DFUAck) {
+      fclose(_target);
+      _target = NULL;
+      _transferPending = false;
+    }
   }
+}
 
-  return packet->last;
+bool DFUManager::isPending()
+{
+  return _transferPending;
 }
 
 // acknowledgment flag is reset when read

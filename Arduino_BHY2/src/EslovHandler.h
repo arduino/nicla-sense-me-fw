@@ -38,7 +38,6 @@ private:
   uint8_t _rxBuffer[ESLOV_MAX_LENGTH];
 
   EslovState _state;
-  uint8_t _last;
 
 private:
   friend class Arduino_BHY2;
