@@ -47,22 +47,19 @@ func openPort(usbPort string, baudRate int) serial.Port {
 }
 
 func readSensorData(buffer []byte, port serial.Port) {
-	n, err := port.Read(buffer)
-	errCheck(err)
-	if n != sensorDataSize {
-		fmt.Println("data not valid")
-	} else {
-		// Print the received sensor data
-		var data SensorData
-		data.id = uint8(buffer[0])
-		data.size = uint8(buffer[1])
-		//data.data = uint64(binary.LittleEndian.Uint64(buffer[2:10]))
-		data.data = buffer[2:(2 + data.size)]
-		//copy(data.data[:], buffer[2:(2+data.size)])
-		//fmt.Printf("sensor: %d	size: %d	data: ", data.id, data.size)
-		//fmt.Println(data.data)
-		parseData(&data)
+	var dataPacket [sensorDataSize]byte
+	for rxLen := 0; rxLen < sensorDataSize; {
+		n, err := port.Read(buffer)
+		errCheck(err)
+		copy(dataPacket[rxLen:sensorDataSize], buffer[:n])
+		rxLen = rxLen + n
 	}
+	// Print the received sensor data
+	var data SensorData
+	data.id = uint8(dataPacket[0])
+	data.size = uint8(dataPacket[1])
+	data.data = dataPacket[2:(2 + data.size)]
+	parseData(&data)
 }
 
 func liveRead(port serial.Port) {
