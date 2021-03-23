@@ -32,7 +32,7 @@ char FileUtils::computeCRC(FILE *file) {
   long len = getFileLen(file);
 
   //read by chunks of 256 bytes
-  uint16_t iterations = len/256;
+  uint16_t iterations = floor(len/256);
   uint8_t spare_bytes = len%256;
 
   int buffer_index = 2;
