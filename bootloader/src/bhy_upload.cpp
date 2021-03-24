@@ -277,6 +277,12 @@ int fwupdate_bhi260(void)
 #endif
 
         rslt = upload_firmware(&bhy2);
+
+        /* Check if the sensor is ready to load firmware */
+        rslt = bhy2_get_boot_status(&boot_status, &bhy2);
+        print_api_error(rslt, &bhy2);
+        printf("Boot status: %02X\r\n", boot_status);
+
         temp_rslt = bhy2_get_error_value(&sensor_error, &bhy2);
         if (sensor_error)
         {
@@ -322,6 +328,9 @@ int fwupdate_bhi260(void)
             */
 
         }
+
+        rslt = bhy2_get_boot_status(&boot_status, &bhy2);
+        printf("Boot status: %02X\r\n", boot_status);
     }
     else
     {
@@ -333,6 +342,9 @@ int fwupdate_bhi260(void)
     }
 
     close_interfaces();
+
+    rslt = bhy2_get_boot_status(&boot_status, &bhy2);
+    printf("Boot status: %02X\r\n", boot_status);
 
     return rslt;
 }
