@@ -13,6 +13,10 @@
 
 void setup()
 {
+
+  CoreDebug->DEMCR = 0;
+  NRF_CLOCK->TRACECONFIG = 0;
+
 #if DEBUG
   Serial.begin(115200);
   BHY2.debug(Serial);
