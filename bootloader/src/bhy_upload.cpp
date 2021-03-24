@@ -192,6 +192,8 @@ void install_callbacks(struct bhy2_dev* bhy2) {
  * and bhy2_upload_firmware_to_ram_partly APIs
  */
 
+long getUpdateFileSize();
+
 int fwupdate_bhi260(void)
 {
     uint8_t product_id = 0;
@@ -264,7 +266,7 @@ int fwupdate_bhi260(void)
         if (boot_status & BHY2_BST_FLASH_DETECTED)
         {
             uint32_t start_addr = BHY2_FLASH_SECTOR_START_ADDR;
-            uint32_t end_addr = start_addr + sizeof(bhy2_firmware_image);
+            uint32_t end_addr = start_addr + getUpdateFileSize();
             printf("Flash detected. Erasing flash to upload firmware\r\n");
 
             rslt = bhy2_erase_flash(start_addr, end_addr, &bhy2);
@@ -348,20 +350,35 @@ static void print_api_error(int8_t rslt, struct bhy2_dev *dev)
     }
 }
 
+
+long getUpdateFileSize() {
+    FILE *file_bhy = fopen(BHY_UPDATE_FILE_PATH, "rb");
+
+    if (file_bhy == NULL) {
+        printf("No BHY UPDATE file found!");
+        return 0;
+    }
+
+    long len_bhy = bhyfile.getFileLen(file_bhy);
+    return len_bhy;
+}
+
 static int8_t upload_firmware(struct bhy2_dev *dev)
 {
     int8_t rslt = BHY2_OK;
 
     FILE *file_bhy = fopen(BHY_UPDATE_FILE_PATH, "rb");
 
-    if (file_bhy == NULL) {
-        printf("No BHY UPDATE file found!");
-        rslt = BHY2_E_NULL_PTR;
-        return rslt;
+    long len_bhy = getUpdateFileSize();
+    printf("BHY Firmware size is %ld bytes\r\n", len_bhy);
+
+    if (len_bhy == 0) {
+        return BHY2_E_NULL_PTR;
     }
 
-    long len_bhy = bhyfile.getFileLen(file_bhy);
-    printf("BHY Firmware size is %ld bytes\r\n", len_bhy);
+    uint16_t iterations = len_bhy/256;
+    printf("Iterations: %d \r\n", iterations);
+
 
     char crc_bhy_file = bhyfile.getFileCRC(file_bhy);
     printf("CRC written in BHY file is %x \r\n", crc_bhy_file);
