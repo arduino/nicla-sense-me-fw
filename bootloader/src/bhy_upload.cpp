@@ -204,10 +204,6 @@ int fwupdate_bhi260(void)
 
     uint8_t hintr_ctrl, hif_ctrl, boot_status;
 
-    hostboot = new DigitalOut(BHI_HOSTBOOT);
-    *hostboot = 0;
-    ThisThread::sleep_for(5ms);
-
     DigitalOut* reset = new DigitalOut(RESET_BHI260);
     *reset = 0;
     ThisThread::sleep_for(5ms);
