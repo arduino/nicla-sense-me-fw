@@ -64,7 +64,7 @@ int check_signature(bool fail_safe)
         } else {
             printf("Press the button for at least 3 seconds to enter the Fail Safe mode \r\n");
             //wait for the button to be pressed
-            while(*boot_rst_n) {}
+            //while(*boot_rst_n) {}
             if(try_fail_safe(3000)) {
                 printf("Starting safe application\r\n");
                 mbed_start_application(POST_APPLICATION_ADDR);
@@ -141,7 +141,7 @@ int apply_update(FILE *file, uint32_t address, bool fail_safe)
             printf("Press the button for at least 3 seconds to enter the Fail Safe mode \r\n");
 
             //wait for the button to be pressed
-            while(*boot_rst_n) {}
+            //while(*boot_rst_n) {}
 
             return try_fail_safe(3000);
         } else {
@@ -256,6 +256,7 @@ int main()
     leds.powerUp();
 
     fwupdate_bhi260();
+    
     /*
     while (1) {
         leds.ledBlink(green, 1000);
