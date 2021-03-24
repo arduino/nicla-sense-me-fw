@@ -1,7 +1,7 @@
 #include "DFUManager.h"
 
 SPIFBlockDevice DFUManager::_bd(SPI_PSELMOSI0, SPI_PSELMISO0,
-                     SPI_PSELSCK0, CS_FLASH);
+                     SPI_PSELSCK0, CS_FLASH, 16000000);
 
 mbed::LittleFileSystem DFUManager::_fs("fs");
 

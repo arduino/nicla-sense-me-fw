@@ -29,7 +29,7 @@
 
 //Pin order: MOSI, MISO, SCK, CS
 SPIFBlockDevice spif(MBED_CONF_APP_SPIF_MOSI, MBED_CONF_APP_SPIF_MISO,
-                     MBED_CONF_APP_SPIF_SCK, MBED_CONF_APP_SPIF_CS);
+                     MBED_CONF_APP_SPIF_SCK, MBED_CONF_APP_SPIF_CS, 16000000);
 
 LittleFileSystem fs(MOUNT_PATH);
 FlashIAP flash;

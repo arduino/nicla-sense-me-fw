@@ -49,7 +49,7 @@
 #define BHA260_SHUTTLE_ID 0x139
 #define BHI260_SHUTTLE_ID 0x119
 
-mbed::DigitalOut BHY260_CS_PIN(SPI_PSELSS0);
+mbed::DigitalOut BHY260_CS_PIN(SPI_PSELSS0, 1);
 mbed::DigitalIn BHY260_INT_PIN(INT_BHI260);
 
 
@@ -104,6 +104,7 @@ mbed::SPI spi(SPI_PSELMOSI0, SPI_PSELMISO0, SPI_PSELSCK0 /*, SPI_PSELSS0 */);
 
 void setup_interfaces(bool reset_power, enum bhy2_intf intf)
 {
+    spi.frequency(16000000);
 }
 
 void close_interfaces(void)
