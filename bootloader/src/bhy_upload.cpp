@@ -27,6 +27,8 @@
 /* #include "bha260/Bosch_SHUTTLE_BHA260.fw.h" */
 #endif
 
+#define UPLOAD_FIRMWARE_TO_FLASH
+
 #if defined (PC)
 #define MAX_READ_WRITE_LEN 44
 #else
@@ -427,7 +429,7 @@ static int8_t upload_firmware(struct bhy2_dev *dev)
             }
         }
 #ifdef UPLOAD_FIRMWARE_TO_FLASH
-        rslt = bhy2_upload_firmware_to_flash_partly(&bhy2_firmware_image[i], i, incr, dev);
+        rslt = bhy2_upload_firmware_to_flash_partly(bhy2_firmware_image, i, incr, dev);
 #else
         rslt = bhy2_upload_firmware_to_ram_partly(bhy2_firmware_image, len_bhy, i, incr, dev);
 #endif

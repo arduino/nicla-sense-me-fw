@@ -16,14 +16,28 @@ void BoschSensortec::begin()
   auto ret = bhy2_init(BHY2_SPI_INTERFACE, bhy2_spi_read, bhy2_spi_write, bhy2_delay_us, MAX_READ_WRITE_LEN, NULL, &_bhy2);
   if (_debug) _debug->println(get_api_error(ret));
 
+  bhy2_soft_reset(&_bhy2);
+
   // Print bhi status 
-  uint8_t stat;
+  uint8_t stat = 0;
+  //delay(1000);
   ret = bhy2_get_boot_status(&stat, &_bhy2);
   if (_debug) {
     _debug->println(get_api_error(ret));
     _debug->print("Boot status: ");
     _debug->println(stat, HEX);
   }
+
+  ret = bhy2_boot_from_flash(&_bhy2);
+  _debug->println(get_api_error(ret));
+
+  ret = bhy2_get_boot_status(&stat, &_bhy2);
+  if (_debug) {
+    _debug->println(get_api_error(ret));
+    _debug->print("Boot status: ");
+    _debug->println(stat, HEX);
+  }
+
   ret = bhy2_get_host_interrupt_ctrl(&stat, &_bhy2);
   if (_debug) {
     _debug->println(get_api_error(ret));
