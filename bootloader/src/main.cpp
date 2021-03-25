@@ -5,6 +5,7 @@
 #include "bhy_upload.h"
 #include "SPIFBlockDevice.h"
 #include "IS31FL3194.h"
+#include "BQ25120A.h"
 #include "LittleFileSystem.h"
 #include "file_utils.h"
 
@@ -35,6 +36,8 @@ LittleFileSystem fs(MOUNT_PATH);
 FlashIAP flash;
 
 IS31FL3194 leds;
+
+BQ25120A pmic;
 
 FileUtils files;
 
@@ -233,6 +236,29 @@ int main()
     CoreDebug->DEMCR = 0;
     NRF_CLOCK->TRACECONFIG = 0;
 
+    /*
+        LDO reg:
+        |   B7   |  B6   |  B5   |  B4   |  B3   |  B2   | B1  | B0  |
+        | EN_LDO | LDO_4 | LDO_3 | LDO_2 | LDO_1 | LDO_0 |  X  |  X  |
+
+        Conversion function:
+        LDO = 0.8V + LDO_CODE * 100mV
+
+        - for LDO = 3.3V:
+            - set LCO_CODE = 25 (0x19)
+            - shift to lef by 2 positions: (0x19 << 2) = 0x64
+            - set EN_LDO: 0xE4
+        - for LDO = 1.8V:
+            - set LCO_CODE = 10 (0x0A)
+            - shift to lef by 2 positions: (0x0A << 2) = 0x28
+            - set EN_LDO: 0xA8
+    */
+    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL, 0);
+    uint8_t ldo_reg = 0xE4;
+    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL, ldo_reg);
+    ldo_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL);
+    printf("Ldo reg: %04x\n", ldo_reg);
+
     boot_rst_n = new DigitalIn(BUTTON1, PullUp);
 
     bool forced_reboot = !*boot_rst_n;
@@ -256,7 +282,39 @@ int main()
     leds.powerUp();
 
     fwupdate_bhi260();
-    
+
+    for (int i = 0; i < 3; i++) {
+        leds.ledBlink(blue, 1000);
+        ThisThread::sleep_for(1s);
+    }
+
+    //    STATUS reg:
+    //    | B7 | B6 |      B5     | B4 | B3 | B2 | B1 | B0 |
+    //    | RO | RO | EN_SHIPMODE | RO | RO | RO | RO | RO |
+    /*
+    uint8_t status_reg = pmic.getStatus();
+    printf("Initial Status reg: %04x\n", status_reg);
+    status_reg |= 0x20;
+    printf("Setting ship mode: %04x\n", status_reg);
+    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_STATUS, status_reg);
+    status_reg = pmic.getStatus();
+    printf("Read back status reg: %04x\n", status_reg);
+    */
+
+    //    PUSH-BUTTON CONTROL reg:
+    //    | B7 | B6 |   B5  | B4 | B3 | B2 | B1 | B0 |
+    //    | X  | X  | MRREC | X  | X  | X  | X  | X  |
+    //    MRREC = 1 : enter Ship Mode after reset
+    /*
+    uint8_t pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
+    printf("Initial push button reg: %04x\n", pb_reg);
+    pb_reg |= 0x20;
+    printf("Setting ship mode after reset: %04x\n", pb_reg);
+    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL, pb_reg);
+    pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
+    printf("Read back push button reg: %04x\n", pb_reg);
+    */
+
     /*
     while (1) {
         leds.ledBlink(green, 1000);
