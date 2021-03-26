@@ -264,11 +264,16 @@ int fwupdate_bhi260(void)
         if (boot_status & BHY2_BST_FLASH_DETECTED)
         {
             uint32_t start_addr = BHY2_FLASH_SECTOR_START_ADDR;
-            uint32_t end_addr = start_addr + getUpdateFileSize();
-            printf("Flash detected. Erasing flash to upload firmware\r\n");
+            long update_len = getUpdateFileSize();
+            if (update_len == 0) {
+                return 0;
+            } else {
+                uint32_t end_addr = start_addr + update_len;
+                printf("Flash detected and BHY firmware update available. Erasing flash to upload firmware\r\n");
 
-            rslt = bhy2_erase_flash(start_addr, end_addr, &bhy2);
-            print_api_error(rslt, &bhy2);
+                rslt = bhy2_erase_flash(start_addr, end_addr, &bhy2);
+                print_api_error(rslt, &bhy2);
+            }
         }
         else
         {
@@ -362,7 +367,7 @@ long getUpdateFileSize() {
     FILE *file_bhy = fopen(BHY_UPDATE_FILE_PATH, "rb");
 
     if (file_bhy == NULL) {
-        printf("No BHY UPDATE file found!");
+        printf("No BHY UPDATE file found!\r\n");
         return 0;
     }
 
@@ -435,9 +440,11 @@ static int8_t upload_firmware(struct bhy2_dev *dev)
     }
     printf("%d%% complete\r\n", 100);
 
-
-
     fclose(file_bhy);
+
+#ifdef UPLOAD_FIRMWARE_TO_FLASH
+    remove(BHY_UPDATE_FILE_PATH);
+#endif
 
     return rslt;
 }
