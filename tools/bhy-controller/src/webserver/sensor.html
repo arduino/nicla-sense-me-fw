@@ -303,8 +303,11 @@ function parseData(sensor, data) {
       value = data.getUint8(dataIndex, true) * scale; 
       size = 1;
     } else if (valueType == "uint24") {
-      value = data.getUint16(index, true) + (data.getUint8(index+2, true) << 16);
+      value = data.getUint16(dataIndex, true) + (data.getUint8(dataIndex+2, true) << 16);
       size = 3;
+    } else if (valueType == "uint32") {
+      value = data.getUint16(dataIndex, true) + (data.getUint16(dataIndex+2, true) << 16);
+      size = 4;
     } else if (valueType == "int16") {
       value = data.getInt16(dataIndex, true) * scale; 
       size = 2;
