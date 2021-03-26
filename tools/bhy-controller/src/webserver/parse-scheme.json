@@ -7,7 +7,7 @@
       "type": "temperature",
       "parse-scheme": 
       [
-        {"name": "val", "type": "int16", "scale-factor": 0.001}
+        {"name": "val", "type": "int16", "scale-factor": 0.01}
       ]
     },
 
@@ -70,6 +70,24 @@
         {"name": "heading", "type": "int16", "scale-factor": 0.01098},
         {"name": "pitch", "type": "int16", "scale-factor": 0.01098},
         {"name": "roll", "type": "int16", "scale-factor": 0.01098}
+      ]
+    },
+
+    {
+      "id": 7,
+      "type": "barometer",
+      "parse-scheme":
+      [
+        {"name": "val", "type": "uint24", "scale-factor": 0.008}
+      ]
+    },
+
+    {
+      "id": 8,
+      "type": "gas",
+      "parse-scheme":
+      [
+        {"name": "val", "type": "uint32", "scale-factor": 1}
       ]
     }
 

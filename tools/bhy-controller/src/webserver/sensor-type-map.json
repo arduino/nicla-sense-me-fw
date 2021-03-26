@@ -53,10 +53,82 @@
     "type-name": "xyz"
   },
 
+  "22": {
+    "name": "MAGNET",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
+  "24": {
+    "name": "MAGNET_WU",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
+  "28": {
+    "name": "GRAVITY",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
+  "32": {
+    "name": "LINEAR_ACC_WU",
+    "type": 5,
+    "type-name": "xyz"
+  },
+
   "43": {
     "name": "ORI",
     "type": 6,
     "type-name": "orientation"
+  },
+
+  "128": {
+    "name": "TEMPERATURE",
+    "type": 0,
+    "type-name": "temperature"
+  },
+
+  "132": {
+    "name": "TEMPERATURE_WU",
+    "type": 0,
+    "type-name": "temperature"
+  },
+
+  "130": {
+    "name": "HUMIDITY",
+    "type": 1,
+    "type-name": "humidity"
+  },
+
+  "134": {
+    "name": "HUMIDITY_WU",
+    "type": 1,
+    "type-name": "humidity"
+  },
+
+  "129": {
+    "name": "BAROMETER",
+    "type": 7,
+    "type-name": "barometer"
+  },
+
+  "133": {
+    "name": "BAROMETER_WU",
+    "type": 7,
+    "type-name": "barometer"
+  },
+
+  "131": {
+    "name": "GAS",
+    "type": 8,
+    "type-name": "gas"
+  },
+
+  "135": {
+    "name": "GAS_WU",
+    "type": 8,
+    "type-name": "gas"
   }
 
 }
