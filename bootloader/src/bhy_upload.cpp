@@ -293,13 +293,9 @@ int fwupdate_bhi260(void)
         print_api_error(rslt, &bhy2);
         print_api_error(temp_rslt, &bhy2);
 
-#ifdef UPLOAD_FIRMWARE_TO_FLASH
-        printf("Booting from Flash.\r\n");
-        rslt = bhy2_boot_from_flash(&bhy2);
-#else
+#ifndef UPLOAD_FIRMWARE_TO_FLASH
         printf("Booting from RAM.\r\n");
         rslt = bhy2_boot_from_ram(&bhy2);
-#endif
 
         temp_rslt = bhy2_get_error_value(&sensor_error, &bhy2);
         if (sensor_error)
@@ -308,6 +304,7 @@ int fwupdate_bhi260(void)
         }
         print_api_error(rslt, &bhy2);
         print_api_error(temp_rslt, &bhy2);
+#endif
 
         rslt = bhy2_get_kernel_version(&version, &bhy2);
         print_api_error(rslt, &bhy2);
