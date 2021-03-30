@@ -29,7 +29,7 @@ void BoschSensortec::begin()
   }
 
   ret = bhy2_boot_from_flash(&_bhy2);
-  _debug->println(get_api_error(ret));
+  if (_debug) _debug->println(get_api_error(ret));
 
   ret = bhy2_get_boot_status(&stat, &_bhy2);
   if (_debug) {
@@ -78,12 +78,14 @@ void BoschSensortec::begin()
       }
   }
 
-  _debug->println("Present sensors: ");
-  for (int i = 0; i < sizeof(sensors_present); i++) {
-    if (sensors_present[i]) {
-      _debug-> print(i);
-      //_debug-> print(get_sensor_name(i));
-      _debug-> print(", ");
+  if (_debug) {
+    _debug->println("Present sensors: ");
+    for (int i = 0; i < sizeof(sensors_present); i++) {
+      if (sensors_present[i]) {
+        _debug-> print(i);
+        //_debug-> print(get_sensor_name(i));
+        _debug-> print(", ");
+      }
     }
   }
 }
