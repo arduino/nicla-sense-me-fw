@@ -265,7 +265,7 @@ int fwupdate_bhi260(void)
         {
             uint32_t start_addr = BHY2_FLASH_SECTOR_START_ADDR;
             long update_len = getUpdateFileSize();
-            if (update_len == 0) {
+            if (update_len < 1) {
                 return 0;
             } else {
                 uint32_t end_addr = start_addr + update_len;
@@ -384,7 +384,7 @@ static int8_t upload_firmware(struct bhy2_dev *dev)
     long len_bhy = getUpdateFileSize();
     printf("BHY Firmware size is %ld bytes\r\n", len_bhy);
 
-    if (len_bhy == 0) {
+    if (len_bhy < 1) {
         return BHY2_E_NULL_PTR;
     }
 
