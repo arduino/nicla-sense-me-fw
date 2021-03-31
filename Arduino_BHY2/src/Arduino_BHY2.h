@@ -26,9 +26,11 @@ public:
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
 
   void debug(Stream &stream);
+  void ping_i2c0();
 
 private:
   Stream *_debug;
+  int start_time;
 };
 
 extern Arduino_BHY2 BHY2;

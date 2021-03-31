@@ -5,9 +5,15 @@
 #include "BLEHandler.h"
 #include "EslovHandler.h"
 #include "DFUManager.h"
+#include <I2C.h>
+
+mbed::I2C i2c0(I2C_SDA0, I2C_SCL0);
+
+uint8_t BQ25120A_ADDRESS = 0x6A;
 
 Arduino_BHY2::Arduino_BHY2() :
-  _debug(NULL)
+  _debug(NULL),
+  start_time(0)
 {
 }
 
@@ -15,8 +21,20 @@ Arduino_BHY2::~Arduino_BHY2()
 {
 }
 
+void Arduino_BHY2::ping_i2c0() {
+  char response = 0xFF;
+  int curr_time = millis();
+  if ((curr_time - start_time) > 30000) {
+    start_time = curr_time;
+    //Read status reg
+    int ret = i2c0.write(BQ25120A_ADDRESS << 1, 0, 1);
+    ret = i2c0.read(BQ25120A_ADDRESS << 1, &response, 1);
+  }
+}
+
 void Arduino_BHY2::begin()
 {
+  start_time = millis();
   sensortec.begin();
   bleHandler.begin();
   eslovHandler.begin();
@@ -33,6 +51,7 @@ void Arduino_BHY2::update()
     if (_debug) _debug->println("Start DFU procedure. Sketch execution is stopped.");
     // TODO: abort dfu
     while (dfuManager.isPending()) {
+      ping_i2c0();
       bleHandler.update();
     }
     // Wait some time for acknowledgment retrieval
