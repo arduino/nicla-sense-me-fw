@@ -13,12 +13,16 @@
 // Set DEBUG to true in order to enable debug print
 #define DEBUG false
 
+Serial_ SerialUSB2(USBDevice);
+
 void setup()
 {
+  Serial.begin(115200);
+  Serial1.begin(115200);
+  SerialUSB2.begin(115200);
 #if DEBUG
   // When the passthrough is enabled, Serial is busy ->
   // so it cannot be used for debugging. Serial1 is used instead
-  Serial1.begin(115200);
   BHY2_HOST.debug(Serial1);
 #endif
 
@@ -27,5 +31,8 @@ void setup()
 
 void loop()
 {
+  if (Serial1.available()) {
+    SerialUSB2.write(Serial1.read());
+  }
   BHY2_HOST.update();
 }
