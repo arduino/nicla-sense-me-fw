@@ -28,6 +28,10 @@ void configureSensors() {
 
 void setup()
 {
+
+  CoreDebug->DEMCR = 0;
+  NRF_CLOCK->TRACECONFIG = 0;
+
   Serial.begin(115200);
 
   BHY2.begin();
@@ -42,6 +46,7 @@ void loop()
 
   // Update function should be continuously polled
   BHY2.update();
+  BHY2.ping_i2c0();
 
   // Retrieve new data at each 10 ms
   if (millis() - sampleTime >= 10) {
@@ -74,5 +79,3 @@ void loop()
     Serial.println(gyroValue.toString());
   }
 }
-
-
