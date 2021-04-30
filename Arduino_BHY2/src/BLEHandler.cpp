@@ -79,7 +79,7 @@ void BLEHandler::receivedSensorConfig(BLEDevice central, BLECharacteristic chara
 void BLEHandler::begin()
 {
   BLE.begin();
-  BLE.setLocalName("UNISENSE");
+  BLE.setLocalName("NICLA");
 
   // DFU channel
   BLE.setAdvertisedService(dfuService);

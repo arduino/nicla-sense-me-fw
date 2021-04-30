@@ -35,7 +35,7 @@
       <div class="row">
         <!-- <div class="col-md-3 offset-md-3"> -->
         <div class="col"> 
-          <h3>Connect to Unisense</h3>  
+          <h3>Connect to Nicla</h3>  
         </div>
       </div>
       <div class="form-group row">
@@ -73,7 +73,7 @@
           <label class="input-group-text" for="targetSelect">Target</label>
           <select class="custom-select" id="targetSelect" required>
             <option selected>Choose...</option>
-            <option value="unisense">UNISENSE</option>
+            <option value="nicla">NICLA</option>
             <option value="bhi">BHI</option>
           </select>
         </div>
@@ -123,7 +123,7 @@
 </html>
 
 <script>
-const deviceName = 'UNISENSE';
+const deviceName = 'NICLA';
 const dfuService = '34c2e3b8-34aa-11eb-adc1-0242ac120002';
 const dfuAckCharacteristic = '34c2e3be-34aa-11eb-adc1-0242ac120002';
 const dfuInternalCharacteristic = '34c2e3b9-34aa-11eb-adc1-0242ac120002';
@@ -148,7 +148,7 @@ var crc8bit = 0;
 var onlyCRCleft = false;
 var elem;
 
-// Set UNISENSE as default target
+// Set NICLA as default target
 document.getElementById('targetSelect').selectedIndex = 1;
 document.getElementById("progressDiv").style.visibility = 'hidden';
 
@@ -201,7 +201,7 @@ document.querySelector('#update').addEventListener('click', function() {
     elem = document.getElementById("myBar");
     // Take selected dfu characteristic
     target = document.getElementById("targetSelect").value;
-    if (target == "unisense") {
+    if (target == "nicla") {
       dfuCharacteristic = gattInternalCharacteristic;
     } else {
       dfuCharacteristic = gattExternalCharacteristic;
@@ -251,7 +251,7 @@ function connect() {
   .then(connectGATTdfu)
   .then(connectGATTack)
   .then(_ => { 
-    console.log('Select the binary file that you want to send to Unisense');
+    console.log('Select the binary file that you want to send to Nicla');
     onConnection(); 
   })
   .catch(error => { console.log('ERROR: ' + error); });

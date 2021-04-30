@@ -1,7 +1,7 @@
 /* 
- * Use this sketch if you want to control unisense from 
+ * Use this sketch if you want to control nicla from 
  * an external device acting as a host.
- * Here, unisense just reacts to external stimuli coming from
+ * Here, nicla just reacts to external stimuli coming from
  * the eslov port or through BLE 
 */
 

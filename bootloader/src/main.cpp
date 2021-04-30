@@ -52,7 +52,7 @@ int apply_update(FILE *file, uint32_t address, bool fail_safe);
 int check_signature(bool fail_safe)
 {
     void *signature = NULL;
-    signature = memmem((const char*)POST_APPLICATION_ADDR, POST_APPLICATION_SIZE, "UNISENSE", sizeof("UNISENSE"));
+    signature = memmem((const char*)POST_APPLICATION_ADDR, POST_APPLICATION_SIZE, "NICLA", sizeof("NICLA"));
 
     if (signature != NULL) {
         //Signature found: fw can be executed
@@ -61,7 +61,7 @@ int check_signature(bool fail_safe)
         mbed_start_application(POST_APPLICATION_ADDR);
     } else {
         //Signature NOT found: do not run the current fw and try fail safe
-        printf("Unisense signature NOT found! \r\n");
+        printf("Nicla signature NOT found! \r\n");
         if (fail_safe) {
             return 0;
         } else {

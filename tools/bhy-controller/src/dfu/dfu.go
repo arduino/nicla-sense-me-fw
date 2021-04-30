@@ -132,7 +132,7 @@ func Upload(baud_rate int, target string, USBport string, bin_path string) {
 
 			ackBuf := make([]byte, 1)
 
-			//wait response from Unisense
+			//wait response from Nicla
 			for {
 				bytesAck, err := port.Read(ackBuf)
 				if err != nil {
@@ -140,12 +140,12 @@ func Upload(baud_rate int, target string, USBport string, bin_path string) {
 				}
 
 				if bytesAck == 1 {
-					if ackBuf[0] == Ack { //Unisense correctly received the packet
+					if ackBuf[0] == Ack { //Nicla correctly received the packet
 						ackReceived = true
 						fmt.Printf("ACK %x received!\n", ackBuf[0])
 						break
 					}
-					if ackBuf[0] == Nack { //Unisense did NOT correctly received the packet
+					if ackBuf[0] == Nack { //Nicla did NOT correctly received the packet
 						//keep ackReceived = false and resend
 						fmt.Printf("NACK %x received!\n", ackBuf[0])
 						break

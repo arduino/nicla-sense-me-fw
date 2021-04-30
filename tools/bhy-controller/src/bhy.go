@@ -34,11 +34,11 @@ func main() {
 }
 
 func dfuCommand() {
-	// dfu command is used for uploading firmware to unisense
+	// dfu command is used for uploading firmware to nicla
 	dfuFlags := flag.NewFlagSet("dfu", flag.ExitOnError)
 	usbPort := dfuFlags.String("p", "", "usb port")
 	baudRate := dfuFlags.Int("baud", 115200, "baud rate")
-	target := dfuFlags.String("t", "", "indicate a target - ( unisense | bhi ) ")
+	target := dfuFlags.String("t", "", "indicate a target - ( nicla | bhi ) ")
 	binPath := dfuFlags.String("bin", "", "binary path")
 
 	dfuFlags.Parse(os.Args[2:])
@@ -128,9 +128,9 @@ func listCommand() {
 }
 
 func dfuCheckFlags(baudRate int, target string, usbPort string, binPath string) bool {
-	if target != "unisense" && target != "bhi" {
+	if target != "nicla" && target != "bhi" {
 		fmt.Println("")
-		fmt.Println(" -t target not valid, choose between 'unisense' or 'bhi'")
+		fmt.Println(" -t target not valid, choose between 'nicla' or 'bhi'")
 		fmt.Println("")
 		return false
 	}
@@ -171,7 +171,7 @@ func commandError() {
 	fmt.Println("	sensor")
 	fmt.Println("		to control bhy sensors")
 	fmt.Println("	dfu")
-	fmt.Println("		to upload new firmware for unisense or bhy")
+	fmt.Println("		to upload new firmware for nicla or bhy")
 	fmt.Println("	list")
 	fmt.Println("		list available serial ports")
 	fmt.Println("	webserver")

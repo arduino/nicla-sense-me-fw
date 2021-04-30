@@ -1,10 +1,10 @@
 /* 
- * This sketch allows to control unisense from a PC.
- * Upload this sketch on an arduino board connected to unisense 
+ * This sketch allows to control nicla from a PC.
+ * Upload this sketch on an arduino board connected to nicla 
  * through the eslov connector. Then connect the same arduino board
  * to your PC.
  * Now you can use the arduino-bhy tool, written in golang, 
- * to control unisense from either the PC command line or from a web page.
+ * to control nicla from either the PC command line or from a web page.
 */
 
 #include "Arduino.h"

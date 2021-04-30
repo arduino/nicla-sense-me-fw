@@ -12,7 +12,7 @@ will result in:
         sensor
                 to control bhy sensors
         dfu
-                to upload new firmware for unisense or bhy
+                to upload new firmware for nicla or bhy
         list
                 list available serial ports
         webserver
@@ -40,8 +40,8 @@ List of useful commands:
 ./bhy sensor config -p /dev/ttyACM2 -sensor 10 -rate 0 -latency 0
 
 # update bhi firmware
-./bhy dfu -t unisense -bin fw.bin -p /dev/ttyACM2
+./bhy dfu -t nicla -bin fw.bin -p /dev/ttyACM2
 
-# update Unisense firmware
+# update Nicla firmware
 ./bhy dfu -t bhi -bin fw.bin -p /dev/ttyACM2
 ```

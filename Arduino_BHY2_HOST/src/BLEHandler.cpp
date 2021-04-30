@@ -23,7 +23,7 @@ void BLEHandler::begin()
 {
   BLE.begin();
 
-  BLE.scanForName("UNISENSE");
+  BLE.scanForName("NICLA");
 }
 
 void BLEHandler::update()

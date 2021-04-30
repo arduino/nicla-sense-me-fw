@@ -1,7 +1,7 @@
 /* 
- * This sketch shows how an arduino board can act as a host for unisense. 
- * An host board can configure the sensors of unisense and then read their values.
- * The host board should be connected to unisense through the eslov connector.
+ * This sketch shows how an arduino board can act as a host for nicla. 
+ * An host board can configure the sensors of nicla and then read their values.
+ * The host board should be connected to nicla through the eslov connector.
  * 
  * In this example, the accelerometer sensor is enabled and its
  * values are periodically read and then printed to the serial channel

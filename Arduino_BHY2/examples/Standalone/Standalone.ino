@@ -1,6 +1,6 @@
 /* 
- * This sketch shows how unisense can be used in standalone mode.
- * Without the need for an host, unisense can run sketches that 
+ * This sketch shows how nicla can be used in standalone mode.
+ * Without the need for an host, nicla can run sketches that 
  * are able to configure the bhi sensors and are able to read all 
  * the bhi sensors data.
 */

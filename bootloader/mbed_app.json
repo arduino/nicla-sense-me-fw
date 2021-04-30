@@ -31,7 +31,7 @@
         }
     },
     "target_overrides": {
-        "UNISENSE": {
+        "NICLA": {
             "target.restrict_size": "0x10000",
             "target.components_add" : ["SPIF"],
             "target.c_lib": "small",
