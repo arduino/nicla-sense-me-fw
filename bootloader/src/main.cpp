@@ -315,6 +315,14 @@ int main()
     printf("Read back push button reg: %04x\n", pb_reg);
     */
 
+    uint8_t pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
+    printf("Initial push button reg: %04x\n", pb_reg);
+    pb_reg |= 0x04;
+    printf("Setting PG as voltage shifted push-button (input MR): %04x\n", pb_reg);
+    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL, pb_reg);
+    pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
+    printf("Read back push button reg: %04x\n", pb_reg);
+
     /*
     while (1) {
         leds.ledBlink(green, 1000);
