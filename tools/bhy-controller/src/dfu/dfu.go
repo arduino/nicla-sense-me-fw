@@ -1,6 +1,8 @@
 package dfu
 
 import (
+	"github.com/schollz/progressbar/v3"
+	"time"
 	"encoding/binary"
 	"fmt"
 	"log"
@@ -78,6 +80,8 @@ func Upload(baud_rate int, target string, USBport string, bin_path string, debug
 	spareBytes = uint16(fw_size % ((int64)(packSize)))
 	fmt.Printf("spareBytes: %d\n", spareBytes)
 
+	bar := progressbar.Default((int64)(nChunks+1))
+
 	crc8bit = 0
 
 	for n := 0; n <= nChunks; n++ {
@@ -116,6 +120,9 @@ func Upload(baud_rate int, target string, USBport string, bin_path string, debug
 			for j := 0; j < packSize; j++ {
 				fmt.Printf("%x, ", buf[j])
 			}
+		} else {
+			bar.Add(1)
+			time.Sleep(time.Millisecond)
 		}
 
 		header := make([]byte, 3)
@@ -170,6 +177,8 @@ func Upload(baud_rate int, target string, USBport string, bin_path string, debug
 			check(err)
 		}
 	}
+
+	bar.Finish()
 
 	defer f.Close()
 
