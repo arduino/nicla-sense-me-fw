@@ -138,7 +138,8 @@ var dfuCharacteristic;
 
 var arrayFW;
 var fwLen;
-var bytesArray = new Uint8Array(67);
+var bytesArray = new Uint8Array(195);
+var dataLen = 192;
 var iterations = 0;
 var spareBytes = 0;
 var updateIndex = 0;
@@ -181,8 +182,8 @@ document.querySelector('#fileItem').addEventListener('change', function() {
 
 document.querySelector('#update').addEventListener('click', function() {
   if (isWebBluetoothEnabled()) { 
-    iterations = Math.floor(fwLen/64);
-    spareBytes = fwLen%64;
+    iterations = Math.floor(fwLen/dataLen);
+    spareBytes = fwLen%dataLen;
     iterations++;
     if (debug == true) {
       console.log("Iterations: ", iterations);
@@ -366,7 +367,7 @@ function update(index) {
     console.log(index);
   }
 
-  filePtr = 64 * index;
+  filePtr = dataLen * index;
   if (index == iterations - 1) {
     //Last byte
     bytesArray[0] = 1;
@@ -397,7 +398,7 @@ function update(index) {
     bytesArray[3 + spareBytes] = crc[1];
 
     //Fill with 0s the remaining buffer
-    lastBytes = new Uint8Array(64 - spareBytes - 1).fill(0);
+    lastBytes = new Uint8Array(dataLen - spareBytes - 1).fill(0);
     bytesArray.set(lastBytes, 3 + spareBytes + 1);
 
   } else {
@@ -407,7 +408,7 @@ function update(index) {
 
     bytesArray[0] = 0;
     bytesArray.set(index_byte, 1);
-    bytesArray.set(arrayFW.slice(filePtr, (filePtr + 64)), 3);
+    bytesArray.set(arrayFW.slice(filePtr, (filePtr + dataLen)), 3);
   }
   //console.log(bytesArray);
   //console.log('Writing 67 bytes array...');
