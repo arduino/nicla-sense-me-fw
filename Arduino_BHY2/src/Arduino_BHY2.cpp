@@ -34,6 +34,7 @@ void Arduino_BHY2::ping_i2c0() {
 
 void Arduino_BHY2::begin()
 {
+  i2c0.frequency(1000000);
   start_time = millis();
   sensortec.begin();
   bleHandler.begin();
