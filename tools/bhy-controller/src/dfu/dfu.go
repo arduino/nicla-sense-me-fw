@@ -13,14 +13,14 @@ import (
 - 1 byte: OPCODE
 - 1 byte: LASTBYTE
 - 2 bytes: LENGTH/REMAINING
-- 64 bytes: DATA
+- 192 bytes: DATA
 */
 
 var crc8bit byte
 var spareBytes uint16
 var Ack = (byte)(0x0F)
 var Nack = (byte)(0x00)
-var packSize = 64
+var packSize = 192
 var FullPackSize = packSize + 4
 
 func CRC8(buf []byte, last_pack bool) {
