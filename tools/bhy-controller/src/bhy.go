@@ -40,16 +40,17 @@ func dfuCommand() {
 	baudRate := dfuFlags.Int("baud", 115200, "baud rate")
 	target := dfuFlags.String("t", "", "indicate a target - ( nicla | bhi ) ")
 	binPath := dfuFlags.String("bin", "", "binary path")
+	debug := dfuFlags.Int("log", 0, "enable debug - ( 0 | 1 ) (default 0)")
 
 	dfuFlags.Parse(os.Args[2:])
 
-	ret := dfuCheckFlags(*baudRate, *target, *usbPort, *binPath)
+	ret := dfuCheckFlags(*baudRate, *target, *usbPort, *binPath, *debug)
 	if !ret {
 		dfuFlags.PrintDefaults()
 		return
 	}
 
-	dfu.Upload(*baudRate, *target, *usbPort, *binPath)
+	dfu.Upload(*baudRate, *target, *usbPort, *binPath, *debug)
 }
 
 func webserverCommand() {
@@ -127,7 +128,7 @@ func listCommand() {
 	}
 }
 
-func dfuCheckFlags(baudRate int, target string, usbPort string, binPath string) bool {
+func dfuCheckFlags(baudRate int, target string, usbPort string, binPath string, debug int) bool {
 	if target != "nicla" && target != "bhi" {
 		fmt.Println("")
 		fmt.Println(" -t target not valid, choose between 'nicla' or 'bhi'")

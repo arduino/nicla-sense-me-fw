@@ -38,7 +38,7 @@ func CRC8(buf []byte, last_pack bool) {
 
 }
 
-func Upload(baud_rate int, target string, USBport string, bin_path string) {
+func Upload(baud_rate int, target string, USBport string, bin_path string, debug int) {
 	oc := 0
 	if target == "bhi" {
 		oc = 1
@@ -109,11 +109,13 @@ func Upload(baud_rate int, target string, USBport string, bin_path string) {
 			binary.LittleEndian.PutUint16(idx, index)
 		}
 
-		fmt.Printf("opcode: %d\n", opcode[:1])
-		fmt.Printf("lastPack: %d\n", last)
-		fmt.Printf("index: %d\n", index)
-		for j := 0; j < packSize; j++ {
-			fmt.Printf("%x, ", buf[j])
+		if debug == 1 {
+			fmt.Printf("opcode: %d\n", opcode[:1])
+			fmt.Printf("lastPack: %d\n", last)
+			fmt.Printf("index: %d\n", index)
+			for j := 0; j < packSize; j++ {
+				fmt.Printf("%x, ", buf[j])
+			}
 		}
 
 		header := make([]byte, 3)
@@ -128,7 +130,9 @@ func Upload(baud_rate int, target string, USBport string, bin_path string) {
 		for ackReceived == false {
 			_, err = port.Write(packet)
 			check(err)
-			fmt.Printf("Packet sent to MKR\n")
+			if debug == 1 {
+				fmt.Printf("Packet sent to MKR\n")
+			}
 
 			ackBuf := make([]byte, 1)
 
@@ -142,7 +146,9 @@ func Upload(baud_rate int, target string, USBport string, bin_path string) {
 				if bytesAck == 1 {
 					if ackBuf[0] == Ack { //Nicla correctly received the packet
 						ackReceived = true
-						fmt.Printf("ACK %x received!\n", ackBuf[0])
+						if debug == 1 {
+							fmt.Printf("ACK %x received!\n", ackBuf[0])
+						}
 						break
 					}
 					if ackBuf[0] == Nack { //Nicla did NOT correctly received the packet
