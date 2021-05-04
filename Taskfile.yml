@@ -1,0 +1,17 @@
+version: "3"
+
+includes:
+  dist-bhy-controller-tool: ./DistTasks.yml
+
+tasks:
+  build-bhy-controller-tool:
+    desc: Build the bhy controller tool
+    dir: tools/bhy-controller/src
+    cmds:
+      - go build -v
+
+vars:
+  DIST_DIR:
+    sh: echo "`pwd`/dist"
+  TOOL_DIR:
+    sh: echo "`pwd`/tools/bhy-controller/src"
