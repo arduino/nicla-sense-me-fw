@@ -17,6 +17,7 @@ EslovHandler::~EslovHandler()
 void EslovHandler::begin(bool passthrough)
 {
   Wire.begin();   
+  Wire.setClock(500000);
   if (passthrough) {
     Serial.begin(115200);        
   }
