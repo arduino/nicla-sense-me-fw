@@ -17,7 +17,7 @@ jobs:
           version: 3.x
 
       - name: Build
-        run: task dist:all
+        run: task dist-bhy-controller-tool:all
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
