@@ -125,7 +125,6 @@ int apply_update(FILE *file, uint32_t address, bool fail_safe)
     printf("Firmware size is %ld bytes\r\n", len);
 
     char crc_file = files.getFileCRC(file);
-    printf("CRC written in file is %x \r\n", crc_file);
 
     fseek(file, 0, SEEK_SET);
 
@@ -142,6 +141,7 @@ int apply_update(FILE *file, uint32_t address, bool fail_safe)
             return try_fail_safe();
         } else {
             printf("ERROR! Wrong CRC in fail safe sketch \r\n");
+            printf("The computed CRC is %x, while it should be %x \r\n", crc, crc_file);
             return 0;
         }
 
@@ -225,8 +225,6 @@ int try_update()
 
 void blink(uint8_t color)
 {
-    printf("IS31FL3194 RGB led driver %02X\n", leds.getChipID());
-
     leds.reset();
     leds.init();
     leds.powerUp();
