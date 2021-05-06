@@ -19,11 +19,14 @@ jobs:
       - name: Build
         run: task dist-bhy-controller-tool:all
 
+      - name: Zip dist files
+        run: zip dist.zip dist/*
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: dist
-          path: dist
+          path: dist.zip
 
   notarize-macos:
     runs-on: macos-latest
@@ -67,8 +70,11 @@ jobs:
           # so we need to add execution permission back until @v2 actions are released.
           chmod +x dist/macos64/bhy
 
+      - name: Zip dist files
+        run: zip dist.zip dist/*
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: dist
-          path: dist
+          path: dist.zip

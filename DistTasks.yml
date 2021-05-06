@@ -62,7 +62,7 @@ tasks:
         -p "{{ .BUILD_PLATFORM }}"
     vars:
       PLATFORM_DIR: "linux32"
-      BUILD_COMMAND: "go build -o /dist/{{ .PLATFORM_DIR }}/bhy.exe"
+      BUILD_COMMAND: "go build -o /dist/{{ .PLATFORM_DIR }}/bhy"
       BUILD_PLATFORM: "linux/386"
       PACKAGE_PLATFORM: "Linux_32bit"
       CONTAINER_TAG: "{{ .GO_VERSION }}-main"
@@ -81,7 +81,7 @@ tasks:
         -p "{{ .BUILD_PLATFORM }}"
     vars:
       PLATFORM_DIR: "linux64"
-      BUILD_COMMAND: "go build -o /dist/{{ .PLATFORM_DIR }}/bhy.exe"
+      BUILD_COMMAND: "go build -o /dist/{{ .PLATFORM_DIR }}/bhy"
       BUILD_PLATFORM: "linux/amd64"
       PACKAGE_PLATFORM: "Linux_64bit"
       CONTAINER_TAG: "{{ .GO_VERSION }}-main"
