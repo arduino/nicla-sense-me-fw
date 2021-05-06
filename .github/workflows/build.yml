@@ -49,7 +49,7 @@ jobs:
           security create-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
           security default-keychain -s ${{ env.KEYCHAIN }}
           security unlock-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
-          security import ${{ env.INSTALLER_CERT_MAC_PATH }} -k ${{ env.KEYCHAIN }} -f pkcs12 -A -T /usr/bin/codesign -P ${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}
+          security import ${{ env.INSTALLER_CERT_MAC_PATH }} -k ${{ env.KEYCHAIN }} -f pkcs12 -A -T /usr/bin/codesign -P "${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}"
           security set-key-partition-list -S apple-tool:,apple: -s -k ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
 
       - name: Install gon for code signing and app notarization
