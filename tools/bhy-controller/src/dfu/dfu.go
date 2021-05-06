@@ -3,9 +3,10 @@ package dfu
 import (
 	"arduino/bhy/util"
 	"fmt"
-	"log"
 	"math"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/schollz/progressbar/v3"
 	"go.bug.st/serial"
@@ -13,21 +14,22 @@ import (
 
 func sendPacket(port serial.Port, packet *dfuPacket) {
 	for ackReceived := false; ackReceived == false; {
-		log.Printf("Sending packet %d", packet.index)
+		log.Debugf("Sending packet %d\n", packet.index)
 		_, err := port.Write(packet.build())
-		log.Println(packet.build())
+		log.Debugln(packet.build())
 		util.ErrCheck(err)
 
 		//wait ack from Nicla
+		log.Debugln("Waiting for ack")
 		ackBuf := make([]byte, 1)
 		for n := 0; n != 1; {
 			n, err = port.Read(ackBuf)
 			util.ErrCheck(err)
 
 			if n == 0 {
-				log.Print("Ack not received")
+				log.Debugln("Ack not received")
 			} else if n > 1 {
-				log.Print("Ack expected but more than one byte received")
+				log.Debugln("Ack expected but more than one byte received")
 			}
 		}
 
@@ -35,7 +37,10 @@ func sendPacket(port serial.Port, packet *dfuPacket) {
 	}
 }
 
-func Upload(baud int, target string, usbPort string, bPath string, debug int) {
+func Upload(baud int, target string, usbPort string, bPath string, debug bool) {
+	if debug {
+		log.SetLevel(log.DebugLevel)
+	}
 	// Open serial port
 	port := util.OpenPort(usbPort, baud)
 
