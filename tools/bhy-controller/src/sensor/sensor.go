@@ -28,6 +28,22 @@ type SensorConfig struct {
 	latency    uint32
 }
 
+func (s SensorConfig) pack() []byte {
+	// Prepare configuration packet to send
+	op := []byte{eslovConfigOpcode}
+	id := byte(s.id)
+	rate := make([]byte, 4)
+	binary.LittleEndian.PutUint32(rate, math.Float32bits(s.sampleRate))
+	lat := make([]byte, 4)
+	binary.LittleEndian.PutUint32(lat, s.latency)
+
+	packet := append(op, id)
+	packet = append(packet, rate...)
+	packet = append(packet, lat...)
+
+	return packet
+}
+
 func errCheck(e error) {
 	if e != nil {
 		log.Fatal(e)
@@ -118,25 +134,14 @@ func Configure(usbPort string, baudRate int, id int, rate float64, latency int) 
 	defer port.Close()
 	fmt.Printf("Connected - port: %s - baudrate: %d\n", usbPort, baudRate)
 
-	// Fill a configuration struct just for clarity
-	var config SensorConfig
-	config.id = uint8(id)
-	config.sampleRate = float32(rate)
-	config.latency = uint32(latency)
-	// Prepare configuration packet to send
-	opCode := []byte{eslovConfigOpcode}
-	cId := []byte{config.id}
-	cSample := make([]byte, 4)
-	binary.LittleEndian.PutUint32(cSample[:], math.Float32bits(config.sampleRate))
-	cLatency := make([]byte, 4)
-	binary.LittleEndian.PutUint32(cLatency, config.latency)
-	var packet []byte
-	packet = append(opCode, cId...)
-	packet = append(packet, cSample...)
-	packet = append(packet, cLatency...)
+	s := &SensorConfig{
+		id:         uint8(id),
+		sampleRate: float32(rate),
+		latency:    uint32(latency),
+	}
 
-	fmt.Printf("Sending configuration: sensor %d	rate %f	latency %d", config.id, config.sampleRate, config.latency)
-	n, err := port.Write(packet)
+	fmt.Printf("Sending configuration: sensor %d	rate %f	latency %d", s.id, s.sampleRate, s.latency)
+	n, err := port.Write(s.pack())
 	errCheck(err)
 	fmt.Printf("Sent %v bytes\n", n)
 }
