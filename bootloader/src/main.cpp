@@ -41,7 +41,7 @@ BQ25120A pmic;
 
 FileUtils files;
 
-DigitalIn* boot_rst_n;
+DigitalIn boot_rst_n(BUTTON1);
 Timer timer_rst_n;
 
 int try_fail_safe(int timeout);
@@ -87,7 +87,7 @@ int try_fail_safe(int timeout)
     int elapsed_time_ms = 0;
     timer_rst_n.start();
 
-    while((elapsed_time_ms < timeout) && (*boot_rst_n == 0)) {
+    while((elapsed_time_ms < timeout) && (!boot_rst_n)) {
         elapsed_time_ms = timer_rst_n.read_ms();
     }
 
@@ -230,6 +230,66 @@ int try_update()
     }
 }
 
+void debounce(int state)
+{
+    bool stable = false;
+
+    int last_button_state = state;
+    int last_change = timer_rst_n.read_ms();
+    int debouncing_time = 1;
+    while(!stable) {
+        while((timer_rst_n.read_ms() - last_change) < debouncing_time ) {
+            if (boot_rst_n != last_button_state) {
+                last_button_state = boot_rst_n;
+                last_change = timer_rst_n.read_ms();
+            }
+        }
+        if (boot_rst_n == state) {
+            stable = true;
+        } else {
+            printf("Button didn't return to its initial state\r\n");
+        }
+    }
+}
+
+int selectOperation()
+{
+    timer_rst_n.start();
+    debounce(0);
+    while(boot_rst_n == 0) {}
+    debounce(1);
+    int max_pressure_interval = 500;
+    int last_time = timer_rst_n.read_ms();
+    while(boot_rst_n == 1) {
+        if ((timer_rst_n.read_ms() - last_time) > max_pressure_interval) {
+            //Max time elapsed: button pressed just once
+            return 1;
+        }
+    }
+    debounce(0);
+    while(boot_rst_n == 0) {}
+    debounce(1);
+    last_time = timer_rst_n.read_ms();
+    while(boot_rst_n == 1) {
+        if ((timer_rst_n.read_ms() - last_time) > max_pressure_interval) {
+            //Max time elapsed: button pressed 2 times
+            return 2;
+        }
+    }
+    debounce(0);
+    while(boot_rst_n == 0) {}
+    debounce(1);
+    last_time = timer_rst_n.read_ms();
+    while(boot_rst_n == 1) {
+        if ((timer_rst_n.read_ms() - last_time) > max_pressure_interval) {
+            //Max time elapsed: button pressed 3 times
+            return 3;
+        }
+    }
+
+    return 0;
+}
+
 int main()
 {
 
@@ -257,12 +317,77 @@ int main()
     uint8_t ldo_reg = 0xE4;
     pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL, ldo_reg);
     ldo_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL);
-    printf("Ldo reg: %04x\n", ldo_reg);
+    //printf("Ldo reg: %04x\n", ldo_reg);
 
-    boot_rst_n = new DigitalIn(BUTTON1, PullUp);
-
-    bool forced_reboot = !*boot_rst_n;
     printf("Bootloader starting\r\n");
+
+#if defined (CONFIG_GPIO_AS_PINRESET)
+    printf("CONFIG_GPIO_AS_PINRESET defined\r\n");
+#else
+    printf("CONFIG_GPIO_AS_PINRESET NOT defined\r\n");
+#endif
+
+    uint32_t pselreg0 = NRF_UICR->PSELRESET[0];
+    uint32_t pselreg1 = NRF_UICR->PSELRESET[1];
+
+    printf("Register NRF_UICR->PSELRESET[0] = 0x%04x\n", NRF_UICR->PSELRESET[0]);
+    printf("Register NRF_UICR->PSELRESET[1] = 0x%04x\n", NRF_UICR->PSELRESET[1]);
+    /*
+    NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen << NVMC_CONFIG_WEN_Pos;
+    while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
+    
+    //Disable pin as reset
+    pselreg0 |= 0x80000000;
+    pselreg1 |= 0x80000000;
+    NRF_UICR->PSELRESET[0] = pselreg0;
+    NRF_UICR->PSELRESET[1] = pselreg1;
+
+    NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren << NVMC_CONFIG_WEN_Pos;
+    while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
+
+    printf("Register NRF_UICR->PSELRESET[0] = 0x%04x\n", NRF_UICR->PSELRESET[0]);
+    printf("Register NRF_UICR->PSELRESET[1] = 0x%04x\n", NRF_UICR->PSELRESET[1]);
+    */
+
+    /*
+    bool button_reset = false;
+
+    int32_t reset_reason = NRF_POWER->RESETREAS;
+    //printf("Reset reason = 0x%04x\n", reset_reason);
+    printf("Reset reason = %d \r\n", reset_reason);
+    if ((reset_reason && 0x00000001) == 0x00000001) {
+        printf("Reset reason = RESET_REASON_PIN_RESET\r\n");
+        button_reset = true;
+    }
+    */
+
+    if (boot_rst_n == 0) {
+
+        int buttonTaps = selectOperation();
+        switch (buttonTaps)
+        {
+        case 1:
+            //Reset Anna
+            printf("Resetting Anna \r\n");
+            goto load_app;
+            break;
+
+        case 2:
+            //Enter Ship Mode
+            printf("Entering Ship Mode\r\n");
+            break;
+
+        case 3:
+            //Fail Safe
+            printf("Entering Fail Safe Mode\r\n");
+            break;
+        
+        default:
+            break;
+        }
+    }
+
+load_app:
 
     //Mount the file system
     int err = fs.mount(&spif);
@@ -323,23 +448,7 @@ int main()
     pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
     printf("Read back push button reg: %04x\n", pb_reg);
 
-    /*
-    while (1) {
-        leds.ledBlink(green, 1000);
-        ThisThread::sleep_for(1s);
-    }
-    */
-    if(forced_reboot) {
-
-        if(try_fail_safe(3000)) {
-            check_signature(true);
-        }
-
-    } else {
-
-        try_update();
-
-    }
+    try_update();
 
     fs.unmount();
     spif.deinit();
