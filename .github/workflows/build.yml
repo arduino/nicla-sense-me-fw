@@ -63,15 +63,9 @@ jobs:
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
         run: |
           gon gon.config.hcl
-          # GitHub's upload/download-artifact@v1 actions don't preserve file permissions,
-          # so we need to add execution permission back until @v2 actions are released.
-          chmod +x dist/macos64/bhy
-
-      - name: Zip dist files
-        run: zip dist.zip dist/*
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: dist
-          path: dist.zip
+          path: dist
