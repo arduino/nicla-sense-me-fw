@@ -44,9 +44,25 @@ FileUtils files;
 DigitalIn boot_rst_n(BUTTON1);
 Timer timer_rst_n;
 
-int try_fail_safe(int timeout);
+int try_fail_safe();
 int try_update(void);
 int apply_update(FILE *file, uint32_t address, bool fail_safe);
+
+
+int mountFileSystem()
+{
+    //Mount the file system
+    int err = fs.mount(&spif);
+    if (err) {
+        DEBUG_PRINTF("Formatting file system...\n");
+        err=fs.reformat(&spif);
+        if (err) {
+            DEBUG_PRINTF("Mount failed\n");
+            return MOUNT_FAILED;
+        }
+    }
+    return 0;
+}
 
 
 int check_signature(bool fail_safe)
@@ -65,10 +81,8 @@ int check_signature(bool fail_safe)
         if (fail_safe) {
             return 0;
         } else {
-            printf("Press the button for at least 3 seconds to enter the Fail Safe mode \r\n");
-            //wait for the button to be pressed
-            //while(*boot_rst_n) {}
-            if(try_fail_safe(3000)) {
+            printf("Attempting Fail Safe... \r\n");
+            if(try_fail_safe()) {
                 printf("Starting safe application\r\n");
                 mbed_start_application(POST_APPLICATION_ADDR);
             } else {
@@ -79,43 +93,22 @@ int check_signature(bool fail_safe)
 }
 
 
-int try_fail_safe(int timeout)
+int try_fail_safe()
 {
-    //Try fail safe: check button state
-    //if button pressed, start timer
-    printf("Button pressed \r\n");
-    int elapsed_time_ms = 0;
-    timer_rst_n.start();
+    //Retrieve a know firmware from FAIL_SAFE.BIN file
+    FILE *file_fail_safe = fopen(FAIL_SAFE_FILE_PATH, "rb");
+    if (file_fail_safe != NULL) {
+        printf("Fail safe file found \r\n");
 
-    while((elapsed_time_ms < timeout) && (!boot_rst_n)) {
-        elapsed_time_ms = timer_rst_n.read_ms();
-    }
+        int safe_fw_found = apply_update(file_fail_safe, POST_APPLICATION_ADDR, true);
 
-    timer_rst_n.stop();
-    timer_rst_n.reset();
+        fclose(file_fail_safe);
 
-    if (elapsed_time_ms < timeout) {
-        //NO fail safe
-        printf("Button for fail safe has been pulled down for less than 3 seconds. No fail safe! \r\n");
-        return 0;
+        return safe_fw_found;
+
     } else {
-        //Fail safe
-        printf("Fail safe mode ON \r\n");
-        //Retrieve a know firmware from FAIL_SAFE.BIN file
-        FILE *file_fail_safe = fopen(FAIL_SAFE_FILE_PATH, "rb");
-        if (file_fail_safe != NULL) {
-            printf("Fail safe file found \r\n");
-
-            int safe_fw_found = apply_update(file_fail_safe, POST_APPLICATION_ADDR, true);
-
-            fclose(file_fail_safe);
-
-            return safe_fw_found;
-
-        } else {
-            printf("No fail safe firmware found \r\n");
-            return 0;
-        }
+        printf("No fail safe firmware found \r\n");
+        return 0;
     }
 }
 
@@ -146,7 +139,7 @@ int apply_update(FILE *file, uint32_t address, bool fail_safe)
             //wait for the button to be pressed
             //while(*boot_rst_n) {}
 
-            return try_fail_safe(3000);
+            return try_fail_safe();
         } else {
             printf("ERROR! Wrong CRC in fail safe sketch \r\n");
             return 0;
@@ -230,6 +223,37 @@ int try_update()
     }
 }
 
+void blink(uint8_t color)
+{
+    printf("IS31FL3194 RGB led driver %02X\n", leds.getChipID());
+
+    leds.reset();
+    leds.init();
+    leds.powerUp();
+
+    for (int i = 0; i < 3; i++) {
+        leds.ledBlink(color, 1000);
+        ThisThread::sleep_for(1s);
+    }
+}
+
+
+void enableShipMode()
+{
+    //    STATUS reg:
+    //    | B7 | B6 |      B5     | B4 | B3 | B2 | B1 | B0 |
+    //    | RO | RO | EN_SHIPMODE | RO | RO | RO | RO | RO |
+
+    uint8_t status_reg = pmic.getStatus();
+    printf("Initial Status reg: %04x\n", status_reg);
+    status_reg |= 0x20;
+    printf("Setting ship mode: %04x\n", status_reg);
+    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_STATUS, status_reg);
+    status_reg = pmic.getStatus();
+    printf("Read back status reg: %04x\n", status_reg);
+
+}
+
 void debounce(int state)
 {
     bool stable = false;
@@ -290,6 +314,18 @@ int selectOperation()
     return 0;
 }
 
+void loadApp()
+{
+    mountFileSystem();
+
+    fwupdate_bhi260();
+
+    try_update();
+
+    fs.unmount();
+    spif.deinit();
+}
+
 int main()
 {
 
@@ -321,111 +357,6 @@ int main()
 
     printf("Bootloader starting\r\n");
 
-#if defined (CONFIG_GPIO_AS_PINRESET)
-    printf("CONFIG_GPIO_AS_PINRESET defined\r\n");
-#else
-    printf("CONFIG_GPIO_AS_PINRESET NOT defined\r\n");
-#endif
-
-    uint32_t pselreg0 = NRF_UICR->PSELRESET[0];
-    uint32_t pselreg1 = NRF_UICR->PSELRESET[1];
-
-    printf("Register NRF_UICR->PSELRESET[0] = 0x%04x\n", NRF_UICR->PSELRESET[0]);
-    printf("Register NRF_UICR->PSELRESET[1] = 0x%04x\n", NRF_UICR->PSELRESET[1]);
-    /*
-    NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen << NVMC_CONFIG_WEN_Pos;
-    while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
-    
-    //Disable pin as reset
-    pselreg0 |= 0x80000000;
-    pselreg1 |= 0x80000000;
-    NRF_UICR->PSELRESET[0] = pselreg0;
-    NRF_UICR->PSELRESET[1] = pselreg1;
-
-    NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren << NVMC_CONFIG_WEN_Pos;
-    while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
-
-    printf("Register NRF_UICR->PSELRESET[0] = 0x%04x\n", NRF_UICR->PSELRESET[0]);
-    printf("Register NRF_UICR->PSELRESET[1] = 0x%04x\n", NRF_UICR->PSELRESET[1]);
-    */
-
-    /*
-    bool button_reset = false;
-
-    int32_t reset_reason = NRF_POWER->RESETREAS;
-    //printf("Reset reason = 0x%04x\n", reset_reason);
-    printf("Reset reason = %d \r\n", reset_reason);
-    if ((reset_reason && 0x00000001) == 0x00000001) {
-        printf("Reset reason = RESET_REASON_PIN_RESET\r\n");
-        button_reset = true;
-    }
-    */
-
-    if (boot_rst_n == 0) {
-
-        int buttonTaps = selectOperation();
-        switch (buttonTaps)
-        {
-        case 1:
-            //Reset Anna
-            printf("Resetting Anna \r\n");
-            goto load_app;
-            break;
-
-        case 2:
-            //Enter Ship Mode
-            printf("Entering Ship Mode\r\n");
-            break;
-
-        case 3:
-            //Fail Safe
-            printf("Entering Fail Safe Mode\r\n");
-            break;
-        
-        default:
-            break;
-        }
-    }
-
-load_app:
-
-    //Mount the file system
-    int err = fs.mount(&spif);
-    if (err) {
-        DEBUG_PRINTF("Formatting file system...\n");
-        err=fs.reformat(&spif);
-        if (err) {
-            DEBUG_PRINTF("Mount failed\n");
-            return MOUNT_FAILED;
-        }
-    }
-
-    printf("IS31FL3194 RGB led driver %02X\n", leds.getChipID());
-
-    leds.reset();
-    leds.init();
-    leds.powerUp();
-
-    fwupdate_bhi260();
-
-    for (int i = 0; i < 3; i++) {
-        leds.ledBlink(blue, 1000);
-        ThisThread::sleep_for(1s);
-    }
-
-    //    STATUS reg:
-    //    | B7 | B6 |      B5     | B4 | B3 | B2 | B1 | B0 |
-    //    | RO | RO | EN_SHIPMODE | RO | RO | RO | RO | RO |
-    /*
-    uint8_t status_reg = pmic.getStatus();
-    printf("Initial Status reg: %04x\n", status_reg);
-    status_reg |= 0x20;
-    printf("Setting ship mode: %04x\n", status_reg);
-    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_STATUS, status_reg);
-    status_reg = pmic.getStatus();
-    printf("Read back status reg: %04x\n", status_reg);
-    */
-
     //    PUSH-BUTTON CONTROL reg:
     //    | B7 | B6 |   B5  | B4 | B3 | B2 | B1 | B0 |
     //    | X  | X  | MRREC | X  | X  | X  | X  | X  |
@@ -440,6 +371,7 @@ load_app:
     printf("Read back push button reg: %04x\n", pb_reg);
     */
 
+    /*
     uint8_t pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
     printf("Initial push button reg: %04x\n", pb_reg);
     pb_reg |= 0x04;
@@ -447,9 +379,52 @@ load_app:
     pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL, pb_reg);
     pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
     printf("Read back push button reg: %04x\n", pb_reg);
+    */
 
-    try_update();
+#if defined (CONFIG_GPIO_AS_PINRESET)
+    printf("CONFIG_GPIO_AS_PINRESET defined\r\n");
+#else
+    printf("CONFIG_GPIO_AS_PINRESET NOT defined\r\n");
+#endif
 
-    fs.unmount();
-    spif.deinit();
+    if (boot_rst_n == 0) {
+
+        int buttonTaps = selectOperation();
+        switch (buttonTaps)
+        {
+        case 1:
+            //Reset Anna
+            printf("Resetting Anna \r\n");
+            blink(blue);
+            loadApp();
+            break;
+
+        case 2:
+            //Enter Ship Mode
+            printf("Entering Ship Mode\r\n");
+            enableShipMode();
+            blink(red);
+            break;
+
+        case 3:
+            //Fail Safe
+            printf("Entering Fail Safe Mode\r\n");
+            mountFileSystem();
+            blink(green);
+            try_fail_safe();
+            printf("Starting safe application\r\n");
+            mbed_start_application(POST_APPLICATION_ADDR);
+            break;
+        
+        default:
+            break;
+        }
+
+    } else {
+
+        blink(blue);
+
+        loadApp();
+
+    }
 }
