@@ -36,7 +36,9 @@
             "target.components_add" : ["SPIF"],
             "target.c_lib": "small",
             "platform.stdio-baud-rate": 115200,
-            "platform.default-serial-baud-rate": 115200
+            "platform.default-serial-baud-rate": 115200,
+            "target.macros_remove": ["CONFIG_GPIO_AS_PINRESET"]
+            
         }
     }
 }
