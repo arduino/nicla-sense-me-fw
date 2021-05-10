@@ -44,9 +44,11 @@ FileUtils files;
 DigitalIn boot_rst_n(BUTTON1);
 Timer timer_rst_n;
 
+uint32_t regret;
+
 int try_fail_safe();
 int try_update(void);
-int apply_update(FILE *file, uint32_t address, bool fail_safe);
+int apply_update(FILE *file, uint32_t address);
 
 
 int mountFileSystem()
@@ -65,30 +67,18 @@ int mountFileSystem()
 }
 
 
-int check_signature(bool fail_safe)
+int check_signature(FILE *file, long file_len)
 {
     void *signature = NULL;
-    signature = memmem((const char*)POST_APPLICATION_ADDR, POST_APPLICATION_SIZE, "NICLA", sizeof("NICLA"));
+    signature = memmem((const char*)file, file_len, "NICLA", sizeof("NICLA"));
 
     if (signature != NULL) {
-        //Signature found: fw can be executed
         printf("Signature check PASSED \r\n");
-        printf("Starting application\r\n");
-        mbed_start_application(POST_APPLICATION_ADDR);
+        return 1;
     } else {
         //Signature NOT found: do not run the current fw and try fail safe
         printf("Nicla signature NOT found! \r\n");
-        if (fail_safe) {
-            return 0;
-        } else {
-            printf("Attempting Fail Safe... \r\n");
-            if(try_fail_safe()) {
-                printf("Starting safe application\r\n");
-                mbed_start_application(POST_APPLICATION_ADDR);
-            } else {
-                return 0;
-            }
-        }
+        return 0;
     }
 }
 
@@ -97,23 +87,37 @@ int try_fail_safe()
 {
     //Retrieve a know firmware from FAIL_SAFE.BIN file
     FILE *file_fail_safe = fopen(FAIL_SAFE_FILE_PATH, "rb");
+    regret = NRF_POWER->GPREGRET2;
     if (file_fail_safe != NULL) {
         printf("Fail safe file found \r\n");
 
-        int safe_fw_found = apply_update(file_fail_safe, POST_APPLICATION_ADDR, true);
+        int safe_fw_found = apply_update(file_fail_safe, POST_APPLICATION_ADDR);
 
         fclose(file_fail_safe);
+
+        if (safe_fw_found) {
+            //Clear all flags
+            NRF_POWER->GPREGRET2 = 0;
+            printf("Starting safe application\r\n");
+            mbed_start_application(POST_APPLICATION_ADDR);
+        } else {
+            printf("Deleting Fail Safe sketch. Please load a correct one.\r\n");
+            remove(FAIL_SAFE_FILE_PATH);
+        }
 
         return safe_fw_found;
 
     } else {
         printf("No fail safe firmware found \r\n");
+        regret = regret | 0x04;
+        NRF_POWER->GPREGRET2 = regret;
+
         return 0;
     }
 }
 
 
-int apply_update(FILE *file, uint32_t address, bool fail_safe)
+int apply_update(FILE *file, uint32_t address)
 {
     long len = files.getFileLen(file);
 
@@ -124,30 +128,36 @@ int apply_update(FILE *file, uint32_t address, bool fail_safe)
 
     printf("Firmware size is %ld bytes\r\n", len);
 
+    int signature_found = check_signature(file, len);
+    regret = NRF_POWER->GPREGRET2;
+    if (!signature_found) {
+        regret = regret | 0x01;
+        NRF_POWER->GPREGRET2 = regret;
+
+        return 0;
+    }
+    printf("Signature found\r\n");
+    //Clear error bit
+    regret = regret && 0xFE;
+    NRF_POWER->GPREGRET2 = regret;
+
     char crc_file = files.getFileCRC(file);
 
     fseek(file, 0, SEEK_SET);
 
     char crc = files.computeCRC(file);
 
+    regret = NRF_POWER->GPREGRET2;
     if (crc!=crc_file) {
-        if (!fail_safe) {
             printf("Wrong CRC! The computed CRC is %x, while it should be %x \r\n", crc, crc_file);
-            printf("Press the button for at least 3 seconds to enter the Fail Safe mode \r\n");
-
-            //wait for the button to be pressed
-            //while(*boot_rst_n) {}
-
-            return try_fail_safe();
-        } else {
-            printf("ERROR! Wrong CRC in fail safe sketch \r\n");
-            printf("The computed CRC is %x, while it should be %x \r\n", crc, crc_file);
+            regret = regret | 0x02;
+            NRF_POWER->GPREGRET2 = regret;
             return 0;
-        }
-
-    } else {
-        printf("Correct CRC=%x \r\n", crc);
     }
+    //Clear error flags
+    regret = regret && 0xFC;
+    NRF_POWER->GPREGRET2 = regret;
+    printf("Correct CRC=%x \r\n", crc);
 
     fseek(file, 0, SEEK_SET);
   
@@ -207,19 +217,23 @@ int try_update()
 
     FILE *file = fopen(ANNA_UPDATE_FILE_PATH, "rb");
     if (file != NULL) {
+        printf("ANNA_UPDATE_FILE found!\r\n");
 
-        update = apply_update(file, POST_APPLICATION_ADDR, false);
+        update = apply_update(file, POST_APPLICATION_ADDR);
 
         fclose(file);
         remove(ANNA_UPDATE_FILE_PATH);
 
+        if (update) {
+            printf("Starting new application\r\n");
+        } else {
+            printf("Unable to load the new application. Loading the previous one...\r\n");
+        }
+        mbed_start_application(POST_APPLICATION_ADDR);
+
     } else {
         printf("No ANNA_UPDATE_FILE found. Starting main application\r\n");
         mbed_start_application(POST_APPLICATION_ADDR);
-    }
-
-    if (update) {
-        check_signature(false);
     }
 }
 
@@ -314,8 +328,6 @@ int selectOperation()
 
 void loadApp()
 {
-    mountFileSystem();
-
     fwupdate_bhi260();
 
     try_update();
@@ -354,6 +366,23 @@ int main()
     //printf("Ldo reg: %04x\n", ldo_reg);
 
     printf("Bootloader starting\r\n");
+
+    mountFileSystem();
+
+    FILE *file_fail_safe = fopen(FAIL_SAFE_FILE_PATH, "r");
+    regret = NRF_POWER->GPREGRET2;
+    if (file_fail_safe == NULL) {
+        //No fail safe sketch available. Set error bit
+        regret = regret | 0x04;
+        NRF_POWER->GPREGRET2 = regret;
+    } else {
+        //Fail safe sketch available. Clean error bit
+        regret = regret && 0xFB;
+        NRF_POWER->GPREGRET2 = regret;
+    }
+
+    regret = NRF_POWER->GPREGRET2;
+    printf("NRF_POWER->GPREGRET2 = %04x\n", regret);
 
     //    PUSH-BUTTON CONTROL reg:
     //    | B7 | B6 |   B5  | B4 | B3 | B2 | B1 | B0 |
@@ -410,8 +439,7 @@ int main()
             mountFileSystem();
             blink(green);
             try_fail_safe();
-            printf("Starting safe application\r\n");
-            mbed_start_application(POST_APPLICATION_ADDR);
+            while(1);
             break;
         
         default:
