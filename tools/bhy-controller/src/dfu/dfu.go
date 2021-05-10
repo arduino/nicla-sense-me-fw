@@ -37,6 +37,19 @@ func sendPacket(port serial.Port, packet *dfuPacket) {
 	}
 }
 
+func readPayload(f *os.File, idx int, buf []byte) int {
+	//Adjust pointer to fw binary file
+	p := (int64)(idx * PayloadSize)
+	_, err := f.Seek(p, 0)
+	util.ErrCheck(err)
+
+	// Read payload from the binary file
+	n, err := f.Read(buf)
+	util.ErrCheck(err)
+
+	return n
+}
+
 func Upload(baud int, target string, usbPort string, bPath string, debug bool) {
 	if debug {
 		log.SetLevel(log.DebugLevel)
@@ -63,15 +76,11 @@ func Upload(baud int, target string, usbPort string, bPath string, debug bool) {
 	for i := 0; i < nChunks; i++ {
 		bar.Add(1)
 
-		//Adjust pointer to fw binary file
-		p := (int64)(i * PayloadSize)
-		_, err = f.Seek(p, 0)
-		util.ErrCheck(err)
-
-		// Read payload from the binary file
-		n, err := f.Read(buf)
-		util.ErrCheck(err)
-		crc = CRC8(buf, n, crc)
+		n := 0
+		if i < nChunks-1 || spareBytes > 0 {
+			n = readPayload(f, i, buf)
+			crc = CRC8(buf, n, crc)
+		}
 
 		packet := newDFUPacket(target, i, n, buf)
 		// if this is the very last packet
