@@ -15,11 +15,12 @@ EslovHandler::~EslovHandler()
 {
 }
 
-void EslovHandler::begin()
+bool EslovHandler::begin()
 {
   Wire1.begin(ESLOV_DEFAULT_ADDRESS);
   Wire1.onReceive(EslovHandler::onReceive); 
-  Wire1.onRequest(EslovHandler::onRequest); 
+  Wire1.onRequest(EslovHandler::onRequest);
+  return true;
 }
 
 void EslovHandler::onReceive(int length)

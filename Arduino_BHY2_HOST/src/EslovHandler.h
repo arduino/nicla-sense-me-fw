@@ -34,7 +34,7 @@ public:
   EslovHandler();
   virtual ~EslovHandler();
 
-  void begin(bool passthrough);
+  bool begin(bool passthrough);
   void update();
 
   void writeDfuPacket(uint8_t *data, uint8_t length);

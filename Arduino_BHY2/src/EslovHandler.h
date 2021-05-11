@@ -25,7 +25,7 @@ public:
   EslovHandler();
   virtual ~EslovHandler();
 
-  void begin();
+  bool begin();
 
   static void onReceive(int length);
   static void onRequest();

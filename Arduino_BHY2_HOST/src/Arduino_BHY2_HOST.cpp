@@ -11,10 +11,10 @@ Arduino_BHY2_HOST::~Arduino_BHY2_HOST()
 {
 }
 
-void Arduino_BHY2_HOST::begin(bool passthrough)
+bool Arduino_BHY2_HOST::begin(bool passthrough)
 {
   _passthrough = passthrough;
-  eslovHandler.begin(passthrough);
+  return eslovHandler.begin(passthrough);
 }
 
 void Arduino_BHY2_HOST::update()

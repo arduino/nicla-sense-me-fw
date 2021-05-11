@@ -17,7 +17,7 @@ DFUManager::~DFUManager()
 {
 }
 
-void DFUManager::begin()
+bool DFUManager::begin()
 {
   int err = _fs.mount(&_bd);
   if (err) {
@@ -25,8 +25,10 @@ void DFUManager::begin()
     if(_debug) {
       _debug->print("Error mounting file system: ");
       _debug->println(err);
+      return false;
     }
   }
+  return true;
 }
 
 void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)

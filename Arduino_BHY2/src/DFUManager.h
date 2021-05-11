@@ -31,7 +31,7 @@ public:
   DFUManager();
   virtual ~DFUManager();
 
-  void begin();
+  bool begin();
   void processPacket(DFUType dfuType, const uint8_t* data);
 
   bool isPending();

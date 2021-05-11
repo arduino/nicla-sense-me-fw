@@ -11,7 +11,7 @@ public:
   virtual ~Arduino_BHY2_HOST();
 
   // Necessary API. Update function should be continuously polled if PASSTHORUGH is ENABLED
-  void begin(bool passthrough = false);
+  bool begin(bool passthrough = false);
   void update();
 
   // Functions for controlling the BHY when PASSTHROUGH is DISABLED

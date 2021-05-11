@@ -27,7 +27,7 @@ public:
   virtual ~BoschSensortec();
 
   // sketch-side API
-  void begin(); 
+  bool begin(); 
   void update();
   void configureSensor(SensorConfigurationPacket& config);
 

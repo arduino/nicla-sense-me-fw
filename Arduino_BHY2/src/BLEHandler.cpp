@@ -76,9 +76,11 @@ void BLEHandler::receivedSensorConfig(BLEDevice central, BLECharacteristic chara
   sensortec.configureSensor(data);
 }
 
-void BLEHandler::begin()
+bool BLEHandler::begin()
 {
-  BLE.begin();
+  if (!BLE.begin()) {
+    return false;
+  }
   BLE.setLocalName("NICLA");
 
   // DFU channel
@@ -99,6 +101,7 @@ void BLEHandler::begin()
 
   //
   BLE.advertise();
+  return true;
 }
 
 void BLEHandler::update()

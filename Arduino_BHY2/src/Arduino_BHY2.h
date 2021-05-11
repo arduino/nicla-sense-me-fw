@@ -11,7 +11,7 @@ public:
   virtual ~Arduino_BHY2();
 
   // Necessary API. Update function should be continuously polled 
-  void begin();
+  bool begin();
   void update();
 
   // API for using the bosch sensortec from sketch

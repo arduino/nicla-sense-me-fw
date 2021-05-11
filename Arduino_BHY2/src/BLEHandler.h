@@ -11,7 +11,7 @@ public:
   BLEHandler();
   virtual ~BLEHandler();
 
-  void begin();
+  bool begin();
   void update();
 
   static void debug(Stream &stream);

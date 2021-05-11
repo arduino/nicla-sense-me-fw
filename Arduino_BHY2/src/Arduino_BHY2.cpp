@@ -32,14 +32,23 @@ void Arduino_BHY2::ping_i2c0() {
   }
 }
 
-void Arduino_BHY2::begin()
+bool Arduino_BHY2::begin()
 {
   i2c0.frequency(500000);
   start_time = millis();
-  sensortec.begin();
-  bleHandler.begin();
-  eslovHandler.begin();
-  dfuManager.begin();
+  if (!sensortec.begin()) {
+    return false;
+  }
+  if (!bleHandler.begin()) {
+    return false;
+  }
+  if (!eslovHandler.begin()) {
+    return false;
+  }
+  if (!dfuManager.begin()) {
+    return false;
+  }
+  return true;
 }
 
 void Arduino_BHY2::update()
