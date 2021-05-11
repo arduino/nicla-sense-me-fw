@@ -13,11 +13,16 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+
 #define MOUNT_PATH           "fs"
 #define ANNA_UPDATE_FILE_PATH   "/" MOUNT_PATH "/ANNA_UPDATE.BIN"
 #define FAIL_SAFE_FILE_PATH "/" MOUNT_PATH "/FAIL_SAFE.BIN"
 
+#if defined(DEBUG)
 #define DEBUG_PRINTF(...) printf(__VA_ARGS__)
+#else
+#define DEBUG_PRINTF(...) (__VA_ARGS__)
+#endif
 
 #define WRONG_OTA_BINARY 	(-1)
 #define MOUNT_FAILED 		(-2)
@@ -73,11 +78,11 @@ int check_signature(FILE *file, long file_len)
     signature = memmem((const char*)file, file_len, "NICLA", sizeof("NICLA"));
 
     if (signature != NULL) {
-        printf("Signature check PASSED \r\n");
+        DEBUG_PRINTF("Signature check PASSED \r\n");
         return 1;
     } else {
         //Signature NOT found: do not run the current fw and try fail safe
-        printf("Nicla signature NOT found! \r\n");
+        DEBUG_PRINTF("Nicla signature NOT found! \r\n");
         return 0;
     }
 }
@@ -89,7 +94,7 @@ int try_fail_safe()
     FILE *file_fail_safe = fopen(FAIL_SAFE_FILE_PATH, "rb");
     regret = NRF_POWER->GPREGRET2;
     if (file_fail_safe != NULL) {
-        printf("Fail safe file found \r\n");
+        DEBUG_PRINTF("Fail safe file found \r\n");
 
         int safe_fw_found = apply_update(file_fail_safe, POST_APPLICATION_ADDR);
 
@@ -98,17 +103,17 @@ int try_fail_safe()
         if (safe_fw_found) {
             //Clear all flags
             NRF_POWER->GPREGRET2 = 0;
-            printf("Starting safe application\r\n");
+            DEBUG_PRINTF("Starting safe application\r\n");
             mbed_start_application(POST_APPLICATION_ADDR);
         } else {
-            printf("Deleting Fail Safe sketch. Please load a correct one.\r\n");
+            DEBUG_PRINTF("Deleting Fail Safe sketch. Please load a correct one.\r\n");
             remove(FAIL_SAFE_FILE_PATH);
         }
 
         return safe_fw_found;
 
     } else {
-        printf("No fail safe firmware found \r\n");
+        DEBUG_PRINTF("No fail safe firmware found \r\n");
         regret = regret | 0x04;
         NRF_POWER->GPREGRET2 = regret;
 
@@ -126,7 +131,7 @@ int apply_update(FILE *file, uint32_t address)
         return 1;
     }
 
-    printf("Firmware size is %ld bytes\r\n", len);
+    DEBUG_PRINTF("Firmware size is %ld bytes\r\n", len);
 
     int signature_found = check_signature(file, len);
     regret = NRF_POWER->GPREGRET2;
@@ -136,7 +141,7 @@ int apply_update(FILE *file, uint32_t address)
 
         return 0;
     }
-    printf("Signature found\r\n");
+    DEBUG_PRINTF("Signature found\r\n");
     //Clear error bit
     regret = regret && 0xFE;
     NRF_POWER->GPREGRET2 = regret;
@@ -149,7 +154,7 @@ int apply_update(FILE *file, uint32_t address)
 
     regret = NRF_POWER->GPREGRET2;
     if (crc!=crc_file) {
-            printf("Wrong CRC! The computed CRC is %x, while it should be %x \r\n", crc, crc_file);
+            DEBUG_PRINTF("Wrong CRC! The computed CRC is %x, while it should be %x \r\n", crc, crc_file);
             regret = regret | 0x02;
             NRF_POWER->GPREGRET2 = regret;
             return 0;
@@ -157,7 +162,7 @@ int apply_update(FILE *file, uint32_t address)
     //Clear error flags
     regret = regret && 0xFC;
     NRF_POWER->GPREGRET2 = regret;
-    printf("Correct CRC=%x \r\n", crc);
+    DEBUG_PRINTF("Correct CRC=%x \r\n", crc);
 
     fseek(file, 0, SEEK_SET);
   
@@ -201,7 +206,7 @@ int apply_update(FILE *file, uint32_t address)
             }
         }
     }
-    printf("Flashed 100%%\r\n");
+    DEBUG_PRINTF("Flashed 100%%\r\n");
 
     delete[] page_buffer;
 
@@ -217,7 +222,7 @@ int try_update()
 
     FILE *file = fopen(ANNA_UPDATE_FILE_PATH, "rb");
     if (file != NULL) {
-        printf("ANNA_UPDATE_FILE found!\r\n");
+        DEBUG_PRINTF("ANNA_UPDATE_FILE found!\r\n");
 
         update = apply_update(file, POST_APPLICATION_ADDR);
 
@@ -225,14 +230,14 @@ int try_update()
         remove(ANNA_UPDATE_FILE_PATH);
 
         if (update) {
-            printf("Starting new application\r\n");
+            DEBUG_PRINTF("Starting new application\r\n");
         } else {
-            printf("Unable to load the new application. Loading the previous one...\r\n");
+            DEBUG_PRINTF("Unable to load the new application. Loading the previous one...\r\n");
         }
         mbed_start_application(POST_APPLICATION_ADDR);
 
     } else {
-        printf("No ANNA_UPDATE_FILE found. Starting main application\r\n");
+        DEBUG_PRINTF("No ANNA_UPDATE_FILE found. Starting main application\r\n");
         mbed_start_application(POST_APPLICATION_ADDR);
     }
 }
@@ -257,12 +262,12 @@ void enableShipMode()
     //    | RO | RO | EN_SHIPMODE | RO | RO | RO | RO | RO |
 
     uint8_t status_reg = pmic.getStatus();
-    printf("Initial Status reg: %04x\n", status_reg);
+    DEBUG_PRINTF("Initial Status reg: %04x\n", status_reg);
     status_reg |= 0x20;
-    printf("Setting ship mode: %04x\n", status_reg);
+    DEBUG_PRINTF("Setting ship mode: %04x\n", status_reg);
     pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_STATUS, status_reg);
     status_reg = pmic.getStatus();
-    printf("Read back status reg: %04x\n", status_reg);
+    DEBUG_PRINTF("Read back status reg: %04x\n", status_reg);
 
 }
 
@@ -283,7 +288,7 @@ void debounce(int state)
         if (boot_rst_n == state) {
             stable = true;
         } else {
-            printf("Button didn't return to its initial state\r\n");
+            DEBUG_PRINTF("Button didn't return to its initial state\r\n");
         }
     }
 }
@@ -363,9 +368,9 @@ int main()
     uint8_t ldo_reg = 0xE4;
     pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL, ldo_reg);
     ldo_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL);
-    //printf("Ldo reg: %04x\n", ldo_reg);
+    //DEBUG_PRINTF("Ldo reg: %04x\n", ldo_reg);
 
-    printf("Bootloader starting\r\n");
+    DEBUG_PRINTF("Bootloader starting\r\n");
 
     mountFileSystem();
 
@@ -382,7 +387,7 @@ int main()
     }
 
     regret = NRF_POWER->GPREGRET2;
-    printf("NRF_POWER->GPREGRET2 = %04x\n", regret);
+    DEBUG_PRINTF("NRF_POWER->GPREGRET2 = %04x\n", regret);
 
     //    PUSH-BUTTON CONTROL reg:
     //    | B7 | B6 |   B5  | B4 | B3 | B2 | B1 | B0 |
@@ -390,28 +395,28 @@ int main()
     //    MRREC = 1 : enter Ship Mode after reset
     /*
     uint8_t pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
-    printf("Initial push button reg: %04x\n", pb_reg);
+    DEBUG_PRINTF("Initial push button reg: %04x\n", pb_reg);
     pb_reg |= 0x20;
-    printf("Setting ship mode after reset: %04x\n", pb_reg);
+    DEBUG_PRINTF("Setting ship mode after reset: %04x\n", pb_reg);
     pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL, pb_reg);
     pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
-    printf("Read back push button reg: %04x\n", pb_reg);
+    DEBUG_PRINTF("Read back push button reg: %04x\n", pb_reg);
     */
 
     /*
     uint8_t pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
-    printf("Initial push button reg: %04x\n", pb_reg);
+    DEBUG_PRINTF("Initial push button reg: %04x\n", pb_reg);
     pb_reg |= 0x04;
-    printf("Setting PG as voltage shifted push-button (input MR): %04x\n", pb_reg);
+    DEBUG_PRINTF("Setting PG as voltage shifted push-button (input MR): %04x\n", pb_reg);
     pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL, pb_reg);
     pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
-    printf("Read back push button reg: %04x\n", pb_reg);
+    DEBUG_PRINTF("Read back push button reg: %04x\n", pb_reg);
     */
 
 #if defined (CONFIG_GPIO_AS_PINRESET)
-    printf("CONFIG_GPIO_AS_PINRESET defined\r\n");
+    DEBUG_PRINTF("CONFIG_GPIO_AS_PINRESET defined\r\n");
 #else
-    printf("CONFIG_GPIO_AS_PINRESET NOT defined\r\n");
+    DEBUG_PRINTF("CONFIG_GPIO_AS_PINRESET NOT defined\r\n");
 #endif
 
     if (boot_rst_n == 0) {
@@ -421,21 +426,21 @@ int main()
         {
         case 1:
             //Reset Anna
-            printf("Resetting Anna \r\n");
+            DEBUG_PRINTF("Resetting Anna \r\n");
             blink(blue);
             loadApp();
             break;
 
         case 2:
             //Enter Ship Mode
-            printf("Entering Ship Mode\r\n");
+            DEBUG_PRINTF("Entering Ship Mode\r\n");
             enableShipMode();
             blink(red);
             break;
 
         case 3:
             //Fail Safe
-            printf("Entering Fail Safe Mode\r\n");
+            DEBUG_PRINTF("Entering Fail Safe Mode\r\n");
             mountFileSystem();
             blink(green);
             try_fail_safe();
