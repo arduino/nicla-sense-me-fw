@@ -1,193 +1,101 @@
 package dfu
 
 import (
-	"github.com/schollz/progressbar/v3"
-	"time"
-	"encoding/binary"
+	"arduino/bhy/util"
 	"fmt"
-	"log"
+	"math"
 	"os"
 
+	log "github.com/sirupsen/logrus"
+
+	"github.com/schollz/progressbar/v3"
 	"go.bug.st/serial"
 )
 
-/*Packet format:
-- 1 byte: OPCODE
-- 1 byte: LASTBYTE
-- 2 bytes: LENGTH/REMAINING
-- 192 bytes: DATA
-*/
+func sendPacket(port serial.Port, packet *dfuPacket) {
+	for ackReceived := false; ackReceived == false; {
+		log.Debugf("Sending packet %d\n", packet.index)
+		_, err := port.Write(packet.build())
+		log.Debugln(packet.build())
+		util.ErrCheck(err)
 
-var crc8bit byte
-var spareBytes uint16
-var Ack = (byte)(0x0F)
-var Nack = (byte)(0x00)
-var packSize = 192
-var FullPackSize = packSize + 4
+		//wait ack from Nicla
+		log.Debugln("Waiting for ack")
+		ackBuf := make([]byte, 1)
+		for n := 0; n != 1; {
+			n, err = port.Read(ackBuf)
+			util.ErrCheck(err)
 
-func CRC8(buf []byte, last_pack bool) {
+			if n == 0 {
+				log.Debugln("Ack not received")
+			} else if n > 1 {
+				log.Debugln("Ack expected but more than one byte received")
+			}
+		}
 
-	buf_len := packSize
-
-	if last_pack {
-		buf_len = (int)(spareBytes)
+		ackReceived = (ackBuf[0] == Ack)
 	}
-
-	for i := 0; i < buf_len; i++ {
-		b := buf[i]
-		crc8bit = crc8bit ^ b
-	}
-
 }
 
-func Upload(baud_rate int, target string, USBport string, bin_path string, debug int) {
-	oc := 0
-	if target == "bhi" {
-		oc = 1
+func readPayload(f *os.File, idx int, buf []byte) int {
+	//Adjust pointer to fw binary file
+	p := (int64)(idx * PayloadSize)
+	_, err := f.Seek(p, 0)
+	util.ErrCheck(err)
+
+	// Read payload from the binary file
+	n, err := f.Read(buf)
+	util.ErrCheck(err)
+
+	return n
+}
+
+func Upload(baud int, target string, usbPort string, bPath string, debug bool) {
+	if debug {
+		log.SetLevel(log.DebugLevel)
 	}
-	oc16 := (uint16)(oc)
-	opcode := make([]byte, 2)
-
-	binary.LittleEndian.PutUint16(opcode, oc16)
-
-	last := make([]byte, 1)
-	idx := make([]byte, 2)
-
-	mode := &serial.Mode{
-		BaudRate: baud_rate,
-		Parity:   serial.NoParity,
-		DataBits: 8,
-		StopBits: serial.OneStopBit,
-	}
-
-	port, err := serial.Open(USBport, mode)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// Open serial port
+	port := util.OpenPort(usbPort, baud)
 
 	//Open the firmware binary file and get the length
-	f, err := os.Open(bin_path)
-	check(err)
+	f, err := os.Open(bPath)
+	defer f.Close()
+	util.ErrCheck(err)
 	fi, err := f.Stat()
-	check(err)
-	fw_size := fi.Size()
-	fmt.Printf("The firware is %d bytes long\n", fw_size)
+	util.ErrCheck(err)
+	fwSize := fi.Size()
+	fmt.Printf("The firmware is %d bytes long\n", fwSize)
 
-	buf := make([]byte, packSize)
+	// consider fwSize + 1 for crc byte
+	nChunks := int(math.Ceil(float64(fwSize+1) / float64(PayloadSize)))
+	spareBytes := int(fwSize % int64(PayloadSize))
+	bar := progressbar.Default(int64(nChunks))
+	crc := uint8(0)
+	buf := make([]byte, PayloadSize)
 
-	nChunks := int(fw_size / ((int64)(packSize)))
-	fmt.Printf("nChunks: %d\n", nChunks)
-	spareBytes = uint16(fw_size % ((int64)(packSize)))
-	fmt.Printf("spareBytes: %d\n", spareBytes)
-
-	bar := progressbar.Default((int64)(nChunks+1))
-
-	crc8bit = 0
-
-	for n := 0; n <= nChunks; n++ {
-
-		if n < nChunks || spareBytes > 0 {
-			//Read packSize bytes from the binary file
-			_, err := f.Read(buf)
-			check(err)
-
-			//update the CRC at each chunk of packSize bytes read
-			if n == nChunks {
-				CRC8(buf, true)
-			} else {
-				CRC8(buf, false)
-			}
-		}
-
-		index := (uint16)(n)
-
-		if n == nChunks { //Last packet
-			last[0] = 1
-			//Add 8-bit CRC to len
-			binary.LittleEndian.PutUint16(idx, (spareBytes + 1))
-			index = spareBytes + 1
-			//Add CRC to data
-			buf[spareBytes] = crc8bit
-		} else {
-			last[0] = 0
-			binary.LittleEndian.PutUint16(idx, index)
-		}
-
-		if debug == 1 {
-			fmt.Printf("opcode: %d\n", opcode[:1])
-			fmt.Printf("lastPack: %d\n", last)
-			fmt.Printf("index: %d\n", index)
-			for j := 0; j < packSize; j++ {
-				fmt.Printf("%x, ", buf[j])
-			}
-		} else {
+	for i := 0; i < nChunks; i++ {
+		if !debug {
 			bar.Add(1)
-			time.Sleep(time.Millisecond)
 		}
 
-		header := make([]byte, 3)
-		header = append(last, idx[:2]...)
-		opcodeHeader := make([]byte, 4)
-		opcodeHeader = append(opcode[:1], header...)
-		packet := make([]byte, FullPackSize)
-		packet = append(opcodeHeader, buf...)
-
-		ackReceived := false
-
-		for ackReceived == false {
-			_, err = port.Write(packet)
-			check(err)
-			if debug == 1 {
-				fmt.Printf("Packet sent to MKR\n")
-			}
-
-			ackBuf := make([]byte, 1)
-
-			//wait response from Nicla
-			for {
-				bytesAck, err := port.Read(ackBuf)
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				if bytesAck == 1 {
-					if ackBuf[0] == Ack { //Nicla correctly received the packet
-						ackReceived = true
-						if debug == 1 {
-							fmt.Printf("ACK %x received!\n", ackBuf[0])
-						}
-						break
-					}
-					if ackBuf[0] == Nack { //Nicla did NOT correctly received the packet
-						//keep ackReceived = false and resend
-						fmt.Printf("NACK %x received!\n", ackBuf[0])
-						break
-					}
-					fmt.Printf("ERROR! Unknown ACK format: %x\n", ackBuf[0])
-					break
-				}
-			}
-
+		n := 0
+		if i < nChunks-1 || spareBytes > 0 {
+			n = readPayload(f, i, buf)
+			crc = CRC8(buf, n, crc)
 		}
 
-		if n != nChunks {
-			//Adjust pointer to fw binary file
-			p := (int64)((n + 1) * packSize)
-			_, err = f.Seek(p, 0)
-			check(err)
+		packet := newDFUPacket(target, i, n, buf)
+		// if this is the very last packet
+		if i == (nChunks - 1) {
+			packet.setLast(1)
+			// assert n == spareBytes
+			// append crc to this packet
+			buf[spareBytes] = crc
+			packet.setLength(spareBytes + 1)
 		}
+		sendPacket(port, packet)
 	}
 
 	bar.Finish()
-
-	defer f.Close()
-
 	fmt.Printf("FW sent!\n")
-
-}
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
 }
