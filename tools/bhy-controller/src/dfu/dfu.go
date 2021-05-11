@@ -74,7 +74,9 @@ func Upload(baud int, target string, usbPort string, bPath string, debug bool) {
 	buf := make([]byte, PayloadSize)
 
 	for i := 0; i < nChunks; i++ {
-		bar.Add(1)
+		if !debug {
+			bar.Add(1)
+		}
 
 		n := 0
 		if i < nChunks-1 || spareBytes > 0 {
