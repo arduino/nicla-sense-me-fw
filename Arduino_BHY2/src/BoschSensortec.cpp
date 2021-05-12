@@ -66,6 +66,7 @@ bool BoschSensortec::begin()
   }
 
   bhy2_update_virtual_sensor_list(&_bhy2);
+  bhy2_get_virt_sensor_list(_sensorsPresent, &_bhy2);
 
   printSensors();
 
@@ -73,22 +74,20 @@ bool BoschSensortec::begin()
 }
 
 void BoschSensortec::printSensors() {
-  bool sensorsPresent[256];
-  uint8_t presentBuff[32];
+  bool presentBuff[256];
 
-  bhy2_get_virt_sensor_list(presentBuff, &_bhy2);
-  for (uint16_t i = 0; i < sizeof(presentBuff); i++)
+  for (uint16_t i = 0; i < sizeof(_sensorsPresent); i++)
   {
       for (uint8_t j = 0; j < 8; j++)
       {
-          sensorsPresent[i * 8 + j] = ((presentBuff[i] >> j) & 0x01);
+          presentBuff[i * 8 + j] = ((_sensorsPresent[i] >> j) & 0x01);
       }
   }
 
   if (_debug) {
     _debug->println("Present sensors: ");
-    for (int i = 0; i < sizeof(sensorsPresent); i++) {
-      if (sensorsPresent[i]) {
+    for (int i = 0; i < sizeof(presentBuff); i++) {
+      if (presentBuff[i]) {
         _debug->print(i);
         _debug->print(" - ");
         _debug->print(get_sensor_name(i));
@@ -96,6 +95,12 @@ void BoschSensortec::printSensors() {
       }
     }
   }
+}
+
+bool BoschSensortec::hasSensor(uint8_t sensorId) {
+  int i = sensorId / 8;
+  int j = sensorId % 8;
+  return ((_sensorsPresent[i] >> j) & 0x01) == 1;
 }
 
 void BoschSensortec::configureSensor(SensorConfigurationPacket& config)

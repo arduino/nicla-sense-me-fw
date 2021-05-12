@@ -104,6 +104,11 @@ bool Arduino_BHY2::readSensorData(SensorDataPacket &data)
   return sensortec.readSensorData(data);
 }
 
+bool Arduino_BHY2::hasSensor(uint8_t sensorId)
+{
+  return sensortec.hasSensor(sensorId);
+}
+
 void Arduino_BHY2::parse(SensorDataPacket& data, DataXYZ& vector)
 {
   DataParser::parse(data, vector);

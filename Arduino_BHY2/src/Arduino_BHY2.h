@@ -20,6 +20,7 @@ public:
   void addSensorData(const SensorDataPacket &sensorData);
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);
+  bool hasSensor(uint8_t sensorId);
 
   void parse(SensorDataPacket& data, DataXYZ& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector);

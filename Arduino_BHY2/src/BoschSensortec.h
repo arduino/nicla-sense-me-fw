@@ -30,7 +30,9 @@ public:
   bool begin(); 
   void update();
   void configureSensor(SensorConfigurationPacket& config);
+
   void printSensors();
+  bool hasSensor(uint8_t sensorId);
 
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);
@@ -44,6 +46,7 @@ private:
   uint8_t _workBuffer[WORK_BUFFER_SIZE];
   
   struct bhy2_dev _bhy2;
+  uint8_t _sensorsPresent[32];
 
 private:
   friend class Arduino_BHY2;
