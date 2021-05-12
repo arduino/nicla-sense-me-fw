@@ -41,8 +41,6 @@ private:
   mbed::CircularBuffer<SensorDataPacket, SENSOR_QUEUE_SIZE, uint8_t> _sensorQueue;
 
   uint8_t _workBuffer[WORK_BUFFER_SIZE];
-
-  SensorConfigurationPacket* _savedConfig;
   
   struct bhy2_dev _bhy2;
 

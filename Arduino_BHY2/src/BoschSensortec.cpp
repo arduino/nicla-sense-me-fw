@@ -2,7 +2,6 @@
 #include "BoschParser.h"
 
 BoschSensortec::BoschSensortec() : 
-  _savedConfig(NULL),
   _debug(NULL)
 {
 }
