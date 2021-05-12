@@ -30,6 +30,7 @@ public:
   bool begin(); 
   void update();
   void configureSensor(SensorConfigurationPacket& config);
+  void printSensors();
 
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);
