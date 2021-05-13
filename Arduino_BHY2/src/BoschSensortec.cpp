@@ -14,9 +14,7 @@ bool BoschSensortec::begin()
 {
   auto ret = bhy2_init(BHY2_SPI_INTERFACE, bhy2_spi_read, bhy2_spi_write, bhy2_delay_us, MAX_READ_WRITE_LEN, NULL, &_bhy2);
   if (_debug) _debug->println(get_api_error(ret));
-  if (ret != BHY2_OK) {
-    return false;
-  } 
+  if (ret != BHY2_OK) return false; 
 
   bhy2_soft_reset(&_bhy2);
 
@@ -32,6 +30,7 @@ bool BoschSensortec::begin()
 
   ret = bhy2_boot_from_flash(&_bhy2);
   if (_debug) _debug->println(get_api_error(ret));
+  if (ret != BHY2_OK) return false; 
 
   ret = bhy2_get_boot_status(&stat, &_bhy2);
   if (_debug) {
@@ -46,6 +45,7 @@ bool BoschSensortec::begin()
     _debug->print("Interrupt ctrl: ");
     _debug->println(stat, HEX);
   }
+
   ret = bhy2_get_host_intf_ctrl(&stat, &_bhy2);
   if (_debug) {
     _debug->println(get_api_error(ret));

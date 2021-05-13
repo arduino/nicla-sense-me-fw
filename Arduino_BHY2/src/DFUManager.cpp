@@ -21,12 +21,18 @@ bool DFUManager::begin()
 {
   int err = _fs.mount(&_bd);
   if (err) {
-    err = _fs.reformat(&_bd);
     if(_debug) {
       _debug->print("Error mounting file system: ");
       _debug->println(err);
+    }
+
+    if (_fs.reformat(&_bd)) {
+      if(_debug) {
+        _debug->println("Error reformatting file system");
+      }
       return false;
     }
+
   }
   return true;
 }
