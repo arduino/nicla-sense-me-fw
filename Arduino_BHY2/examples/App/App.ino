@@ -11,8 +11,6 @@
 // Set DEBUG to true in order to enable debug print
 #define DEBUG false
 
-int start_time;
-
 void setup()
 {
 #if DEBUG
@@ -26,5 +24,4 @@ void setup()
 void loop()
 {
   BHY2.update();
-  BHY2.ping_i2c0();
 }
