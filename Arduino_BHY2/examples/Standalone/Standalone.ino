@@ -28,10 +28,6 @@ void configureSensors() {
 
 void setup()
 {
-
-  CoreDebug->DEMCR = 0;
-  NRF_CLOCK->TRACECONFIG = 0;
-
   Serial.begin(115200);
 
   BHY2.begin();
