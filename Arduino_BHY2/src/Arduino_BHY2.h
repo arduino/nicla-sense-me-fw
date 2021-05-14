@@ -27,6 +27,7 @@ public:
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
 
   void debug(Stream &stream);
+  void delay(unsigned long );
 
 private:
   Stream *_debug;

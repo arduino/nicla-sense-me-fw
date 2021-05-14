@@ -135,4 +135,16 @@ void Arduino_BHY2::debug(Stream &stream)
   BoschParser::debug(stream);
 }
 
+#include "ArduinoBLE.h"
+void Arduino_BHY2::delay(unsigned long ms)
+{
+  unsigned long start = millis();
+  unsigned long elapsed = 0;
+  while (elapsed < ms) {
+    BLE.poll(ms - elapsed);
+    elapsed = millis() - start;
+  }
+    update();
+}
+
 Arduino_BHY2 BHY2;
