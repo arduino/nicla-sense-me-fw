@@ -9,11 +9,11 @@
 
 mbed::I2C i2c0(I2C_SDA0, I2C_SCL0);
 
-uint8_t BQ25120A_ADDRESS = 0x6A;
+const uint8_t BQ25120A_ADDRESS = 0x6A;
 
 Arduino_BHY2::Arduino_BHY2() :
   _debug(NULL),
-  start_time(0)
+  _pingTime(0)
 {
 }
 
@@ -21,11 +21,11 @@ Arduino_BHY2::~Arduino_BHY2()
 {
 }
 
-void Arduino_BHY2::ping_i2c0() {
+void Arduino_BHY2::pingI2C() {
   char response = 0xFF;
-  int curr_time = millis();
-  if ((curr_time - start_time) > 30000) {
-    start_time = curr_time;
+  int currTime = millis();
+  if ((currTime - _pingTime) > 30000) {
+    _pingTime = currTime;
     //Read status reg
     int ret = i2c0.write(BQ25120A_ADDRESS << 1, 0, 1);
     ret = i2c0.read(BQ25120A_ADDRESS << 1, &response, 1);
@@ -35,7 +35,7 @@ void Arduino_BHY2::ping_i2c0() {
 bool Arduino_BHY2::begin()
 {
   i2c0.frequency(500000);
-  start_time = millis();
+  _pingTime = millis();
   if (!sensortec.begin()) {
     return false;
   }
@@ -53,6 +53,7 @@ bool Arduino_BHY2::begin()
 
 void Arduino_BHY2::update()
 {
+  pingI2C();
   sensortec.update();
   bleHandler.update();
 
@@ -61,7 +62,7 @@ void Arduino_BHY2::update()
     if (_debug) _debug->println("Start DFU procedure. Sketch execution is stopped.");
     // TODO: abort dfu
     while (dfuManager.isPending()) {
-      ping_i2c0();
+      pingI2C();
       bleHandler.update();
     }
     // Wait some time for acknowledgment retrieval
@@ -102,6 +103,11 @@ uint8_t Arduino_BHY2::availableSensorData()
 bool Arduino_BHY2::readSensorData(SensorDataPacket &data)
 {
   return sensortec.readSensorData(data);
+}
+
+bool Arduino_BHY2::hasSensor(uint8_t sensorId)
+{
+  return sensortec.hasSensor(sensorId);
 }
 
 void Arduino_BHY2::parse(SensorDataPacket& data, DataXYZ& vector)

@@ -20,17 +20,19 @@ public:
   void addSensorData(const SensorDataPacket &sensorData);
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);
+  bool hasSensor(uint8_t sensorId);
 
   void parse(SensorDataPacket& data, DataXYZ& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
 
   void debug(Stream &stream);
-  void ping_i2c0();
 
 private:
   Stream *_debug;
-  int start_time;
+
+  void pingI2C();
+  int _pingTime;
 };
 
 extern Arduino_BHY2 BHY2;

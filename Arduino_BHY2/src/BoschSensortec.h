@@ -31,6 +31,9 @@ public:
   void update();
   void configureSensor(SensorConfigurationPacket& config);
 
+  void printSensors();
+  bool hasSensor(uint8_t sensorId);
+
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);
 
@@ -41,10 +44,9 @@ private:
   mbed::CircularBuffer<SensorDataPacket, SENSOR_QUEUE_SIZE, uint8_t> _sensorQueue;
 
   uint8_t _workBuffer[WORK_BUFFER_SIZE];
-
-  SensorConfigurationPacket* _savedConfig;
   
   struct bhy2_dev _bhy2;
+  uint8_t _sensorsPresent[32];
 
 private:
   friend class Arduino_BHY2;

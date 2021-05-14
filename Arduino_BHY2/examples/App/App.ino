@@ -11,14 +11,8 @@
 // Set DEBUG to true in order to enable debug print
 #define DEBUG false
 
-int start_time;
-
 void setup()
 {
-
-  CoreDebug->DEMCR = 0;
-  NRF_CLOCK->TRACECONFIG = 0;
-
 #if DEBUG
   Serial.begin(115200);
   BHY2.debug(Serial);
@@ -30,5 +24,4 @@ void setup()
 void loop()
 {
   BHY2.update();
-  BHY2.ping_i2c0();
 }
