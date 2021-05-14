@@ -1,0 +1,28 @@
+power consumption nicla
+
+
+empty sketch delay: 2.60 mA
+empty busy: 11 mA
+empty + ble begin + long poll: 3.90 mA
+
+advertising long poll (4s) (default): 4.40 mA 
+advertising long poll (10 sec 0x4000): 3.90 mA 
+
+
+
+no library:
+power up bhy: 2.60 mA
+power up bhy + bhy update + sleep 4s: 2.70/2.60 mA
+
+"" + sensor configured + sleep 1s: 4 mA
+"" + without print: 3.21 mA
+
+"" + sensor configured + sleep 100ms: 3.90 mA
+"" + without print: 3.26 mA
+
+library:
+power up bhy (no ble, eslov etc.):  11.50 mA
+
+
+power up bhy with sensors (no ble, eslov etc.):
+
