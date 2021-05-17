@@ -270,7 +270,7 @@ int fwupdate_bhi260(void)
             uint32_t start_addr = BHY2_FLASH_SECTOR_START_ADDR;
             long update_len = getUpdateFileSize();
             if (update_len < 1) {
-                return 0;
+                return -1;
             } else {
                 uint32_t end_addr = start_addr + update_len;
                 DEBUG_PRINTF("Flash detected and BHY firmware update available. Erasing flash to upload firmware\r\n");
@@ -283,7 +283,7 @@ int fwupdate_bhi260(void)
         {
             DEBUG_PRINTF("Flash not detected\r\n");
 
-            return 0;
+            return -1;
         }
 #endif
 
@@ -298,6 +298,7 @@ int fwupdate_bhi260(void)
         if (sensor_error)
         {
             DEBUG_PRINTF("%s\r\n", get_sensor_error_text(sensor_error));
+            return -1;
         }
         print_api_error(rslt, &bhy2);
         print_api_error(temp_rslt, &bhy2);
@@ -346,7 +347,7 @@ int fwupdate_bhi260(void)
 
         close_interfaces();
 
-        return 0;
+        return -1;
     }
 
     close_interfaces();
