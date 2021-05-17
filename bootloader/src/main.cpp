@@ -234,12 +234,15 @@ int try_update()
         } else {
             DEBUG_PRINTF("Unable to load the new application. Loading the previous one...\r\n");
         }
-        mbed_start_application(POST_APPLICATION_ADDR);
 
     } else {
         DEBUG_PRINTF("No ANNA_UPDATE_FILE found. Starting main application\r\n");
-        mbed_start_application(POST_APPLICATION_ADDR);
     }
+
+    fs.unmount();
+    spif.deinit();
+
+    mbed_start_application(POST_APPLICATION_ADDR);
 }
 
 void blink(uint8_t color)
@@ -336,9 +339,6 @@ void loadApp()
     fwupdate_bhi260();
 
     try_update();
-
-    fs.unmount();
-    spif.deinit();
 }
 
 int main()
