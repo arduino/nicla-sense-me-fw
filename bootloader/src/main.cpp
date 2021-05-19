@@ -376,11 +376,12 @@ int main()
     //DEBUG_PRINTF("Ldo reg: %04x\n", ldo_reg);
 
     //    PUSH-BUTTON CONTROL reg:
-    //    | B7 | B6 |   B5  | B4 | B3 | B2 | B1 | B0 |
-    //    | X  | X  | MRREC | X  | X  | X  | X  | X  |
+    //    | B7 | B6 |   B5  |    B4   |    B3   | B2 | B1 | B0 |
+    //    | X  | X  | MRREC | MRRESET | MRRESET | X  | X  | X  |
     //    MRREC = 0 : enter Ship Mode after reset
+    //    MRRESET = 00 : 5 s button press for reset
     uint8_t pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
-    pb_reg &= 0xDF;
+    pb_reg &= 0xC7;
     pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL, pb_reg);
     pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
     DEBUG_PRINTF("Push button ctrl reg: %04x\n", pb_reg);
