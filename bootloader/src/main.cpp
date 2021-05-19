@@ -372,6 +372,19 @@ int main()
 
     DEBUG_PRINTF("Bootloader starting\r\n");
 
+    if (NRF_UICR->PSELRESET[0] != 0 || NRF_UICR->PSELRESET[1] != 00) {
+        NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen << NVMC_CONFIG_WEN_Pos;
+        while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
+        DEBUG_PRINTF("NRF_UICR->PSELRESET[0]: %04x\n", NRF_UICR->PSELRESET[0]);
+        NRF_UICR->PSELRESET[0] = 0x80000000;
+        while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
+        DEBUG_PRINTF("NRF_UICR->PSELRESET[1]: %04x\n", NRF_UICR->PSELRESET[1]);
+        NRF_UICR->PSELRESET[1] = 0x80000000;
+        while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
+        NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren << NVMC_CONFIG_WEN_Pos;
+        while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
+    }
+
     mountFileSystem();
 
     FILE *file_fail_safe = fopen(FAIL_SAFE_FILE_PATH, "r");
