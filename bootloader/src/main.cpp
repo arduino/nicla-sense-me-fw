@@ -145,7 +145,7 @@ int apply_update(FILE *file, uint32_t address)
     }
     DEBUG_PRINTF("Signature found\r\n");
     //Clear error bit
-    regret = regret && 0xFE;
+    regret &= 0xFE;
     NRF_POWER->GPREGRET2 = regret;
 
     char crc_file = files.getFileCRC(file);
@@ -162,7 +162,7 @@ int apply_update(FILE *file, uint32_t address)
             return 0;
     }
     //Clear error flags
-    regret = regret && 0xFC;
+    regret &= 0xFC;
     NRF_POWER->GPREGRET2 = regret;
     DEBUG_PRINTF("Correct CRC=%x \r\n", crc);
 
@@ -412,7 +412,7 @@ int main()
         NRF_POWER->GPREGRET2 = regret;
     } else {
         //Fail safe sketch available. Clean error bit
-        regret = regret && 0xFB;
+        regret &= 0xFB;
         NRF_POWER->GPREGRET2 = regret;
     }
 
