@@ -255,6 +255,7 @@ void blink(uint8_t color)
         leds.ledBlink(color, 1000);
         ThisThread::sleep_for(1s);
     }
+    leds.powerDown();
 }
 
 
@@ -370,6 +371,17 @@ int main()
     ldo_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL);
     //DEBUG_PRINTF("Ldo reg: %04x\n", ldo_reg);
 
+    //    PUSH-BUTTON CONTROL reg:
+    //    | B7 | B6 |   B5  | B4 | B3 | B2 | B1 | B0 |
+    //    | X  | X  | MRREC | X  | X  | X  | X  | X  |
+    //    MRREC = 0 : enter Ship Mode after reset
+    uint8_t pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
+    pb_reg &= 0xDF;
+    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL, pb_reg);
+    pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
+    DEBUG_PRINTF("Push button ctrl reg: %04x\n", pb_reg);
+
+
     DEBUG_PRINTF("Bootloader starting\r\n");
 
     if (NRF_UICR->PSELRESET[0] != 0 || NRF_UICR->PSELRESET[1] != 00) {
@@ -402,29 +414,6 @@ int main()
     regret = NRF_POWER->GPREGRET2;
     DEBUG_PRINTF("NRF_POWER->GPREGRET2 = %04x\n", regret);
 
-    //    PUSH-BUTTON CONTROL reg:
-    //    | B7 | B6 |   B5  | B4 | B3 | B2 | B1 | B0 |
-    //    | X  | X  | MRREC | X  | X  | X  | X  | X  |
-    //    MRREC = 1 : enter Ship Mode after reset
-    /*
-    uint8_t pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
-    DEBUG_PRINTF("Initial push button reg: %04x\n", pb_reg);
-    pb_reg |= 0x20;
-    DEBUG_PRINTF("Setting ship mode after reset: %04x\n", pb_reg);
-    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL, pb_reg);
-    pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
-    DEBUG_PRINTF("Read back push button reg: %04x\n", pb_reg);
-    */
-
-    /*
-    uint8_t pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
-    DEBUG_PRINTF("Initial push button reg: %04x\n", pb_reg);
-    pb_reg |= 0x04;
-    DEBUG_PRINTF("Setting PG as voltage shifted push-button (input MR): %04x\n", pb_reg);
-    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL, pb_reg);
-    pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
-    DEBUG_PRINTF("Read back push button reg: %04x\n", pb_reg);
-    */
 
 #if defined (CONFIG_GPIO_AS_PINRESET)
     DEBUG_PRINTF("CONFIG_GPIO_AS_PINRESET defined\r\n");
@@ -447,8 +436,11 @@ int main()
         case 2:
             //Enter Ship Mode
             DEBUG_PRINTF("Entering Ship Mode\r\n");
+            blink(yellow);
             enableShipMode();
-            blink(red);
+            while(1) {
+                blink(red);
+            }
             break;
 
         case 3:
