@@ -49,6 +49,8 @@ FileUtils files;
 DigitalIn boot_rst_n(BUTTON1);
 Timer timer_rst_n;
 
+DigitalOut cd(p25);
+
 uint32_t regret;
 
 int try_fail_safe();
@@ -347,6 +349,8 @@ int main()
 
     CoreDebug->DEMCR = 0;
     NRF_CLOCK->TRACECONFIG = 0;
+
+    cd = 1;
 
     /*
         LDO reg:
