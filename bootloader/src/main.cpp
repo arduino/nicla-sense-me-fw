@@ -416,6 +416,8 @@ int main()
         NRF_POWER->GPREGRET2 = regret;
     }
 
+    fclose(file_fail_safe);
+
     regret = NRF_POWER->GPREGRET2;
     DEBUG_PRINTF("NRF_POWER->GPREGRET2 = %04x\n", regret);
 
