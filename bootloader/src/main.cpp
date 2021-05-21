@@ -369,11 +369,15 @@ int main()
             - shift to lef by 2 positions: (0x0A << 2) = 0x28
             - set EN_LDO: 0xA8
     */
-    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL, 0);
+#if defined(DEBUG)
+    //Enable LDO
     uint8_t ldo_reg = 0xE4;
     pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL, ldo_reg);
     ldo_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL);
-    //DEBUG_PRINTF("Ldo reg: %04x\n", ldo_reg);
+#else
+    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL, 0);
+#endif
+
 
     //    PUSH-BUTTON CONTROL reg:
     //    | B7 | B6 |   B5  |    B4   |    B3   | B2 | B1 | B0 |
