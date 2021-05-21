@@ -7,6 +7,7 @@
 
 #include "Arduino.h"
 #include "Arduino_BHY2.h"
+#include "Nicla_System.h"
 
 // Set DEBUG to true in order to enable debug print
 #define DEBUG false
@@ -17,6 +18,8 @@ void setup()
   Serial.begin(115200);
   BHY2.debug(Serial);
 #endif
+
+  enable3V3LDO();
 
   BHY2.begin();
 }

@@ -28,6 +28,8 @@ public:
   void parse(SensorDataPacket& data, DataOrientation& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
 
+  void checkEslovInt();
+
   void debug(Stream &stream);
 
 private:
@@ -35,6 +37,10 @@ private:
 
   void pingI2C();
   int _pingTime;
+  int _timeout;
+  int _startTime;
+  bool _timeoutExpired;
+  bool _eslovActive;
 };
 
 extern Arduino_BHY2 BHY2;
