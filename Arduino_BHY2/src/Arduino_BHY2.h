@@ -12,7 +12,8 @@ public:
 
   // Necessary API. Update function should be continuously polled 
   bool begin();
-  void update();
+  void update(); // remove this to enforce a sleep
+  void update(unsigned long delay); // Update and then sleep
 
   // API for using the bosch sensortec from sketch
   void configureSensor(SensorConfigurationPacket& config);

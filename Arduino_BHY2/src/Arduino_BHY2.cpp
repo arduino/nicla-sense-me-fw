@@ -76,6 +76,18 @@ void Arduino_BHY2::update()
   }
 }
 
+// Update and then sleep
+void Arduino_BHY2::update(unsigned long delay)
+{
+  update();
+  unsigned long start = millis();
+  unsigned long elapsed = 0;
+  while (elapsed < delay) {
+    bleHandler.poll(delay - elapsed);
+    elapsed = millis() - start;
+  }
+}
+
 void Arduino_BHY2::configureSensor(SensorConfigurationPacket& config)
 {
   sensortec.configureSensor(config);
