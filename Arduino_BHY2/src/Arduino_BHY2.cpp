@@ -32,6 +32,14 @@ void Arduino_BHY2::pingI2C() {
   }
 }
 
+void Arduino_BHY2::eslovActive()
+{
+  if (digitalRead(p19)) {
+    disableLDO();
+    timeout.detach();
+  }
+}
+
 bool Arduino_BHY2::begin()
 {
   i2c0.frequency(500000);
@@ -48,6 +56,12 @@ bool Arduino_BHY2::begin()
   if (!dfuManager.begin()) {
     return false;
   }
+
+  pinMode(p19, INPUT);
+  if (digitalRead(p19)) {
+    timeout.attach(mbed::callback(this, &DFUManager::eslovActive), 100s);
+  }
+
   return true;
 }
 

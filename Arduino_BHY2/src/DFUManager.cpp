@@ -1,5 +1,9 @@
 #include "DFUManager.h"
 
+
+using namespace std::chrono_literals;
+using namespace std::chrono;
+
 SPIFBlockDevice DFUManager::_bd(SPI_PSELMOSI0, SPI_PSELMISO0,
                      SPI_PSELSCK0, CS_FLASH, 16000000);
 
@@ -34,6 +38,7 @@ bool DFUManager::begin()
     }
 
   }
+
   return true;
 }
 
