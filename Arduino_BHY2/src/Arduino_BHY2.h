@@ -13,7 +13,8 @@ public:
   // Necessary API. Update function should be continuously polled 
   bool begin();
   void update(); // remove this to enforce a sleep
-  void update(unsigned long delay); // Update and then sleep
+  void update(unsigned long ms); // Update and then sleep
+  void delay(unsigned long ms); // to be used instead of arduino delay()
 
   // API for using the bosch sensortec from sketch
   void configureSensor(SensorConfigurationPacket& config);

@@ -77,13 +77,18 @@ void Arduino_BHY2::update()
 }
 
 // Update and then sleep
-void Arduino_BHY2::update(unsigned long delay)
+void Arduino_BHY2::update(unsigned long ms)
 {
   update();
+  delay(ms);
+}
+
+void Arduino_BHY2::delay(unsigned long ms) 
+{
   unsigned long start = millis();
   unsigned long elapsed = 0;
-  while (elapsed < delay) {
-    bleHandler.poll(delay - elapsed);
+  while (elapsed < ms) {
+    bleHandler.poll(ms - elapsed);
     elapsed = millis() - start;
   }
 }
