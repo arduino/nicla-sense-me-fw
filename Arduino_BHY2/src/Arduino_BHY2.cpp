@@ -7,9 +7,7 @@
 #include "DFUManager.h"
 #include <I2C.h>
 
-mbed::I2C i2c0(I2C_SDA0, I2C_SCL0);
-
-const uint8_t BQ25120A_ADDRESS = 0x6A;
+mbed::I2C I2C(I2C_SDA0, I2C_SCL0);
 
 Arduino_BHY2::Arduino_BHY2() :
   _debug(NULL),
@@ -27,14 +25,14 @@ void Arduino_BHY2::pingI2C() {
   if ((currTime - _pingTime) > 30000) {
     _pingTime = currTime;
     //Read status reg
-    int ret = i2c0.write(BQ25120A_ADDRESS << 1, 0, 1);
-    ret = i2c0.read(BQ25120A_ADDRESS << 1, &response, 1);
+    int ret = I2C.write(BQ25120A_ADDRESS << 1, 0, 1);
+    ret = I2C.read(BQ25120A_ADDRESS << 1, &response, 1);
   }
 }
 
 bool Arduino_BHY2::begin()
 {
-  i2c0.frequency(500000);
+  I2C.frequency(500000);
   _pingTime = millis();
   if (!sensortec.begin()) {
     return false;
