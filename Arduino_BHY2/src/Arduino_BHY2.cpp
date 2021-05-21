@@ -7,6 +7,9 @@
 #include "DFUManager.h"
 #include <I2C.h>
 
+using namespace std::chrono_literals;
+using namespace std::chrono;
+
 mbed::I2C I2C(I2C_SDA0, I2C_SCL0);
 
 Arduino_BHY2::Arduino_BHY2() :
@@ -57,7 +60,7 @@ bool Arduino_BHY2::begin()
 
   pinMode(p19, INPUT);
   if (digitalRead(p19)) {
-    timeout.attach(mbed::callback(this, &DFUManager::eslovActive), 100s);
+    timeout.attach(mbed::callback(this, &Arduino_BHY2::eslovActive), 100s);
   }
 
   return true;
