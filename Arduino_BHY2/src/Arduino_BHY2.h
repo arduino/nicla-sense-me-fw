@@ -5,9 +5,6 @@
 #include "SensorTypes.h"
 #include "DataParser.h"
 
-#include "mbed.h"
-#include "Nicla_System.h"
-
 class Arduino_BHY2 {
 public:
   Arduino_BHY2();
@@ -29,7 +26,7 @@ public:
   void parse(SensorDataPacket& data, DataOrientation& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
 
-  void eslovActive();
+  void checkEslovInt();
 
   void debug(Stream &stream);
 
@@ -38,7 +35,10 @@ private:
 
   void pingI2C();
   int _pingTime;
-  mbed::Timeout timeout;
+  int _timeout;
+  int _startTime;
+  bool _timeoutExpired;
+  bool _eslovActive;
 };
 
 extern Arduino_BHY2 BHY2;

@@ -7,14 +7,19 @@
 #include "DFUManager.h"
 #include <I2C.h>
 
-using namespace std::chrono_literals;
-using namespace std::chrono;
+#include "mbed.h"
+#include "Nicla_System.h"
 
 mbed::I2C I2C(I2C_SDA0, I2C_SCL0);
 
+mbed::DigitalIn eslovInt(p19);
+
 Arduino_BHY2::Arduino_BHY2() :
   _debug(NULL),
-  _pingTime(0)
+  _pingTime(0),
+  _timeout(60000),
+  _timeoutExpired(false),
+  _eslovActive(false)
 {
 }
 
@@ -33,11 +38,17 @@ void Arduino_BHY2::pingI2C() {
   }
 }
 
-void Arduino_BHY2::eslovActive()
-{
-  if (digitalRead(p19)) {
+void Arduino_BHY2::checkEslovInt() {
+  if (millis() - _startTime < _timeout) {
+    //Timeout didn't expire yet
+    if (!eslovInt) {
+      //Eslov has been activated
+      _eslovActive = true;
+    }
+  } else {
+    //Timeout expired
+    _timeoutExpired = true;
     disableLDO();
-    timeout.detach();
   }
 }
 
@@ -58,9 +69,12 @@ bool Arduino_BHY2::begin()
     return false;
   }
 
-  pinMode(p19, INPUT);
-  if (digitalRead(p19)) {
-    timeout.attach(mbed::callback(this, &Arduino_BHY2::eslovActive), 100s);
+  if (eslovInt) {
+    //Eslov is NOT active
+    _startTime = millis();
+  } else {
+    //Eslov is already active
+    _eslovActive = true;
   }
 
   return true;
@@ -69,6 +83,11 @@ bool Arduino_BHY2::begin()
 void Arduino_BHY2::update()
 {
   pingI2C();
+
+  if (!_timeoutExpired && !_eslovActive) {
+    checkEslovInt();
+  }
+
   sensortec.update();
   bleHandler.update();
 
