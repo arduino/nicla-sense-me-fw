@@ -52,6 +52,10 @@ void Arduino_BHY2::checkEslovInt() {
   }
 }
 
+void Arduino_BHY2::setLDOTimeout(int time) {
+  _timeout = time;
+}
+
 bool Arduino_BHY2::begin()
 {
   I2C.frequency(500000);
