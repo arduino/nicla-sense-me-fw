@@ -27,6 +27,7 @@ public:
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
 
   void checkEslovInt();
+  void setLDOTimeout(int time);
 
   void debug(Stream &stream);
 
