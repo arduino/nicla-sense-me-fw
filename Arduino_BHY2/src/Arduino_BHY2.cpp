@@ -12,7 +12,7 @@
 
 mbed::I2C I2C(I2C_SDA0, I2C_SCL0);
 
-mbed::DigitalIn eslovInt(p19);
+mbed::DigitalIn eslovInt(p19, PullUp);
 
 Arduino_BHY2::Arduino_BHY2() :
   _debug(NULL),
