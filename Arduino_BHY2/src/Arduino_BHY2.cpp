@@ -19,7 +19,8 @@ Arduino_BHY2::Arduino_BHY2() :
   _pingTime(0),
   _timeout(60000),
   _timeoutExpired(false),
-  _eslovActive(false)
+  _eslovActive(false),
+  _startTime(0)
 {
 }
 
@@ -44,6 +45,7 @@ void Arduino_BHY2::checkEslovInt() {
     if (!eslovInt) {
       //Eslov has been activated
       _eslovActive = true;
+      eslovHandler.begin();
     }
   } else {
     //Timeout expired
@@ -58,6 +60,7 @@ void Arduino_BHY2::setLDOTimeout(int time) {
 
 bool Arduino_BHY2::begin()
 {
+  _startTime = millis();
   I2C.frequency(500000);
   _pingTime = millis();
   if (!sensortec.begin()) {
@@ -66,19 +69,8 @@ bool Arduino_BHY2::begin()
   if (!bleHandler.begin()) {
     return false;
   }
-  if (!eslovHandler.begin()) {
-    return false;
-  }
   if (!dfuManager.begin()) {
     return false;
-  }
-
-  if (eslovInt) {
-    //Eslov is NOT active
-    _startTime = millis();
-  } else {
-    //Eslov is already active
-    _eslovActive = true;
   }
 
   return true;
