@@ -17,6 +17,11 @@ enum DFUAckCode {
   DFUNack = 0x00
 };
 
+enum DFUSource {
+  bleDFU,
+  eslovDFU
+};
+
 struct __attribute__((packed)) DFUPacket {
   uint8_t last: 1;
   union {
@@ -32,9 +37,10 @@ public:
   virtual ~DFUManager();
 
   bool begin();
-  void processPacket(DFUType dfuType, const uint8_t* data);
+  void processPacket(DFUSource source, DFUType dfuType, const uint8_t* data);
 
   bool isPending();
+  DFUSource dfuSource();
 
   uint8_t acknowledgment();
 
@@ -45,6 +51,7 @@ private:
 
   uint8_t _acknowledgment;
   bool _transferPending;
+  DFUSource _dfuSource;
 
 private:
   friend class Arduino_BHY2;

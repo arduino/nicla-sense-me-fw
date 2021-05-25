@@ -38,10 +38,11 @@ bool DFUManager::begin()
   return true;
 }
 
-void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
+void DFUManager::processPacket(DFUSource source, DFUType dfuType, const uint8_t* data)
 {
   DFUPacket* packet = (DFUPacket*)data;
   _transferPending = true;
+  _dfuSource = source;
 
   if (_debug) {
     _debug->print("packet: ");
@@ -89,6 +90,11 @@ void DFUManager::processPacket(DFUType dfuType, const uint8_t* data)
 bool DFUManager::isPending()
 {
   return _transferPending;
+}
+
+DFUSource DFUManager::dfuSource()
+{
+  return _dfuSource;
 }
 
 // acknowledgment flag is reset when read

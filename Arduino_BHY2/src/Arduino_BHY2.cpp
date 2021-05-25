@@ -92,14 +92,26 @@ void Arduino_BHY2::update()
     if (_debug) _debug->println("Start DFU procedure. Sketch execution is stopped.");
     // TODO: abort dfu
     while (dfuManager.isPending()) {
+      if (dfuManager.dfuSource() == bleDFU) {
+        if (eslovHandler.eslovActive) {
+          eslovHandler.end();
+        }
+        bleHandler.update();
+      } else if (dfuManager.dfuSource() == eslovDFU) {
+        if (bleHandler.bleActive) {
+          bleHandler.end();
+        }
+      }
       pingI2C();
-      bleHandler.update();
     }
     // Wait some time for acknowledgment retrieval
-    auto timeRef = millis();
-    while (millis() - timeRef < 1000) {
-      bleHandler.update();
+    if (dfuManager.dfuSource() == bleDFU) {
+      auto timeRef = millis();
+      while (millis() - timeRef < 1000) {
+        bleHandler.update();
+      }
     }
+
     // Reboot after fw update
     if (_debug) _debug->println("DFU procedure terminated. Rebooting.");
     NVIC_SystemReset();

@@ -18,6 +18,7 @@ EslovHandler::~EslovHandler()
 bool EslovHandler::begin()
 {
   Wire.begin(ESLOV_DEFAULT_ADDRESS);
+  eslovActive = true;
   Wire.onReceive(EslovHandler::onReceive); 
   Wire.onRequest(EslovHandler::onRequest);
   return true;
@@ -64,6 +65,12 @@ void EslovHandler::requestEvent()
   }
 }
 
+void EslovHandler::end()
+{
+  eslovActive = false;
+  Wire.end();
+}
+
 void EslovHandler::receiveEvent(int length)
 {
   if (_debug) {
@@ -77,7 +84,7 @@ void EslovHandler::receiveEvent(int length)
     // Check if packet is complete depending on its opcode
     if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
-        dfuManager.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
+        dfuManager.processPacket(eslovDFU, DFU_EXTERNAL, &_rxBuffer[1]);
 
         _state = ESLOV_DFU_ACK_STATE;
 
@@ -87,7 +94,7 @@ void EslovHandler::receiveEvent(int length)
 
     } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
-        dfuManager.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
+        dfuManager.processPacket(eslovDFU, DFU_INTERNAL, &_rxBuffer[1]);
 
         _state = ESLOV_DFU_ACK_STATE;
 
