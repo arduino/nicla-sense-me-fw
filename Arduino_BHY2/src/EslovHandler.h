@@ -26,9 +26,12 @@ public:
   virtual ~EslovHandler();
 
   bool begin();
+  void end();
 
   static void onReceive(int length);
   static void onRequest();
+
+  bool eslovActive = false;
 
 private:
   void receiveEvent(int length);

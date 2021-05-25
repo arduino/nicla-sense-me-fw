@@ -43,7 +43,7 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
     _debug->print("Size of data: ");
     _debug->println(sizeof(data));
   }
-  dfuManager.processPacket(dfuType, data);
+  dfuManager.processPacket(bleDFU, dfuType, data);
 
   writeDFUAcknowledgment();
 }
@@ -81,6 +81,7 @@ bool BLEHandler::begin()
   if (!BLE.begin()) {
     return false;
   }
+  bleActive = true;
   BLE.setLocalName("NICLA");
 
   // DFU channel
@@ -127,6 +128,13 @@ void BLEHandler::update()
 void BLEHandler::poll(unsigned long timeout)
 {
   BLE.poll(timeout);
+}
+
+
+void BLEHandler::end()
+{
+  bleActive = false;
+  BLE.end();
 }
 
 void BLEHandler::debug(Stream &stream)
