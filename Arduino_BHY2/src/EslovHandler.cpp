@@ -23,6 +23,24 @@ bool EslovHandler::begin()
   return true;
 }
 
+void EslovHandler::update() 
+{
+  //_debug->println("pre check");
+  if (dfuManager.dfuSource() != eslovDFU) return;
+  //_debug->println("post check");
+
+  // wait for event
+  _sem.acquire();
+
+  noInterrupts();
+
+  // send packet to dfu
+  dfuManager.processPacket(eslovDFU, DFU_INTERNAL, &_rxBuffer[1]);
+
+  // enable interrupts
+  interrupts();
+}
+
 void EslovHandler::onReceive(int length)
 {
   eslovHandler.receiveEvent(length);
@@ -77,22 +95,36 @@ void EslovHandler::receiveEvent(int length)
     // Check if packet is complete depending on its opcode
     if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
-        dfuManager.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
+        //dfuManager.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
+
+        // disable interrupts
+        //noInterrupts();
+        dfuManager.preProcessPacket(eslovDFU);
+        // unlock sem
+        _sem.release();
 
         _state = ESLOV_DFU_ACK_STATE;
 
         dump();
         _rxIndex = 0;
+        //return;
       }
 
     } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
-        dfuManager.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
+        //dfuManager.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
+
+        // disable interrupts
+        //noInterrupts();
+        dfuManager.preProcessPacket(eslovDFU);
+        // unlock sem
+        _sem.release();
 
         _state = ESLOV_DFU_ACK_STATE;
 
         dump();
         _rxIndex = 0;
+        //return;
       }
 
     } else if (_rxBuffer[0] == ESLOV_SENSOR_CONFIG_OPCODE) {

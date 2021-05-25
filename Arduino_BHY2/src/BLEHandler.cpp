@@ -43,7 +43,7 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
     _debug->print("Size of data: ");
     _debug->println(sizeof(data));
   }
-  dfuManager.processPacket(dfuType, data);
+  dfuManager.processPacket(bleDFU, dfuType, data);
 
   writeDFUAcknowledgment();
 }

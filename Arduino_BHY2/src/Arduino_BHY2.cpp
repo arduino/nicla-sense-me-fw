@@ -78,6 +78,7 @@ bool Arduino_BHY2::begin()
 
 void Arduino_BHY2::update()
 {
+  _debug->println("update");
   pingI2C();
 
   if (!_timeoutExpired && !_eslovActive) {
@@ -87,13 +88,18 @@ void Arduino_BHY2::update()
   sensortec.update();
   bleHandler.update();
 
+  // TODO: refactor with do while 
+
   // While updating fw, detach the library from the sketch
   if (dfuManager.isPending()) {
     if (_debug) _debug->println("Start DFU procedure. Sketch execution is stopped.");
     // TODO: abort dfu
     while (dfuManager.isPending()) {
+      _debug->println("update dfu");
       pingI2C();
+      //bleHandler.poll();
       bleHandler.update();
+      eslovHandler.update();
     }
     // Wait some time for acknowledgment retrieval
     auto timeRef = millis();

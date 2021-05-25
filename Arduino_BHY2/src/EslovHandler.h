@@ -4,6 +4,8 @@
 #include "Arduino.h"
 #include "Wire.h"
 
+#include "rtos.h"
+
 #define ESLOV_MAX_LENGTH      255
 #define ESLOV_DEFAULT_ADDRESS 0x55
 
@@ -26,6 +28,7 @@ public:
   virtual ~EslovHandler();
 
   bool begin();
+  void update();
 
   static void onReceive(int length);
   static void onRequest();
@@ -38,6 +41,8 @@ private:
   uint8_t _rxBuffer[ESLOV_MAX_LENGTH];
 
   EslovState _state;
+
+  rtos::Semaphore _sem();
 
 private:
   friend class Arduino_BHY2;
