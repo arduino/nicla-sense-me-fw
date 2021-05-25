@@ -7,13 +7,20 @@
 #include "DFUManager.h"
 #include <I2C.h>
 
-mbed::I2C i2c0(I2C_SDA0, I2C_SCL0);
+#include "mbed.h"
+#include "Nicla_System.h"
 
-const uint8_t BQ25120A_ADDRESS = 0x6A;
+mbed::I2C I2C(I2C_SDA0, I2C_SCL0);
+
+mbed::DigitalIn eslovInt(p19, PullUp);
 
 Arduino_BHY2::Arduino_BHY2() :
   _debug(NULL),
-  _pingTime(0)
+  _pingTime(0),
+  _timeout(60000),
+  _timeoutExpired(false),
+  _eslovActive(false),
+  _startTime(0)
 {
 }
 
@@ -27,14 +34,35 @@ void Arduino_BHY2::pingI2C() {
   if ((currTime - _pingTime) > 30000) {
     _pingTime = currTime;
     //Read status reg
-    int ret = i2c0.write(BQ25120A_ADDRESS << 1, 0, 1);
-    ret = i2c0.read(BQ25120A_ADDRESS << 1, &response, 1);
+    int ret = I2C.write(BQ25120A_ADDRESS << 1, 0, 1);
+    ret = I2C.read(BQ25120A_ADDRESS << 1, &response, 1);
   }
+}
+
+void Arduino_BHY2::checkEslovInt() {
+  if (millis() - _startTime < _timeout) {
+    //Timeout didn't expire yet
+    if (!eslovInt) {
+      //Eslov has been activated
+      _eslovActive = true;
+      eslovHandler.begin();
+    }
+  } else {
+    //Timeout expired
+    _timeoutExpired = true;
+    disableLDO();
+  }
+}
+
+void Arduino_BHY2::setLDOTimeout(int time) {
+  _timeout = time;
 }
 
 bool Arduino_BHY2::begin()
 {
-  i2c0.frequency(500000);
+  _startTime = millis();
+  enable3V3LDO();
+  I2C.frequency(500000);
   _pingTime = millis();
   if (!sensortec.begin()) {
     return false;
@@ -42,18 +70,21 @@ bool Arduino_BHY2::begin()
   if (!bleHandler.begin()) {
     return false;
   }
-  if (!eslovHandler.begin()) {
-    return false;
-  }
   if (!dfuManager.begin()) {
     return false;
   }
+
   return true;
 }
 
 void Arduino_BHY2::update()
 {
   pingI2C();
+
+  if (!_timeoutExpired && !_eslovActive) {
+    checkEslovInt();
+  }
+
   sensortec.update();
   bleHandler.update();
 
@@ -73,6 +104,23 @@ void Arduino_BHY2::update()
     // Reboot after fw update
     if (_debug) _debug->println("DFU procedure terminated. Rebooting.");
     NVIC_SystemReset();
+  }
+}
+
+// Update and then sleep
+void Arduino_BHY2::update(unsigned long ms)
+{
+  update();
+  delay(ms);
+}
+
+void Arduino_BHY2::delay(unsigned long ms) 
+{
+  unsigned long start = millis();
+  unsigned long elapsed = 0;
+  while (elapsed < ms) {
+    bleHandler.poll(ms - elapsed);
+    elapsed = millis() - start;
   }
 }
 

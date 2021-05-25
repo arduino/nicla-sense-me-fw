@@ -12,7 +12,9 @@ public:
 
   // Necessary API. Update function should be continuously polled 
   bool begin();
-  void update();
+  void update(); // remove this to enforce a sleep
+  void update(unsigned long ms); // Update and then sleep
+  void delay(unsigned long ms); // to be used instead of arduino delay()
 
   // API for using the bosch sensortec from sketch
   void configureSensor(SensorConfigurationPacket& config);
@@ -26,6 +28,9 @@ public:
   void parse(SensorDataPacket& data, DataOrientation& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
 
+  void checkEslovInt();
+  void setLDOTimeout(int time);
+
   void debug(Stream &stream);
 
 private:
@@ -33,6 +38,10 @@ private:
 
   void pingI2C();
   int _pingTime;
+  int _timeout;
+  int _startTime;
+  bool _timeoutExpired;
+  bool _eslovActive;
 };
 
 extern Arduino_BHY2 BHY2;

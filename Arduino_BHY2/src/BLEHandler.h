@@ -13,6 +13,7 @@ public:
 
   bool begin();
   void update();
+  void poll(unsigned long timeout);
 
   static void debug(Stream &stream);
 

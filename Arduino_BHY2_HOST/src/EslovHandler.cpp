@@ -2,6 +2,8 @@
 
 #define ESLOV_DELAY (10)
 
+#define ESLOV_INT_PIN (7)
+
 EslovHandler::EslovHandler() :
   _rxIndex(0),
   _rxBuffer(),
@@ -21,6 +23,10 @@ bool EslovHandler::begin(bool passthrough)
   if (passthrough) {
     Serial.begin(115200);
   }
+
+  // Indicates eslov presence
+  pinMode(ESLOV_INT_PIN, OUTPUT);
+  digitalWrite(ESLOV_INT_PIN, LOW);
   return true;
 }
 

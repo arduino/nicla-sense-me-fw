@@ -34,6 +34,7 @@ bool DFUManager::begin()
     }
 
   }
+
   return true;
 }
 
