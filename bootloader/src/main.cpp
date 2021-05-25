@@ -78,16 +78,29 @@ int mountFileSystem()
 int check_signature(FILE *file, long file_len)
 {
     void *signature = NULL;
-    signature = memmem((const char*)file, file_len, "NICLA", sizeof("NICLA"));
+    char buffer[128];
+    int nChunks = ceil(file_len/128);
 
-    if (signature != NULL) {
-        DEBUG_PRINTF("Signature check PASSED \r\n");
-        return 1;
-    } else {
-        //Signature NOT found: do not run the current fw and try fail safe
-        DEBUG_PRINTF("Nicla signature NOT found! \r\n");
-        return 0;
+    for (int j = 0; j < sizeof("NICLA"); j++) {
+
+        for (int i = 0; i < nChunks; i++) {
+            int file_ptr = j + i*128;
+            fseek(file, 0, SEEK_SET);
+            fseek(file, file_ptr, SEEK_SET);
+            fread(buffer, 1, 128, file);
+            signature = memmem(buffer, 128, "NICLA", sizeof("NICLA"));
+
+            if (signature != NULL) {
+                DEBUG_PRINTF("Signature check PASSED \r\n");
+                return 1;
+            }
+        }
+
     }
+
+    //Signature NOT found: do not run the current fw and try fail safe
+    DEBUG_PRINTF("Nicla signature NOT found! \r\n");
+    return 0;
 }
 
 
