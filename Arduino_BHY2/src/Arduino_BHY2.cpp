@@ -50,7 +50,7 @@ void Arduino_BHY2::checkEslovInt() {
   } else {
     //Timeout expired
     _timeoutExpired = true;
-    disableLDO();
+    nicla::disableLDO();
   }
 }
 
@@ -61,7 +61,7 @@ void Arduino_BHY2::setLDOTimeout(int time) {
 bool Arduino_BHY2::begin()
 {
   _startTime = millis();
-  enable3V3LDO();
+  nicla::enable3V3LDO();
   I2C.frequency(500000);
   _pingTime = millis();
   if (!sensortec.begin()) {
