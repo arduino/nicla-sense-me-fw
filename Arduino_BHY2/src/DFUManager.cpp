@@ -82,7 +82,6 @@ void DFUManager::processPacket(DFUSource source, DFUType dfuType, const uint8_t*
     if (_acknowledgment == DFUAck) {
       fclose(_target);
       _target = NULL;
-      _transferPending = false;
     }
   }
 }
@@ -95,6 +94,11 @@ bool DFUManager::isPending()
 DFUSource DFUManager::dfuSource()
 {
   return _dfuSource;
+}
+
+void DFUManager::closeDfu()
+{
+  _transferPending = false;
 }
 
 // acknowledgment flag is reset when read

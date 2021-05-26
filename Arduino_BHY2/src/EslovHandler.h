@@ -47,6 +47,7 @@ private:
   void debug(Stream &stream);
   void dump();
   Stream *_debug;
+  bool _lastDfuPack;
 };
 
 extern EslovHandler eslovHandler;
