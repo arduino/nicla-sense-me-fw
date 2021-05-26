@@ -1,5 +1,8 @@
 #include "DFUManager.h"
 
+#include "BLEHandler.h"
+#include "EslovHandler.h"
+
 SPIFBlockDevice DFUManager::_bd(SPI_PSELMOSI0, SPI_PSELMISO0,
                      SPI_PSELSCK0, CS_FLASH, 16000000);
 
@@ -43,6 +46,14 @@ void DFUManager::processPacket(DFUSource source, DFUType dfuType, const uint8_t*
   DFUPacket* packet = (DFUPacket*)data;
   _transferPending = true;
   _dfuSource = source;
+
+  if (source == bleDFU && eslovHandler.eslovActive) {
+    eslovHandler.eslovActive = false;
+    eslovHandler.end();
+  } else if (source == eslovDFU && bleHandler.bleActive) {
+    bleHandler.bleActive = false;
+    bleHandler.end();
+  }
 
   if (_debug) {
     _debug->print("packet: ");

@@ -10,7 +10,6 @@
 #include "mbed.h"
 #include "Nicla_System.h"
 
-
 mbed::DigitalIn eslovInt(p19, PullUp);
 
 Arduino_BHY2::Arduino_BHY2() :
@@ -92,15 +91,8 @@ void Arduino_BHY2::update()
     if (_debug) _debug->println("Start DFU procedure. Sketch execution is stopped.");
     // TODO: abort dfu
     while (dfuManager.isPending()) {
-      if (dfuManager.dfuSource() == bleDFU) {
-        if (eslovHandler.eslovActive) {
-          eslovHandler.end();
-        }
+      if (dfuManager.dfuSource() == bleDFU && bleHandler.bleActive) {
         bleHandler.update();
-      } else if (dfuManager.dfuSource() == eslovDFU) {
-        if (bleHandler.bleActive) {
-          bleHandler.end();
-        }
       }
       pingI2C();
     }
