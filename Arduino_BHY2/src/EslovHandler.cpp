@@ -7,7 +7,8 @@ EslovHandler::EslovHandler() :
   _rxIndex(0),
   _rxBuffer(),
   _state(ESLOV_AVAILABLE_SENSOR_STATE),
-  _debug(NULL)
+  _debug(NULL),
+  _lastDfuPack(false)
 {
 }
 
@@ -57,6 +58,9 @@ void EslovHandler::requestEvent()
 
   } else if (_state == ESLOV_DFU_ACK_STATE) {
     uint8_t ack = dfuManager.acknowledgment();
+    if (_lastDfuPack && ack == 0x0F) {
+      dfuManager.closeDfu();
+    }
     if (_debug) {
       _debug->print("Ack: ");
       _debug->println(ack);
@@ -86,6 +90,10 @@ void EslovHandler::receiveEvent(int length)
       if (_rxIndex == sizeof(DFUPacket) + 1) {
         dfuManager.processPacket(eslovDFU, DFU_EXTERNAL, &_rxBuffer[1]);
 
+        if (_rxBuffer[1]) {
+          _lastDfuPack = true;
+        }
+
         _state = ESLOV_DFU_ACK_STATE;
 
         dump();
@@ -95,6 +103,10 @@ void EslovHandler::receiveEvent(int length)
     } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
         dfuManager.processPacket(eslovDFU, DFU_INTERNAL, &_rxBuffer[1]);
+
+        if (_rxBuffer[1]) {
+          _lastDfuPack = true;
+        }
 
         _state = ESLOV_DFU_ACK_STATE;
 

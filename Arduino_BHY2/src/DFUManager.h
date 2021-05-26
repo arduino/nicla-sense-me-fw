@@ -38,6 +38,7 @@ public:
 
   bool begin();
   void processPacket(DFUSource source, DFUType dfuType, const uint8_t* data);
+  void closeDfu();
 
   bool isPending();
   DFUSource dfuSource();
