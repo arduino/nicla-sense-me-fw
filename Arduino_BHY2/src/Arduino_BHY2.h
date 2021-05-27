@@ -8,6 +8,7 @@
 #include "sensors/Sensor.h"
 #include "sensors/SensorOrientation.h"
 #include "sensors/SensorXYZ.h"
+#include "sensors/SensorQuaternion.h"
 
 class Arduino_BHY2 {
 public:
