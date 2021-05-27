@@ -5,6 +5,7 @@
 
 class SensorXYZ : public Sensor {
 public:
+  SensorXYZ() {}
   SensorXYZ(uint8_t id) : Sensor(id), _data() {}
 
   int16_t x() 
@@ -31,8 +32,6 @@ public:
   }
 
 private:
-  SensorXYZ() {} 
-
   DataXYZ _data;
 };
 

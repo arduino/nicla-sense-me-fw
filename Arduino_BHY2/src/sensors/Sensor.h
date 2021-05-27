@@ -6,7 +6,7 @@
 
 class Sensor {
 public:
-  //Sensor();
+  __attribute__ ((error("Sensor requires an ID"))) Sensor();
   Sensor(uint8_t id);
   virtual ~Sensor();
 
@@ -21,8 +21,6 @@ public:
   virtual String toString() = 0;
 
 protected:
-  Sensor();
-
   uint8_t _id;
   bool _subscribed;
 };

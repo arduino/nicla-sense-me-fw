@@ -5,6 +5,7 @@
 
 class SensorOrientation : public Sensor {
 public:
+  SensorOrientation() {} 
   SensorOrientation(uint8_t id) : Sensor(id), _data() {}
 
   float head() 
@@ -35,8 +36,6 @@ public:
   }
 
 private:
-  SensorOrientation() {} // default orientation sensor
-
   float _factor;
   DataOrientation _data;
 };
