@@ -8,8 +8,8 @@
 #include "Arduino.h"
 #include "Arduino_BHY2.h"
 
-#define ACCEL_ID (BHY2_SENSOR_ID_ACC)
-#define GYRO_ID (BHY2_SENSOR_ID_GYRO)
+#define ACCEL_ID (SENSOR_ID_ACC)
+#define GYRO_ID (SENSOR_ID_GYRO)
 
 SensorXYZ accel(ACCEL_ID);
 SensorXYZ gyro(GYRO_ID);

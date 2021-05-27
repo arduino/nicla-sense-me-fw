@@ -1,6 +1,7 @@
 #ifndef SENSOR_H_
 #define SENSOR_H_
 
+#include "sensors/SensorID.h"
 #include "sensors/DataParser.h"
 #include "BoschSensortec.h"
 

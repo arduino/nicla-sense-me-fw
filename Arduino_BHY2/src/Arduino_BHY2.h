@@ -10,7 +10,7 @@
 #include "sensors/SensorXYZ.h"
 #include "sensors/SensorQuaternion.h"
 
-#include "bosch/bhy2_defs.h"
+#include "sensors/SensorID.h"
 
 class Arduino_BHY2 {
 public:
