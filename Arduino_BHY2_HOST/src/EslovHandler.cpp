@@ -8,6 +8,7 @@ EslovHandler::EslovHandler() :
   _rxIndex(0),
   _rxBuffer(),
   _eslovState(ESLOV_AVAILABLE_SENSOR_STATE),
+  _intPinAsserted(false),
   _debug(NULL)
 {
 }
@@ -24,9 +25,6 @@ bool EslovHandler::begin(bool passthrough)
     Serial.begin(115200);
   }
 
-  // Indicates eslov presence
-  pinMode(ESLOV_INT_PIN, OUTPUT);
-  digitalWrite(ESLOV_INT_PIN, LOW);
   return true;
 }
 
@@ -101,6 +99,12 @@ void EslovHandler::update()
 
 void EslovHandler::writeDfuPacket(uint8_t *data, uint8_t length)
 {
+  if (!_intPinAsserted) {
+    // Indicates eslov presence
+    pinMode(ESLOV_INT_PIN, OUTPUT);
+    digitalWrite(ESLOV_INT_PIN, LOW);
+    _intPinAsserted = true;
+  }
   Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
   int ret = Wire.write(data, length);
   if (_debug){

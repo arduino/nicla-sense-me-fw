@@ -49,6 +49,7 @@ private:
   uint8_t _rxBuffer[ESLOV_MAX_LENGTH];
 
   EslovState _eslovState;
+  bool _intPinAsserted;
 
 private:
   friend class Arduino_BHY2_HOST;
