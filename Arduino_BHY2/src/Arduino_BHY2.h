@@ -2,8 +2,12 @@
 #define ARDUINO_BHY2_H_
 
 #include "Arduino.h"
-#include "SensorTypes.h"
-#include "DataParser.h"
+#include "sensors/SensorTypes.h"
+#include "sensors/DataParser.h"
+
+#include "sensors/Sensor.h"
+#include "sensors/SensorOrientation.h"
+#include "sensors/SensorXYZ.h"
 
 class Arduino_BHY2 {
 public:
@@ -19,7 +23,7 @@ public:
   // API for using the bosch sensortec from sketch
   void configureSensor(SensorConfigurationPacket& config);
   void configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency);
-  void addSensorData(const SensorDataPacket &sensorData);
+  void addSensorData(SensorDataPacket &sensorData);
   uint8_t availableSensorData();
   bool readSensorData(SensorDataPacket &data);
   bool hasSensor(uint8_t sensorId);

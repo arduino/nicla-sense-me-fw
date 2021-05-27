@@ -137,7 +137,7 @@ void Arduino_BHY2::configureSensor(uint8_t sensorId, float sampleRate, uint32_t 
   sensortec.configureSensor(config);
 }
 
-void Arduino_BHY2::addSensorData(const SensorDataPacket &sensorData)
+void Arduino_BHY2::addSensorData(SensorDataPacket &sensorData)
 {
   sensortec.addSensorData(sensorData);
 }

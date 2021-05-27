@@ -5,7 +5,7 @@
 #include "mbed.h"
 
 #include "bosch/common/common.h"
-#include "SensorTypes.h"
+#include "sensors/SensorTypes.h"
 
 #ifdef __cplusplus
 extern "C"

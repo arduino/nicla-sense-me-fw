@@ -1,5 +1,6 @@
 #include "BoschSensortec.h"
 #include "BoschParser.h"
+#include "sensors/SensorManager.h"
 
 BoschSensortec::BoschSensortec() : 
   _debug(NULL)
@@ -119,11 +120,12 @@ bool BoschSensortec::readSensorData(SensorDataPacket &data)
   return _sensorQueue.pop(data);
 }
 
-void BoschSensortec::addSensorData(const SensorDataPacket &sensorData)
+void BoschSensortec::addSensorData(SensorDataPacket &sensorData)
 {
   // Overwrites oldest data when fifo is full 
   _sensorQueue.push(sensorData);
   // Alternative: handle the full queue by storing it in flash 
+  sensorManager.process(sensorData);
 }
 
 void BoschSensortec::update()
