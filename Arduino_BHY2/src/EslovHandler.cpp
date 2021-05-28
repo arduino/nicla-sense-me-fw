@@ -66,6 +66,13 @@ void EslovHandler::requestEvent()
       _debug->println(ack);
     }
     Wire.write(ack);
+  } else if (_state == ESLOV_SENSOR_ACK_STATE) {
+    uint8_t ack = sensortec.acknowledgment();
+    if (_debug) {
+      _debug->print("Ack: ");
+      _debug->println(ack);
+    }
+    Wire.write(ack);
   }
 }
 
@@ -118,6 +125,8 @@ void EslovHandler::receiveEvent(int length)
       if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
         SensorConfigurationPacket *config = (SensorConfigurationPacket*)&_rxBuffer[1];
         sensortec.configureSensor(*config);
+
+        _state = ESLOV_SENSOR_ACK_STATE;
 
         dump();
         _rxIndex = 0;

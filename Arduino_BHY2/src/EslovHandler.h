@@ -17,7 +17,8 @@ enum EslovOpcode {
 enum EslovState {
   ESLOV_AVAILABLE_SENSOR_STATE = 0x00,
   ESLOV_READ_SENSOR_STATE = 0x01,
-  ESLOV_DFU_ACK_STATE = 0x02
+  ESLOV_DFU_ACK_STATE = 0x02,
+  ESLOV_SENSOR_ACK_STATE = 0x03
 };
 
 class EslovHandler {
