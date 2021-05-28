@@ -23,3 +23,7 @@ void DataParser::parse(SensorDataPacket& data, DataQuaternion& vector) {
   vector.w = data.getInt16(6);
   vector.accuracy = data.getUint16(8);
 }
+
+void DataParser::parseTemperature(SensorDataPacket& data, float& value, float scaleFactor) {
+  value = data.getInt16(0) * scaleFactor;
+}

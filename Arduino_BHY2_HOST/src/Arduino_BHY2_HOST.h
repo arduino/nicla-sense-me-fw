@@ -9,6 +9,7 @@
 #include "sensors/SensorOrientation.h"
 #include "sensors/SensorXYZ.h"
 #include "sensors/SensorQuaternion.h"
+#include "sensors/SensorTemperature.h"
 
 #include "sensors/SensorID.h"
 

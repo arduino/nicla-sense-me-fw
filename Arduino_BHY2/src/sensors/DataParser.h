@@ -51,6 +51,7 @@ public:
   static void parse(SensorDataPacket& data, DataOrientation& vector);
   static void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
   static void parse(SensorDataPacket& data, DataQuaternion& vector);
+  static void parseTemperature(SensorDataPacket& data, float& value, float scaleFactor);
 };
 
 #endif
