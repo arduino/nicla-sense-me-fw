@@ -1,4 +1,4 @@
-#include "DataParser.h"
+#include "sensors/DataParser.h"
 
 void DataParser::parse(SensorDataPacket& data, DataXYZ& vector) {
   vector.x = data.getInt16(0);

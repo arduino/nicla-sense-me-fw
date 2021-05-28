@@ -2,7 +2,7 @@
 #define DATA_PARSER_H_
 
 #include "Arduino.h"
-#include "SensorTypes.h"
+#include "sensors/SensorTypes.h"
 
 struct DataXYZ {
   int16_t x;

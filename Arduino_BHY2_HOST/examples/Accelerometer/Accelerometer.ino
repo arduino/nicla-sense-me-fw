@@ -10,18 +10,7 @@
 #include "Arduino.h"
 #include "Arduino_BHY2_HOST.h"
 
-#define ACCEL_ID (4)
-DataXYZ accValue;
-
-void configureSensors()
-{
-  SensorConfigurationPacket config;
-  config.sampleRate = 1;
-  config.latency = 0;
-
-  config.sensorId = ACCEL_ID;
-  BHY2_HOST.configureSensor(config);
-}
+SensorXYZ accel(SENSOR_ID_ACC);
 
 void setup()
 {
@@ -31,35 +20,16 @@ void setup()
 
   BHY2_HOST.begin();
 
-  configureSensors();
+  accel.configure(1, 0);
 }
 
 void loop()
 {
   static auto printTime = millis();
-  static auto sampleTime = millis();
+  BHY2_HOST.update();
 
-  if (millis() - sampleTime >= 200) {
-    sampleTime = millis();
-
-    if (BHY2_HOST.availableSensorData() > 0) {
-      SensorDataPacket data;
-      BHY2_HOST.readSensorData(data);
-
-      if (data.sensorId == ACCEL_ID) {
-        Serial.print("Received accel: ");
-        BHY2_HOST.parse(data, accValue);
-      }
-    }
-  }
-
-  if (millis() - printTime >= 200) {
+  if (millis() - printTime >= 1000) {
     printTime = millis();
-
-    Serial.print("Acceleration values: ");
-    Serial.println(accValue.toString());
+    Serial.println(String("Acceleration values: ") + accel.toString());
   }
-
-
-  delay(500);
 }

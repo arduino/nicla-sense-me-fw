@@ -10,19 +10,8 @@
 #include "Arduino.h"
 #include "Arduino_BHY2_HOST.h"
 
-#define ORI_ID (43)
 #define ORI_SCALE_FACTOR (360.0f / 32768.0f)
-DataOrientation orientation;
-
-void configureSensors()
-{
-  SensorConfigurationPacket config;
-  config.sampleRate = 1;
-  config.latency = 0;
-
-  config.sensorId = ORI_ID;
-  BHY2_HOST.configureSensor(config);
-}
+SensorOrientation ori(SENSOR_ID_ORI);
 
 void setup()
 {
@@ -31,35 +20,17 @@ void setup()
 
   BHY2_HOST.begin();
 
-  configureSensors();
+  ori.setFactor(ORI_SCALE_FACTOR);
+  ori.configure(1, 0);
 }
 
 void loop()
 {
   static auto printTime = millis();
-  static auto sampleTime = millis();
+  BHY2_HOST.update();
 
-  if (millis() - sampleTime >= 200) {
-    sampleTime = millis();
-
-    if (BHY2_HOST.availableSensorData() > 0) {
-      SensorDataPacket data;
-      BHY2_HOST.readSensorData(data);
-
-      if (data.sensorId == ORI_ID) {
-        Serial.print("Received orientation: ");
-        BHY2_HOST.parse(data, orientation, ORI_SCALE_FACTOR);
-      }
-    }
-  }
-
-  if (millis() - printTime >= 200) {
+  if (millis() - printTime >= 1000) {
     printTime = millis();
-
-    Serial.print("Orientation values: ");
-    Serial.println(orientation.toString());
+    Serial.println(String("Orientation values: ") + ori.toString());
   }
-
-
-  delay(500);
 }

@@ -2,7 +2,7 @@
 #define ESLOV_HANDLER_H_
 
 #include "Arduino.h"
-#include "SensorTypes.h"
+#include "sensors/SensorTypes.h"
 #include "DFUTypes.h"
 #include "Wire.h"
 
