@@ -8,11 +8,8 @@
 #include "Arduino.h"
 #include "Arduino_BHY2.h"
 
-#define ACCEL_ID (SENSOR_ID_ACC)
-#define GYRO_ID (SENSOR_ID_GYRO)
-
-SensorXYZ accel(ACCEL_ID);
-SensorXYZ gyro(GYRO_ID);
+SensorXYZ accel(SENSOR_ID_ACC);
+SensorXYZ gyro(SENSOR_ID_GYRO);
 
 void setup()
 {
@@ -27,13 +24,12 @@ void setup()
 void loop()
 {
   static auto printTime = millis();
-  static auto sampleTime = millis();
 
   // Update function should be continuously polled
   BHY2.update();
 
-  if (millis() - sampleTime >= 1000) {
-    sampleTime = millis();
+  if (millis() - printTime >= 1000) {
+    printTime = millis();
 
     Serial.println(String("acceleration: ") + accel.toString());
     Serial.println(String("gyroscope: ") + gyro.toString());
