@@ -9,6 +9,7 @@ EslovHandler::EslovHandler() :
   _rxBuffer(),
   _eslovState(ESLOV_AVAILABLE_SENSOR_STATE),
   _intPinAsserted(false),
+  _dfuLedOn(false),
   _debug(NULL)
 {
 }
@@ -113,6 +114,7 @@ void EslovHandler::update()
       _rxIndex = 0;
     }
   }
+  
 }
 
 void EslovHandler::writeDfuPacket(uint8_t *data, uint8_t length)
@@ -125,6 +127,14 @@ void EslovHandler::writeDfuPacket(uint8_t *data, uint8_t length)
     _debug->println();
   }
   Wire.endTransmission(false);
+  if (*(data+1)) {
+    //Last packet
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, LOW);
+    _dfuLedOn = false;
+    _intPinAsserted = false;
+    digitalWrite(ESLOV_INT_PIN, HIGH);
+  }
 }
 
 void EslovHandler::writeStateChange(EslovState state)
