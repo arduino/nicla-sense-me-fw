@@ -20,7 +20,7 @@ BLECharacteristic sensorConfigCharacteristic(sensorConfigUuid, BLEWrite, sizeof(
 
 Stream* BLEHandler::_debug = NULL;
 
-BLEHandler::BLEHandler()
+BLEHandler::BLEHandler() : _lastDfuPack(false)
 {
 }
 
@@ -32,6 +32,10 @@ void BLEHandler::writeDFUAcknowledgment()
 {
   uint8_t ack = dfuManager.acknowledgment();
   dfuAckCharacteristic.writeValue(ack);
+
+  if (_lastDfuPack && ack == 0x0F) {
+    dfuManager.closeDfu();
+  }
 }
 
 // DFU channel
@@ -44,6 +48,11 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
     _debug->println(sizeof(data));
   }
   dfuManager.processPacket(bleDFU, dfuType, data);
+
+  if (data[0]) {
+    //Last packet
+    _lastDfuPack = true;
+  }
 
   writeDFUAcknowledgment();
 }

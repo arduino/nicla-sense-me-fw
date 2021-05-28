@@ -23,6 +23,8 @@ public:
 private:
   static Stream *_debug;
 
+  bool _lastDfuPack;
+
   void writeDFUAcknowledgment();
   void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic);
 
