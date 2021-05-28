@@ -53,6 +53,7 @@ private:
 
   EslovState _eslovState;
   bool _intPinAsserted;
+  bool _dfuLedOn;
 
 private:
   friend class Arduino_BHY2_HOST;
