@@ -6,7 +6,7 @@
 class SensorTemperature : public Sensor {
 public:
   SensorTemperature() {} 
-  SensorTemperature(uint8_t id) : Sensor(id), _value(0.)  {}
+  SensorTemperature(uint8_t id) : Sensor(id), _value(0.), _factor(0.01) {}
 
   float value() 
   { 

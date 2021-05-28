@@ -12,8 +12,6 @@ SensorXYZ accel(SENSOR_ID_ACC);
 SensorXYZ gyro(SENSOR_ID_GYRO);
 SensorTemperature temp(SENSOR_ID_TEMP);
 
-#define TEMP_SCALE_FACTOR (0.01)
-
 void setup()
 {
   Serial.begin(115200);
@@ -23,7 +21,6 @@ void setup()
   accel.configure(1, 0);
   gyro.configure(1, 0);
   temp.configure(1, 0);
-  temp.setFactor(TEMP_SCALE_FACTOR);
 }
 
 void loop()

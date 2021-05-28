@@ -6,7 +6,7 @@
 class SensorOrientation : public Sensor {
 public:
   SensorOrientation() {} 
-  SensorOrientation(uint8_t id) : Sensor(id), _data() {}
+  SensorOrientation(uint8_t id) : Sensor(id), _data(), _factor(0.01098) {}
 
   float head() 
   { 

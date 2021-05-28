@@ -10,7 +10,6 @@
 #include "Arduino.h"
 #include "Arduino_BHY2_HOST.h"
 
-#define TEMP_SCALE_FACTOR (0.01)
 SensorTemperature temp(SENSOR_ID_TEMP);
 
 void setup()
@@ -20,7 +19,6 @@ void setup()
 
   BHY2_HOST.begin();
 
-  temp.setFactor(TEMP_SCALE_FACTOR);
   temp.configure(1, 0);
 }
 
