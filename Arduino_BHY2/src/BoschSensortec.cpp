@@ -2,6 +2,7 @@
 #include "BoschParser.h"
 
 BoschSensortec::BoschSensortec() : 
+  _acknowledgment(SensorNack),
   _debug(NULL)
 {
 }
@@ -107,6 +108,11 @@ void BoschSensortec::configureSensor(SensorConfigurationPacket& config)
 {
   auto ret = bhy2_set_virt_sensor_cfg(config.sensorId, config.sampleRate, config.latency, &_bhy2);
   if (_debug) _debug->println(get_api_error(ret));
+  if (ret == BHY2_OK) {
+    _acknowledgment = SensorAck;
+  } else {
+    _acknowledgment = SensorNack;
+  }
 }
 
 uint8_t BoschSensortec::availableSensorData()
@@ -124,6 +130,15 @@ void BoschSensortec::addSensorData(const SensorDataPacket &sensorData)
   // Overwrites oldest data when fifo is full 
   _sensorQueue.push(sensorData);
   // Alternative: handle the full queue by storing it in flash 
+}
+
+// acknowledgment flag is reset when read
+uint8_t BoschSensortec::acknowledgment()
+{
+  uint8_t ack = _acknowledgment;
+  // Reset acknowledgment
+  _acknowledgment = SensorNack;
+  return ack;
 }
 
 void BoschSensortec::update()

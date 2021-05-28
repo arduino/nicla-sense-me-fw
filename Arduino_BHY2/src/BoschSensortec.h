@@ -21,6 +21,11 @@ extern "C"
 
 #define MAX_READ_WRITE_LEN 256
 
+enum SensorAckCode {
+  SensorAck = 0x0F,
+  SensorNack = 0x00
+};
+
 class BoschSensortec {
 public:
   BoschSensortec();
@@ -40,10 +45,13 @@ public:
   // ANNA <-> BOSCH interface
   void addSensorData(const SensorDataPacket &sensorData);
 
+  uint8_t acknowledgment();
+
 private:
   mbed::CircularBuffer<SensorDataPacket, SENSOR_QUEUE_SIZE, uint8_t> _sensorQueue;
 
   uint8_t _workBuffer[WORK_BUFFER_SIZE];
+  uint8_t _acknowledgment;
   
   struct bhy2_dev _bhy2;
   uint8_t _sensorsPresent[32];

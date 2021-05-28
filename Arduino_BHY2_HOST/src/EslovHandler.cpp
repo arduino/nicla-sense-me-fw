@@ -40,8 +40,14 @@ void EslovHandler::update()
     if (_rxBuffer[0] == HOST_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == HOST_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
 
+        setEslovIntPin();
+        if (!_dfuLedOn) {
+          pinMode(LED_BUILTIN, OUTPUT);
+          digitalWrite(LED_BUILTIN, HIGH);
+        }
+
         writeDfuPacket(_rxBuffer, sizeof(DFUPacket) + 1);
-        uint8_t ack = requestDfuPacketAck();
+        uint8_t ack = requestPacketAck();
 
         dump();
         if (_debug) {
@@ -75,6 +81,8 @@ void EslovHandler::update()
 
     } else if (_rxBuffer[0] == HOST_CONFIG_SENSOR_OPCODE) {
       if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
+
+        setEslovIntPin();
         SensorConfigurationPacket* config = (SensorConfigurationPacket*)&_rxBuffer[1];
         if (_debug) {
           _debug->print("received config: ");
@@ -84,6 +92,16 @@ void EslovHandler::update()
           _debug->println();
         }
         writeConfigPacket(*config);
+
+        uint8_t ack = requestPacketAck();
+
+        if (_debug) {
+          // print ack received
+          _debug->print("Sent Ack: ");
+          _debug->println(ack);
+        }
+        
+        Serial.write(ack);
 
         _rxIndex = 0;
       }
@@ -99,12 +117,6 @@ void EslovHandler::update()
 
 void EslovHandler::writeDfuPacket(uint8_t *data, uint8_t length)
 {
-  if (!_intPinAsserted) {
-    // Indicates eslov presence
-    pinMode(ESLOV_INT_PIN, OUTPUT);
-    digitalWrite(ESLOV_INT_PIN, LOW);
-    _intPinAsserted = true;
-  }
   Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
   int ret = Wire.write(data, length);
   if (_debug){
@@ -138,7 +150,7 @@ void EslovHandler::writeConfigPacket(SensorConfigurationPacket& config)
   delay(ESLOV_DELAY);
 }
 
-uint8_t EslovHandler::requestDfuPacketAck()
+uint8_t EslovHandler::requestPacketAck()
 { 
   delay(ESLOV_DELAY);
   uint8_t ret = 0;
@@ -174,6 +186,19 @@ bool EslovHandler::requestSensorData(SensorDataPacket &sData)
     data[i] = Wire.read();
   }
   return true;
+}
+
+void EslovHandler::setEslovIntPin()
+{
+  if (!_intPinAsserted) {
+    // Indicates eslov presence
+    pinMode(ESLOV_INT_PIN, OUTPUT);
+    digitalWrite(ESLOV_INT_PIN, LOW);
+    _intPinAsserted = true;
+    if (_debug) {
+      _debug->println("Eslov int LOW");
+    }
+  }
 }
 
 void EslovHandler::debug(Stream &stream)
