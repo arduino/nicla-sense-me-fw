@@ -9,6 +9,7 @@ EslovHandler::EslovHandler() :
   _rxBuffer(),
   _eslovState(ESLOV_AVAILABLE_SENSOR_STATE),
   _intPinAsserted(false),
+  _intPinCleared(false),
   _dfuLedOn(false),
   _debug(NULL)
 {
@@ -56,7 +57,11 @@ void EslovHandler::update()
           _debug->print("Sent Ack: ");
           _debug->println(ack);
         }
-        
+
+        if (!_intPinCleared && ack == 15) {
+          clearEslovIntPin();
+        }
+
         Serial.write(ack);
         _rxIndex = 0;
       }
@@ -68,6 +73,10 @@ void EslovHandler::update()
       }
       uint8_t availableData = requestAvailableData();
       Serial.write(availableData);
+
+      if (!_intPinCleared && availableData) {
+        clearEslovIntPin();
+      }
 
       SensorDataPacket sensorData;
       while (availableData) {
@@ -101,7 +110,11 @@ void EslovHandler::update()
           _debug->print("Sent Ack: ");
           _debug->println(ack);
         }
-        
+
+        if (!_intPinCleared && ack == 15) {
+          clearEslovIntPin();
+        }
+
         Serial.write(ack);
 
         _rxIndex = 0;
@@ -133,7 +146,6 @@ void EslovHandler::writeDfuPacket(uint8_t *data, uint8_t length)
     digitalWrite(LED_BUILTIN, LOW);
     _dfuLedOn = false;
     _intPinAsserted = false;
-    digitalWrite(ESLOV_INT_PIN, HIGH);
   }
 }
 
@@ -207,6 +219,22 @@ void EslovHandler::setEslovIntPin()
     _intPinAsserted = true;
     if (_debug) {
       _debug->println("Eslov int LOW");
+    }
+  }
+}
+
+void EslovHandler::clearEslovIntPin()
+{
+  /*
+  If Eslov Int pin is never cleared, if Nicla reboots with the MKR board still running the Passthough application
+  and the Eslov cable still connected, Nicla will immediately re-enable Eslov communication.
+  To prevent this, clear Eslov Int pin once Eslov communication already successfully started.
+  */
+  if (_intPinAsserted) {
+    digitalWrite(ESLOV_INT_PIN, HIGH);
+    _intPinCleared = true;
+    if (_debug) {
+      _debug->println("Eslov int pin cleared");
     }
   }
 }

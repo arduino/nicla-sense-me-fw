@@ -46,6 +46,7 @@ public:
   uint8_t requestAvailableData() ;
   bool requestSensorData(SensorDataPacket &sData);
   void setEslovIntPin();
+  void clearEslovIntPin();
 
 private:
   int _rxIndex;
@@ -53,6 +54,7 @@ private:
 
   EslovState _eslovState;
   bool _intPinAsserted;
+  bool _intPinCleared;
   bool _dfuLedOn;
 
 private:
