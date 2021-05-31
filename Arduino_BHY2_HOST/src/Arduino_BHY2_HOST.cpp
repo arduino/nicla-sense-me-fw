@@ -46,6 +46,11 @@ void Arduino_BHY2_HOST::configureSensor(uint8_t sensorId, float sampleRate, uint
   eslovHandler.writeConfigPacket(config);
 }
 
+uint8_t Arduino_BHY2_HOST::requestAck()
+{
+  return eslovHandler.requestPacketAck();
+}
+
 uint8_t Arduino_BHY2_HOST::availableSensorData()
 {
   return eslovHandler.requestAvailableData();
