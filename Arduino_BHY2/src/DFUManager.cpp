@@ -43,16 +43,23 @@ bool DFUManager::begin()
 
 void DFUManager::processPacket(DFUSource source, DFUType dfuType, const uint8_t* data)
 {
-  DFUPacket* packet = (DFUPacket*)data;
   _transferPending = true;
   _dfuSource = source;
 
-  if (source == bleDFU && eslovHandler.eslovActive) {
-    eslovHandler.eslovActive = false;
-    eslovHandler.end();
-  } else if (source == eslovDFU && bleHandler.bleActive) {
-    bleHandler.bleActive = false;
-    bleHandler.end();
+  DFUPacket* packet = (DFUPacket*)data;
+
+  if (source == bleDFU) {
+    //If Eslov is still active, turn it off
+    if (eslovHandler.eslovActive) {
+      eslovHandler.eslovActive = false;
+      eslovHandler.end();
+    }
+  } else {
+    //If BLE is still active, turn it off
+    if (bleHandler.bleActive) {
+      bleHandler.bleActive = false;
+      bleHandler.end();
+    }
   }
 
   if (_debug) {
@@ -90,10 +97,9 @@ void DFUManager::processPacket(DFUSource source, DFUType dfuType, const uint8_t*
       _debug->print("Last packet received. Remaining: ");
       _debug->println(packet->remaining);
     }
-    if (_acknowledgment == DFUAck) {
-      fclose(_target);
-      _target = NULL;
-    }
+    fclose(_target);
+    _target = NULL;
+    closeDfu();
   }
 }
 

@@ -27,7 +27,7 @@ uint8_t Sensor::id()
 
 void Sensor::configure(float rate, uint32_t latency)
 {
-  eslovHandler.setEslovIntPin();
+  eslovHandler.toggleEslovIntPin();
   SensorConfigurationPacket config {_id, rate, latency};
 
   uint8_t ack = 0;

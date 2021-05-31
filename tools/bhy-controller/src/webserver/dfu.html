@@ -318,17 +318,31 @@ function onConnection() {
   status.className = "badge rounded-pill bg-success";
 }
 
-function readAck() {
+function increaseIndex() {
+  if (updateIndex < iterations - 1) {
+    updateIndex++;
+    update(updateIndex);
+  } else {
+    console.log('firmware sent');
+    elem.style.width = 100 + "%";
+    elem.style.backgroundColor = "#18b31d";
+    document.getElementById("endPrint").innerHTML = "Fw upload completed!";
+    return;
+  }
+}
+/*
+
+function readMissingPackets() {
   if (debug == true) {
-    console.log('Reading Ack/Nack...');
+    console.log('Reading missing packet indexes...');
   }
   gattAckCharacteristic.readValue()
   .then(value => {
-    var ack = value.getUint8(0);
+    var missingIndex = value.getUint16(0);
     if (debug == true) {
-      console.log('AckVal is: ', ack);
+      console.log('Missing index is: ', missingIndex);
     }
-    handleAck(ack);
+    update(missingIndex);
   });
 }
 
@@ -360,6 +374,7 @@ function handleAckEvent(event) {
   let value = event.target.value.getUint8(0);
   handleAck(value);
 }
+*/
 
 function update(index) {
   //clearTimeout(dfuTimeout);
@@ -419,7 +434,8 @@ function update(index) {
     elem.style.width = Math.floor(pb) + "%";
 
     //dfuTimeout = setTimeout(handleTimeout, 1000); 
-    setTimeout(readAck, 1);
+    //setTimeout(increaseIndex, 1);
+    increaseIndex();
     if (debug == true) {
       console.log('Written');
     }

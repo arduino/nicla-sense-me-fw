@@ -45,8 +45,7 @@ public:
   uint8_t requestPacketAck();
   uint8_t requestAvailableData() ;
   bool requestSensorData(SensorDataPacket &sData);
-  void setEslovIntPin();
-  void clearEslovIntPin();
+  void toggleEslovIntPin();
 
 private:
   int _rxIndex;

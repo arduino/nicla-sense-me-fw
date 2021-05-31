@@ -56,16 +56,6 @@ void EslovHandler::requestEvent()
       _debug->println(data.size);
     }
 
-  } else if (_state == ESLOV_DFU_ACK_STATE) {
-    uint8_t ack = dfuManager.acknowledgment();
-    if (_lastDfuPack && ack == 0x0F) {
-      dfuManager.closeDfu();
-    }
-    if (_debug) {
-      _debug->print("Ack: ");
-      _debug->println(ack);
-    }
-    Wire.write(ack);
   } else if (_state == ESLOV_SENSOR_ACK_STATE) {
     uint8_t ack = sensortec.acknowledgment();
     if (_debug) {
@@ -90,6 +80,7 @@ void EslovHandler::receiveEvent(int length)
 
   while(Wire.available())
   {
+    digitalWrite(p19, LOW);
     _rxBuffer[_rxIndex++] = Wire.read(); 
 
     // Check if packet is complete depending on its opcode
@@ -97,28 +88,25 @@ void EslovHandler::receiveEvent(int length)
       if (_rxIndex == sizeof(DFUPacket) + 1) {
         dfuManager.processPacket(eslovDFU, DFU_EXTERNAL, &_rxBuffer[1]);
 
-        if (_rxBuffer[1]) {
-          _lastDfuPack = true;
-        }
-
-        _state = ESLOV_DFU_ACK_STATE;
-
         dump();
+
         _rxIndex = 0;
+
+        //Release INT pin
+        digitalWrite(p19, HIGH);
       }
 
     } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
+        digitalWrite(p19, LOW);
         dfuManager.processPacket(eslovDFU, DFU_INTERNAL, &_rxBuffer[1]);
 
-        if (_rxBuffer[1]) {
-          _lastDfuPack = true;
-        }
-
-        _state = ESLOV_DFU_ACK_STATE;
-
         dump();
+
         _rxIndex = 0;
+
+        //Release INT pin
+        digitalWrite(p19, HIGH);
       }
 
     } else if (_rxBuffer[0] == ESLOV_SENSOR_CONFIG_OPCODE) {

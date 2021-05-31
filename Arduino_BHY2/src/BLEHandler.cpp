@@ -28,16 +28,6 @@ BLEHandler::~BLEHandler()
 {
 }
 
-void BLEHandler::writeDFUAcknowledgment()
-{
-  uint8_t ack = dfuManager.acknowledgment();
-  dfuAckCharacteristic.writeValue(ack);
-
-  if (_lastDfuPack && ack == 0x0F) {
-    dfuManager.closeDfu();
-  }
-}
-
 // DFU channel
 void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteristic) 
 {
@@ -52,9 +42,8 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
   if (data[0]) {
     //Last packet
     _lastDfuPack = true;
+    dfuManager.closeDfu();
   }
-
-  writeDFUAcknowledgment();
 }
 
 void BLEHandler::receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic)
