@@ -1,5 +1,8 @@
 # Nicla
-This repo contains everything needed to program Nicla and to control it from another device.
+This repo contains everything needed to program Nicla Sense ME and to control it from another device.
+
+Nicla Sense ME belongs to Arduino Mbed OS boards and its core is available [here](https://github.com/bcmi-labs/ArduinoCore-mbed/tree/nicla_rebased).
+The packaged core can also be downloaded from Arduino IDE as 'Arduino Mbed OS Nicla Boards' by adding http://downloads.arduino.cc/packages/package_mbed_index.json to the Additional Board Manager URLs.
 
 Table of Contents:
 - [Repo structure](#repo-structure)
@@ -18,13 +21,14 @@ Table of Contents:
 In [examples](Arduino_BHY2/examples) there are already working examples for both scenarios:
 - Standalone mode - [Standalone](Arduino_BHY2/examples/Standalone/Standalone.ino) exploits bhi's sensors directly from Nicla.
 - Control from external device mode -  [App](Arduino_BHY2/examples/App/App.ino) waits for external stimuli, coming from eslov or BLE channels.
+- Upload a Fail Safe Firmware - [Fail_Safe_flasher](Arduino_BHY2/examples/Fail_Safe_flasher/Fail_Safe_flasher.ino) uploads a binary to Anna's QSPIFlash. Pressing the button 3 times, Nicla checks if a Fail Safe firmware is present and, if it is valid, runs it.
 ------------
 
 [Arduino_BHY2_HOST](Arduino_BHY2_HOST) - is the library that an arduino board should include in order to control Uninsense through the eslov port.
   It can also act as a passthrough, to allow the control of Nicla from a PC.
   There is an example for both these use cases in [examples](Arduino_BHY2_HOST/examples):
   - Act as passthrough - [Passthrough](Arduino_BHY2_HOST/examples/Passthrough/Passthrough.ino)
-  - Control Nicla directly - [Accelerometer](Arduino_BHY2_HOST/examples/Accelerometer/Accelerometer.ino)
+  - Control Nicla sensors directly - [Accelerometer](Arduino_BHY2_HOST/examples/Accelerometer/Accelerometer.ino), [Orientation](Arduino_BHY2_HOST/examples/Orientation/Orientation.ino), [Temperature](Arduino_BHY2_HOST/examples/Temperature/Temperature.ino)
   
 ------------
 
@@ -43,15 +47,14 @@ In [examples](Arduino_BHY2/examples) there are already working examples for both
 ### Nicla standalone mode
 In this use case, Nicla will be able to control its own sensors without the need for an external host.  
 - Make a standalone sketch importing [Arduino_BHY2](Arduino_BHY2) library, follow this [example](Arduino_BHY2/examples/Standalone/Standalone.ino) to write the code.
-- Select Nicla as the compilation target, then compile.
-- Upload the `.bin` resulting file. (see [Update Nicla firmware](#update-nicla-firmware))
+- Select Nicla Sense ME as the compilation target, then compile and upload.
 
 
 ### Control Nicla from an arduino board through eslov
 - Upload the [App](Arduino_BHY2/examples/App/App.ino) example to Nicla.
-- Write a sketch for the arduino board acting as a host by importing [Arduino_BHY2_HOST](Arduino_BHY2_HOST) and following the [example](Arduino_BHY2_HOST/examples/Accelerometer/Accelerometer.ino).
-- Upload the host sketch to the arduino board.
-- Connect Nicla to the arduino board through the eslov connector.
+- Use an Arduino board, like a MKR, acting as a host by importing [Arduino_BHY2_HOST](Arduino_BHY2_HOST) and following the [example](Arduino_BHY2_HOST/examples/Accelerometer/Accelerometer.ino).
+- Upload the host sketch to the Arduino MKR board.
+- Connect Nicla to the MKR board with an Eslov cable or I2C pins.
 
 
 ### Control Nicla from a PC - web server 
@@ -62,6 +65,7 @@ BLE is used instead of eslov, thus there is no need for an intermediary arduino 
 - Access the command line tool folder.
 - Execute the following command `./bhy webserver` to start the local web server.
 - Open the `http://localhost:8000/index.html` web page with a browser listed in the compatibility list.
+  NB: make sure that WebBLE is enabled! If it is not, enable it from chrome://flags, setting "Experimental Web Platform features".
 
 There are two web pages
 - `sensor.html` allows to configure the sensors and read their values in real time.
@@ -69,7 +73,7 @@ There are two web pages
 
 
 ### Control Nicla from a PC - command line tool
-The command line tool can be used for updating the firmware of Nicla or bhi, for managing Nicla's sensors and for reading their values in real time. Refer to [tools](tools/bhy-controller) for the list of available commands. 
+The command line tool can be used to update the firmware of Nicla or bhi, manage Nicla's sensors and read their values in real time. Refer to [tools](tools/bhy-controller) for the list of available commands. 
 Here the eslov protocol is employed, so an arduino board is needed between Nicla and the PC.
 - Upload the [App](Arduino_BHY2/examples/App/App.ino) example to Nicla.
 - Upload the [Passthrough](Arduino_BHY2_HOST/examples/Passthrough/Passthrough.ino) example to an arduino board.
@@ -91,7 +95,7 @@ Then, Nicla will reset and the firmware will be updated.
 
 #### Update procedure through ESLOV:
 - Follow [Control Nicla from a PC - command line tool](#control-nicla-from-a-pc---command-line-tool)
-- Execute the command `./bhy dfu -p YOUR_PORT -t TARGET -b BIN_FILE`
+- Execute the command `./bhy dfu -p YOUR_PORT -t TARGET -bin BIN_FILE`
     * Replace `YOUR_PORT` with the serial port used by the arduino board
     * Replace `TARGET` with `nicla` or `bhi`
     * Replace `BIN_FILE` with the path of the binary file to bu uploaded
