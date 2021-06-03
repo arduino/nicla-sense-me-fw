@@ -1,6 +1,7 @@
 #include "Arduino_BHY2_HOST.h"
 
 #include "EslovHandler.h"
+#include "sensors/SensorManager.h"
 
 Arduino_BHY2_HOST::Arduino_BHY2_HOST() :
   _passthrough(false)
@@ -21,7 +22,14 @@ void Arduino_BHY2_HOST::update()
 {
   if (_passthrough){
     eslovHandler.update();
+  } else {
+    while (availableSensorData() > 0) {
+      SensorDataPacket data;
+      readSensorData(data);
+      sensorManager.process(data);
+    }
   }
+
 }
 
 void Arduino_BHY2_HOST::configureSensor(SensorConfigurationPacket& config)

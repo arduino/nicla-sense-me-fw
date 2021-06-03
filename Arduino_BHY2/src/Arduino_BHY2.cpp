@@ -5,12 +5,11 @@
 #include "BLEHandler.h"
 #include "EslovHandler.h"
 #include "DFUManager.h"
-#include <I2C.h>
+#include "Wire.h"
 
 #include "mbed.h"
 #include "Nicla_System.h"
 
-mbed::I2C I2C(I2C_SDA0, I2C_SCL0);
 
 mbed::DigitalIn eslovInt(p19, PullUp);
 
@@ -34,8 +33,7 @@ void Arduino_BHY2::pingI2C() {
   if ((currTime - _pingTime) > 30000) {
     _pingTime = currTime;
     //Read status reg
-    int ret = I2C.write(BQ25120A_ADDRESS << 1, 0, 1);
-    ret = I2C.read(BQ25120A_ADDRESS << 1, &response, 1);
+    nicla::readLDOreg();
   }
 }
 
@@ -50,7 +48,7 @@ void Arduino_BHY2::checkEslovInt() {
   } else {
     //Timeout expired
     _timeoutExpired = true;
-    disableLDO();
+    nicla::disableLDO();
   }
 }
 
@@ -60,9 +58,10 @@ void Arduino_BHY2::setLDOTimeout(int time) {
 
 bool Arduino_BHY2::begin()
 {
+  nicla::begin();
   _startTime = millis();
-  enable3V3LDO();
-  I2C.frequency(500000);
+  nicla::enable3V3LDO();
+  Wire1.setClock(500000);
   _pingTime = millis();
   if (!sensortec.begin()) {
     return false;
@@ -138,7 +137,7 @@ void Arduino_BHY2::configureSensor(uint8_t sensorId, float sampleRate, uint32_t 
   sensortec.configureSensor(config);
 }
 
-void Arduino_BHY2::addSensorData(const SensorDataPacket &sensorData)
+void Arduino_BHY2::addSensorData(SensorDataPacket &sensorData)
 {
   sensortec.addSensorData(sensorData);
 }

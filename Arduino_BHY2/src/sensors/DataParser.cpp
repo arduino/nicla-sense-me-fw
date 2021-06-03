@@ -1,4 +1,4 @@
-#include "DataParser.h"
+#include "sensors/DataParser.h"
 
 void DataParser::parse(SensorDataPacket& data, DataXYZ& vector) {
   vector.x = data.getInt16(0);
@@ -22,4 +22,8 @@ void DataParser::parse(SensorDataPacket& data, DataQuaternion& vector) {
   vector.z = data.getInt16(4);
   vector.w = data.getInt16(6);
   vector.accuracy = data.getUint16(8);
+}
+
+void DataParser::parseTemperature(SensorDataPacket& data, float& value, float scaleFactor) {
+  value = data.getInt16(0) * scaleFactor;
 }

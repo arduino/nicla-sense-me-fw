@@ -2,8 +2,16 @@
 #define ARDUINO_BHY2_HOST_H_
 
 #include "Arduino.h"
-#include "SensorTypes.h"
-#include "DataParser.h"
+#include "sensors/SensorTypes.h"
+#include "sensors/DataParser.h"
+
+#include "sensors/Sensor.h"
+#include "sensors/SensorOrientation.h"
+#include "sensors/SensorXYZ.h"
+#include "sensors/SensorQuaternion.h"
+#include "sensors/SensorTemperature.h"
+
+#include "sensors/SensorID.h"
 
 class Arduino_BHY2_HOST {
 public:

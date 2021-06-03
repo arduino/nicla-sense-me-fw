@@ -5,7 +5,7 @@
 #include "mbed.h"
 
 #include "bosch/common/common.h"
-#include "SensorTypes.h"
+#include "sensors/SensorTypes.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -38,7 +38,7 @@ public:
   bool readSensorData(SensorDataPacket &data);
 
   // ANNA <-> BOSCH interface
-  void addSensorData(const SensorDataPacket &sensorData);
+  void addSensorData(SensorDataPacket &sensorData);
 
 private:
   mbed::CircularBuffer<SensorDataPacket, SENSOR_QUEUE_SIZE, uint8_t> _sensorQueue;
