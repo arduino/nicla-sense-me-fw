@@ -14,11 +14,16 @@ public:
   bool begin();
   void update();
   void poll(unsigned long timeout);
+  void end();
 
   static void debug(Stream &stream);
 
+  bool bleActive = false;
+
 private:
   static Stream *_debug;
+
+  bool _lastDfuPack;
 
   void writeDFUAcknowledgment();
   void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic);

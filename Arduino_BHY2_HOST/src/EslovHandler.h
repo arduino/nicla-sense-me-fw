@@ -26,7 +26,9 @@ enum HostOpcode {
 enum EslovState {
   ESLOV_AVAILABLE_SENSOR_STATE = 0x00,
   ESLOV_READ_SENSOR_STATE = 0x01,
-  ESLOV_DFU_ACK_STATE = 0x02
+  ESLOV_DFU_ACK_STATE = 0x02,
+  ESLOV_SENSOR_ACK_STATE = 0x03
+
 };
 
 class EslovHandler {
@@ -40,15 +42,20 @@ public:
   void writeDfuPacket(uint8_t *data, uint8_t length);
   void writeStateChange(EslovState state);
   void writeConfigPacket(SensorConfigurationPacket& config);
-  uint8_t requestDfuPacketAck();
+  uint8_t requestPacketAck();
   uint8_t requestAvailableData() ;
   bool requestSensorData(SensorDataPacket &sData);
+  void setEslovIntPin();
+  void clearEslovIntPin();
 
 private:
   int _rxIndex;
   uint8_t _rxBuffer[ESLOV_MAX_LENGTH];
 
   EslovState _eslovState;
+  bool _intPinAsserted;
+  bool _intPinCleared;
+  bool _dfuLedOn;
 
 private:
   friend class Arduino_BHY2_HOST;

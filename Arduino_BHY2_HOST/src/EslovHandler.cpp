@@ -8,6 +8,9 @@ EslovHandler::EslovHandler() :
   _rxIndex(0),
   _rxBuffer(),
   _eslovState(ESLOV_AVAILABLE_SENSOR_STATE),
+  _intPinAsserted(false),
+  _intPinCleared(false),
+  _dfuLedOn(false),
   _debug(NULL)
 {
 }
@@ -24,9 +27,6 @@ bool EslovHandler::begin(bool passthrough)
     Serial.begin(115200);
   }
 
-  // Indicates eslov presence
-  pinMode(ESLOV_INT_PIN, OUTPUT);
-  digitalWrite(ESLOV_INT_PIN, LOW);
   return true;
 }
 
@@ -42,8 +42,14 @@ void EslovHandler::update()
     if (_rxBuffer[0] == HOST_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == HOST_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
 
+        setEslovIntPin();
+        if (!_dfuLedOn) {
+          pinMode(LED_BUILTIN, OUTPUT);
+          digitalWrite(LED_BUILTIN, HIGH);
+        }
+
         writeDfuPacket(_rxBuffer, sizeof(DFUPacket) + 1);
-        uint8_t ack = requestDfuPacketAck();
+        uint8_t ack = requestPacketAck();
 
         dump();
         if (_debug) {
@@ -51,7 +57,11 @@ void EslovHandler::update()
           _debug->print("Sent Ack: ");
           _debug->println(ack);
         }
-        
+
+        if (!_intPinCleared && ack == 15) {
+          clearEslovIntPin();
+        }
+
         Serial.write(ack);
         _rxIndex = 0;
       }
@@ -63,6 +73,10 @@ void EslovHandler::update()
       }
       uint8_t availableData = requestAvailableData();
       Serial.write(availableData);
+
+      if (!_intPinCleared && availableData) {
+        clearEslovIntPin();
+      }
 
       SensorDataPacket sensorData;
       while (availableData) {
@@ -77,6 +91,8 @@ void EslovHandler::update()
 
     } else if (_rxBuffer[0] == HOST_CONFIG_SENSOR_OPCODE) {
       if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
+
+        setEslovIntPin();
         SensorConfigurationPacket* config = (SensorConfigurationPacket*)&_rxBuffer[1];
         if (_debug) {
           _debug->print("received config: ");
@@ -86,6 +102,20 @@ void EslovHandler::update()
           _debug->println();
         }
         writeConfigPacket(*config);
+
+        uint8_t ack = requestPacketAck();
+
+        if (_debug) {
+          // print ack received
+          _debug->print("Sent Ack: ");
+          _debug->println(ack);
+        }
+
+        if (!_intPinCleared && ack == 15) {
+          clearEslovIntPin();
+        }
+
+        Serial.write(ack);
 
         _rxIndex = 0;
       }
@@ -97,6 +127,7 @@ void EslovHandler::update()
       _rxIndex = 0;
     }
   }
+  
 }
 
 void EslovHandler::writeDfuPacket(uint8_t *data, uint8_t length)
@@ -109,6 +140,13 @@ void EslovHandler::writeDfuPacket(uint8_t *data, uint8_t length)
     _debug->println();
   }
   Wire.endTransmission(false);
+  if (*(data+1)) {
+    //Last packet
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, LOW);
+    _dfuLedOn = false;
+    _intPinAsserted = false;
+  }
 }
 
 void EslovHandler::writeStateChange(EslovState state)
@@ -134,7 +172,7 @@ void EslovHandler::writeConfigPacket(SensorConfigurationPacket& config)
   delay(ESLOV_DELAY);
 }
 
-uint8_t EslovHandler::requestDfuPacketAck()
+uint8_t EslovHandler::requestPacketAck()
 { 
   delay(ESLOV_DELAY);
   uint8_t ret = 0;
@@ -170,6 +208,35 @@ bool EslovHandler::requestSensorData(SensorDataPacket &sData)
     data[i] = Wire.read();
   }
   return true;
+}
+
+void EslovHandler::setEslovIntPin()
+{
+  if (!_intPinAsserted) {
+    // Indicates eslov presence
+    pinMode(ESLOV_INT_PIN, OUTPUT);
+    digitalWrite(ESLOV_INT_PIN, LOW);
+    _intPinAsserted = true;
+    if (_debug) {
+      _debug->println("Eslov int LOW");
+    }
+  }
+}
+
+void EslovHandler::clearEslovIntPin()
+{
+  /*
+  If Eslov Int pin is never cleared, if Nicla reboots with the MKR board still running the Passthough application
+  and the Eslov cable still connected, Nicla will immediately re-enable Eslov communication.
+  To prevent this, clear Eslov Int pin once Eslov communication already successfully started.
+  */
+  if (_intPinAsserted) {
+    digitalWrite(ESLOV_INT_PIN, HIGH);
+    _intPinCleared = true;
+    if (_debug) {
+      _debug->println("Eslov int pin cleared");
+    }
+  }
 }
 
 void EslovHandler::debug(Stream &stream)

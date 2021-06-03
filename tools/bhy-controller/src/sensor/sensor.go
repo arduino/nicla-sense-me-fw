@@ -16,6 +16,11 @@ const (
 	sensorDataSize    = 12
 )
 
+const (
+	Ack         = (byte)(0x0F)
+	Nack        = (byte)(0x00)
+)
+
 type SensorData struct {
 	id   uint8
 	size uint8
@@ -129,8 +134,36 @@ func Read(usbPort string, baudRate int, liveFlag bool) {
 	}
 }
 
+func sendConfig(port serial.Port, s *SensorConfig) {
+	for ackReceived := false; ackReceived == false; {
+
+		fmt.Printf("Sending configuration: sensor %d	rate %f	latency %d", s.id, s.sampleRate, s.latency)
+		n, err := port.Write(s.pack())
+		errCheck(err)
+		fmt.Printf("Sent %v bytes\n", n)
+
+		//wait ack from Nicla
+		ackBuf := make([]byte, 1)
+		for n := 0; n != 1; {
+			n, err = port.Read(ackBuf)
+
+			if n == 0 {
+				fmt.Printf("Ack not received\n")
+			} else if n > 1 {
+				fmt.Printf("Ack expected but more than one byte received\n")
+			}
+		}
+
+		ackReceived = (ackBuf[0] == Ack)
+		if ackBuf[0] == Ack {
+			fmt.Printf("Sensor configuration correctly sent!\n")
+		}
+	}
+}
+
 func Configure(usbPort string, baudRate int, id int, rate float64, latency int) {
 	port := openPort(usbPort, baudRate)
+
 	defer port.Close()
 	fmt.Printf("Connected - port: %s - baudrate: %d\n", usbPort, baudRate)
 
@@ -140,8 +173,5 @@ func Configure(usbPort string, baudRate int, id int, rate float64, latency int) 
 		latency:    uint32(latency),
 	}
 
-	fmt.Printf("Sending configuration: sensor %d	rate %f	latency %d", s.id, s.sampleRate, s.latency)
-	n, err := port.Write(s.pack())
-	errCheck(err)
-	fmt.Printf("Sent %v bytes\n", n)
+	sendConfig(port, s)
 }

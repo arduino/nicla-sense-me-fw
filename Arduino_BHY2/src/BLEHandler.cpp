@@ -20,7 +20,7 @@ BLECharacteristic sensorConfigCharacteristic(sensorConfigUuid, BLEWrite, sizeof(
 
 Stream* BLEHandler::_debug = NULL;
 
-BLEHandler::BLEHandler()
+BLEHandler::BLEHandler() : _lastDfuPack(false)
 {
 }
 
@@ -32,6 +32,10 @@ void BLEHandler::writeDFUAcknowledgment()
 {
   uint8_t ack = dfuManager.acknowledgment();
   dfuAckCharacteristic.writeValue(ack);
+
+  if (_lastDfuPack && ack == 0x0F) {
+    dfuManager.closeDfu();
+  }
 }
 
 // DFU channel
@@ -43,7 +47,12 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
     _debug->print("Size of data: ");
     _debug->println(sizeof(data));
   }
-  dfuManager.processPacket(dfuType, data);
+  dfuManager.processPacket(bleDFU, dfuType, data);
+
+  if (data[0]) {
+    //Last packet
+    _lastDfuPack = true;
+  }
 
   writeDFUAcknowledgment();
 }
@@ -81,6 +90,7 @@ bool BLEHandler::begin()
   if (!BLE.begin()) {
     return false;
   }
+  bleActive = true;
   BLE.setLocalName("NICLA");
 
   // DFU channel
@@ -127,6 +137,13 @@ void BLEHandler::update()
 void BLEHandler::poll(unsigned long timeout)
 {
   BLE.poll(timeout);
+}
+
+
+void BLEHandler::end()
+{
+  bleActive = false;
+  BLE.end();
 }
 
 void BLEHandler::debug(Stream &stream)

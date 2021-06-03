@@ -7,7 +7,8 @@ EslovHandler::EslovHandler() :
   _rxIndex(0),
   _rxBuffer(),
   _state(ESLOV_AVAILABLE_SENSOR_STATE),
-  _debug(NULL)
+  _debug(NULL),
+  _lastDfuPack(false)
 {
 }
 
@@ -18,6 +19,7 @@ EslovHandler::~EslovHandler()
 bool EslovHandler::begin()
 {
   Wire.begin(ESLOV_DEFAULT_ADDRESS);
+  eslovActive = true;
   Wire.onReceive(EslovHandler::onReceive); 
   Wire.onRequest(EslovHandler::onRequest);
   return true;
@@ -56,12 +58,28 @@ void EslovHandler::requestEvent()
 
   } else if (_state == ESLOV_DFU_ACK_STATE) {
     uint8_t ack = dfuManager.acknowledgment();
+    if (_lastDfuPack && ack == 0x0F) {
+      dfuManager.closeDfu();
+    }
+    if (_debug) {
+      _debug->print("Ack: ");
+      _debug->println(ack);
+    }
+    Wire.write(ack);
+  } else if (_state == ESLOV_SENSOR_ACK_STATE) {
+    uint8_t ack = sensortec.acknowledgment();
     if (_debug) {
       _debug->print("Ack: ");
       _debug->println(ack);
     }
     Wire.write(ack);
   }
+}
+
+void EslovHandler::end()
+{
+  eslovActive = false;
+  Wire.end();
 }
 
 void EslovHandler::receiveEvent(int length)
@@ -77,7 +95,11 @@ void EslovHandler::receiveEvent(int length)
     // Check if packet is complete depending on its opcode
     if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
-        dfuManager.processPacket(DFU_EXTERNAL, &_rxBuffer[1]);
+        dfuManager.processPacket(eslovDFU, DFU_EXTERNAL, &_rxBuffer[1]);
+
+        if (_rxBuffer[1]) {
+          _lastDfuPack = true;
+        }
 
         _state = ESLOV_DFU_ACK_STATE;
 
@@ -87,7 +109,11 @@ void EslovHandler::receiveEvent(int length)
 
     } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
-        dfuManager.processPacket(DFU_INTERNAL, &_rxBuffer[1]);
+        dfuManager.processPacket(eslovDFU, DFU_INTERNAL, &_rxBuffer[1]);
+
+        if (_rxBuffer[1]) {
+          _lastDfuPack = true;
+        }
 
         _state = ESLOV_DFU_ACK_STATE;
 
@@ -99,6 +125,8 @@ void EslovHandler::receiveEvent(int length)
       if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
         SensorConfigurationPacket *config = (SensorConfigurationPacket*)&_rxBuffer[1];
         sensortec.configureSensor(*config);
+
+        _state = ESLOV_SENSOR_ACK_STATE;
 
         dump();
         _rxIndex = 0;

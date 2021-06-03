@@ -1,6 +1,7 @@
 #include "Sensor.h"
 #include "SensorManager.h"
 #include "Arduino_BHY2_HOST.h"
+#include "EslovHandler.h"
 
 Sensor::Sensor() : 
   _id(0),
@@ -26,8 +27,14 @@ uint8_t Sensor::id()
 
 void Sensor::configure(float rate, uint32_t latency)
 {
+  eslovHandler.setEslovIntPin();
   SensorConfigurationPacket config {_id, rate, latency};
-  BHY2_HOST.configureSensor(config);
+
+  uint8_t ack = 0;
+  while(ack != 15) {
+    BHY2_HOST.configureSensor(config);
+    ack = BHY2_HOST.requestAck();
+  }
 
   if (rate == 0 && _subscribed) {
     // unregister sensor

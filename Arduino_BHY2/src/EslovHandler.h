@@ -17,7 +17,8 @@ enum EslovOpcode {
 enum EslovState {
   ESLOV_AVAILABLE_SENSOR_STATE = 0x00,
   ESLOV_READ_SENSOR_STATE = 0x01,
-  ESLOV_DFU_ACK_STATE = 0x02
+  ESLOV_DFU_ACK_STATE = 0x02,
+  ESLOV_SENSOR_ACK_STATE = 0x03
 };
 
 class EslovHandler {
@@ -26,9 +27,12 @@ public:
   virtual ~EslovHandler();
 
   bool begin();
+  void end();
 
   static void onReceive(int length);
   static void onRequest();
+
+  bool eslovActive = false;
 
 private:
   void receiveEvent(int length);
@@ -44,6 +48,7 @@ private:
   void debug(Stream &stream);
   void dump();
   Stream *_debug;
+  bool _lastDfuPack;
 };
 
 extern EslovHandler eslovHandler;
