@@ -5,7 +5,7 @@ import "encoding/binary"
 const (
 	Ack         = (byte)(0x0F)
 	Nack        = (byte)(0x00)
-	PayloadSize = 192
+	PayloadSize = 232
 	PackSize    = PayloadSize + 4
 )
 
