@@ -125,13 +125,11 @@
 <script>
 const deviceName = 'NICLA';
 const dfuService = '34c2e3b8-34aa-11eb-adc1-0242ac120002';
-const dfuAckCharacteristic = '34c2e3be-34aa-11eb-adc1-0242ac120002';
 const dfuInternalCharacteristic = '34c2e3b9-34aa-11eb-adc1-0242ac120002';
 const dfuExternalCharacteristic = '34c2e3ba-34aa-11eb-adc1-0242ac120002';
 
 var bleDevice;
 var gattService;
-var gattAckCharacteristic;
 var gattInternalCharacteristic;
 var gattExternalCharacteristic;
 var dfuCharacteristic;
@@ -250,7 +248,6 @@ function crc8() {
 function connect() {
   return getDeviceInfo()
   .then(connectGATTdfu)
-  .then(connectGATTack)
   .then(_ => { 
     console.log('Select the binary file that you want to send to Nicla');
     onConnection(); 
@@ -294,18 +291,6 @@ function connectGATTdfu() {
   });
 }
 
-function connectGATTack() {
-  return gattService.getCharacteristic(dfuAckCharacteristic)
-  .then(characteristic => {
-    gattAckCharacteristic = characteristic;
-    if (debug == true) {
-      console.log("gattAckCharacteristic:", gattAckCharacteristic);
-    }
-    //gattAckCharacteristic.addEventListener('characteristicvaluechanged', handleAckEvent)
-    //gattAckCharacteristic.startNotifications();
-  })
-}
-
 function onDisconnection(event) {
   var status = document.getElementById("connectionStatus");
   status.innerHTML = "Disconnected";
@@ -330,51 +315,6 @@ function increaseIndex() {
     return;
   }
 }
-/*
-
-function readMissingPackets() {
-  if (debug == true) {
-    console.log('Reading missing packet indexes...');
-  }
-  gattAckCharacteristic.readValue()
-  .then(value => {
-    var missingIndex = value.getUint16(0);
-    if (debug == true) {
-      console.log('Missing index is: ', missingIndex);
-    }
-    update(missingIndex);
-  });
-}
-
-function handleAck(value) {
-  if (debug == true) {
-    console.log('Value is '+ value);
-  }
-  if (value == 15) {
-    if (debug == true) {
-      console.log('Ack received!');
-    }
-    updateIndex++;
-  } else {
-    console.log('Nack received! Resend same packet');
-  }
-  if (updateIndex == iterations) {
-    console.log('firmware sent');
-    elem.style.width = 100 + "%";
-    elem.style.backgroundColor = "#18b31d";
-    document.getElementById("endPrint").innerHTML = "Fw upload completed!";
-    return;
-  }
-  update(updateIndex);
-  //setTimeout(_ => {update(updateIndex);}, 1);
-}
-
-function handleAckEvent(event) {
-  //clearTimeout(dfuTimeout);
-  let value = event.target.value.getUint8(0);
-  handleAck(value);
-}
-*/
 
 function update(index) {
   //clearTimeout(dfuTimeout);
@@ -433,8 +373,6 @@ function update(index) {
     var pb = (index/(iterations-1))*100;
     elem.style.width = Math.floor(pb) + "%";
 
-    //dfuTimeout = setTimeout(handleTimeout, 1000); 
-    //setTimeout(increaseIndex, 1);
     increaseIndex();
     if (debug == true) {
       console.log('Written');
@@ -442,10 +380,5 @@ function update(index) {
   });
 }
 
-function handleTimeout() {
-  console.log('Ack did not arrive in time');
-  //updateIndex = 0;
-  update(updateIndex);
-}
 
 </script>

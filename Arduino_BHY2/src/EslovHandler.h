@@ -38,6 +38,9 @@ private:
   void receiveEvent(int length);
   void requestEvent();
 
+  void eslovBusy();
+  void eslovAvailable();
+
   int _rxIndex;
   uint8_t _rxBuffer[ESLOV_MAX_LENGTH];
 
