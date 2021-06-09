@@ -73,6 +73,8 @@ void EslovHandler::update()
         dump();
 
         _rxIndex = 0;
+
+        delay(ESLOV_DELAY);
       
         Serial.write(ack);
       }
@@ -231,6 +233,7 @@ void EslovHandler::toggleEslovIntPin()
     if (_debug) {
       _debug->println("Eslov int pin cleared");
     }
+    delay(500);
   }
 }
 

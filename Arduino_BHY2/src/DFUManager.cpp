@@ -99,7 +99,6 @@ void DFUManager::processPacket(DFUSource source, DFUType dfuType, const uint8_t*
     }
     fclose(_target);
     _target = NULL;
-    closeDfu();
   }
 }
 

@@ -106,6 +106,11 @@ void EslovHandler::receiveEvent(int length)
 
         _rxIndex = 0;
 
+        //Last packet
+        if (_rxBuffer[1]) {
+          dfuManager.closeDfu();
+        }
+
         eslovAvailable();
       }
 
@@ -116,6 +121,11 @@ void EslovHandler::receiveEvent(int length)
         dump();
 
         _rxIndex = 0;
+
+        //Last packet
+        if (_rxBuffer[1]) {
+          dfuManager.closeDfu();
+        }
 
         eslovAvailable();
       }
