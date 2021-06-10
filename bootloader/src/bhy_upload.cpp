@@ -49,6 +49,8 @@ DigitalOut* hostboot;
 
 FileUtils bhyfile;
 
+FILE *file_bhy;
+
 static void time_to_s_ns(uint64_t time_ticks, uint32_t *s, uint32_t *ns)
 {
     uint64_t timestamp = time_ticks; /* Store the last timestamp */
@@ -200,6 +202,8 @@ void install_callbacks(struct bhy2_dev* bhy2) {
 
 long getUpdateFileSize();
 
+bool isBhiFwValid();
+
 int fwupdate_bhi260(void)
 {
     uint8_t product_id = 0;
@@ -272,9 +276,16 @@ int fwupdate_bhi260(void)
             if (update_len < 1) {
                 return -1;
             } else {
-                uint32_t end_addr = start_addr + update_len;
-                DEBUG_PRINTF("Flash detected and BHY firmware update available. Erasing flash to upload firmware\r\n");
+                DEBUG_PRINTF("Flash detected and BHY firmware update available.\r\n");
 
+                if (!isBhiFwValid()) {
+                    DEBUG_PRINTF("If a valid BHI firmware was already available, that will be executed\r\n");
+                    return -1;
+                }
+
+                DEBUG_PRINTF("Erasing flash to upload the new firmware...\r\n");
+
+                uint32_t end_addr = start_addr + update_len;
                 rslt = bhy2_erase_flash(start_addr, end_addr, &bhy2);
                 print_api_error(rslt, &bhy2);
             }
@@ -369,34 +380,18 @@ static void print_api_error(int8_t rslt, struct bhy2_dev *dev)
 
 
 long getUpdateFileSize() {
-    FILE *file_bhy = fopen(BHY_UPDATE_FILE_PATH, "rb");
+    file_bhy = fopen(BHY_UPDATE_FILE_PATH, "rb");
 
     if (file_bhy == NULL) {
         DEBUG_PRINTF("No BHY UPDATE file found!\r\n");
-        return 0;
+        return -1;
     }
 
     long len_bhy = bhyfile.getFileLen(file_bhy);
     return len_bhy;
 }
 
-static int8_t upload_firmware(struct bhy2_dev *dev)
-{
-    int8_t rslt = BHY2_OK;
-
-    FILE *file_bhy = fopen(BHY_UPDATE_FILE_PATH, "rb");
-
-    long len_bhy = getUpdateFileSize();
-    DEBUG_PRINTF("BHY Firmware size is %ld bytes\r\n", len_bhy);
-
-    if (len_bhy < 1) {
-        return BHY2_E_NULL_PTR;
-    }
-
-    uint16_t iterations = len_bhy/256;
-    DEBUG_PRINTF("Iterations: %d \r\n", iterations);
-
-
+bool isBhiFwValid() {
     char crc_bhy_file = bhyfile.getFileCRC(file_bhy);
     DEBUG_PRINTF("CRC written in BHY file is %x \r\n", crc_bhy_file);
 
@@ -406,14 +401,31 @@ static int8_t upload_firmware(struct bhy2_dev *dev)
 
     if (crc_bhy!=crc_bhy_file) {
         DEBUG_PRINTF("Wrong CRC! The computed CRC is %x, while it should be %x \r\n", crc_bhy, crc_bhy_file);
-        //should return an error
-        rslt = BHY2_E_NULL_PTR;
-        return rslt;
+        DEBUG_PRINTF("Deleting BHI fw update file. Please load a correct one.\r\n");
+        remove(BHY_UPDATE_FILE_PATH);
+        return false;
     } else {
         DEBUG_PRINTF("CRC check passed!\r\n");
     }
 
     fseek(file_bhy, 0, SEEK_SET);
+
+    return true;
+}
+
+static int8_t upload_firmware(struct bhy2_dev *dev)
+{
+    int8_t rslt = BHY2_OK;
+
+    long len_bhy = getUpdateFileSize();
+    DEBUG_PRINTF("BHY Firmware size is %ld bytes\r\n", len_bhy);
+
+    if (len_bhy < 1) {
+        return BHY2_E_NULL_PTR;
+    }
+
+    uint16_t iterations = len_bhy/256;
+    //DEBUG_PRINTF("Iterations: %d \r\n", iterations);
 
     uint8_t bhy2_firmware_image[256];
     uint32_t incr = 256; /* Max command packet size */
