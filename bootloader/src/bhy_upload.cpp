@@ -350,7 +350,6 @@ int fwupdate_bhi260(void)
         }
 
         rslt = bhy2_get_boot_status(&boot_status, &bhy2);
-        DEBUG_PRINTF("Boot status: %02X\r\n", boot_status);
     }
     else
     {
@@ -364,7 +363,6 @@ int fwupdate_bhi260(void)
     close_interfaces();
 
     rslt = bhy2_get_boot_status(&boot_status, &bhy2);
-    DEBUG_PRINTF("Boot status: %02X\r\n", boot_status);
 
     return rslt;
 }

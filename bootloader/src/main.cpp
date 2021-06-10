@@ -425,13 +425,6 @@ int main()
     regret = NRF_POWER->GPREGRET2;
     DEBUG_PRINTF("NRF_POWER->GPREGRET2 = %04x\n", regret);
 
-
-#if defined (CONFIG_GPIO_AS_PINRESET)
-    DEBUG_PRINTF("CONFIG_GPIO_AS_PINRESET defined\r\n");
-#else
-    DEBUG_PRINTF("CONFIG_GPIO_AS_PINRESET NOT defined\r\n");
-#endif
-
     if (boot_rst_n == 0) {
 
         int buttonTaps = selectOperation();
