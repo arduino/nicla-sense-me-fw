@@ -10,8 +10,6 @@
 #include "mbed.h"
 #include "Nicla_System.h"
 
-mbed::DigitalIn eslovInt(p19, PullUp);
-
 Arduino_BHY2::Arduino_BHY2() :
   _debug(NULL),
   _pingTime(0),
@@ -39,10 +37,18 @@ void Arduino_BHY2::pingI2C() {
 void Arduino_BHY2::checkEslovInt() {
   if (millis() - _startTime < _timeout) {
     //Timeout didn't expire yet
-    if (!eslovInt) {
+    if (!digitalRead(p19)) {
+      //Wait for MKR to clear Eslov Int pin
+      while(!digitalRead(p19)) {}
+      if (_debug) _debug->println("MKR released Eslov Int pin");
+
+      //Change mode for Eslov Int pin
+      //Eslov Int Pin will be used to synchronize Dfu via Eslov
+      pinMode(p19, OUTPUT);
+
+      eslovHandler.begin();
       //Eslov has been activated
       _eslovActive = true;
-      eslovHandler.begin();
     }
   } else {
     //Timeout expired
@@ -57,6 +63,7 @@ void Arduino_BHY2::setLDOTimeout(int time) {
 
 bool Arduino_BHY2::begin()
 {
+  pinMode(p19, INPUT);
   nicla::begin();
   _startTime = millis();
   nicla::enable3V3LDO();

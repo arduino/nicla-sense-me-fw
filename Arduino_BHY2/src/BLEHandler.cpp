@@ -4,10 +4,8 @@
 
 // DFU channels
 BLEService dfuService("34c2e3b8-34aa-11eb-adc1-0242ac120002");
-auto dfuAckUuid = "34c2e3be-34aa-11eb-adc1-0242ac120002";
 auto dfuInternalUuid = "34c2e3b9-34aa-11eb-adc1-0242ac120002";
 auto dfuExternalUuid = "34c2e3ba-34aa-11eb-adc1-0242ac120002";
-BLECharacteristic dfuAckCharacteristic(dfuAckUuid, (BLERead | BLENotify), 1);
 BLECharacteristic dfuInternalCharacteristic(dfuInternalUuid, BLEWrite, sizeof(DFUPacket), true);
 BLECharacteristic dfuExternalCharacteristic(dfuExternalUuid, BLEWrite, sizeof(DFUPacket), true);
 
@@ -28,16 +26,6 @@ BLEHandler::~BLEHandler()
 {
 }
 
-void BLEHandler::writeDFUAcknowledgment()
-{
-  uint8_t ack = dfuManager.acknowledgment();
-  dfuAckCharacteristic.writeValue(ack);
-
-  if (_lastDfuPack && ack == 0x0F) {
-    dfuManager.closeDfu();
-  }
-}
-
 // DFU channel
 void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteristic) 
 {
@@ -52,9 +40,8 @@ void BLEHandler::processDFUPacket(DFUType dfuType, BLECharacteristic characteris
   if (data[0]) {
     //Last packet
     _lastDfuPack = true;
+    dfuManager.closeDfu();
   }
-
-  writeDFUAcknowledgment();
 }
 
 void BLEHandler::receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic)
@@ -97,7 +84,6 @@ bool BLEHandler::begin()
   BLE.setAdvertisedService(dfuService);
   dfuService.addCharacteristic(dfuInternalCharacteristic);
   dfuService.addCharacteristic(dfuExternalCharacteristic);
-  dfuService.addCharacteristic(dfuAckCharacteristic);
   BLE.addService(dfuService);
   dfuInternalCharacteristic.setEventHandler(BLEWritten, receivedInternalDFU);
   dfuExternalCharacteristic.setEventHandler(BLEWritten, receivedExternalDFU);

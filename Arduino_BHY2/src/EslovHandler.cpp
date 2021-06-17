@@ -18,10 +18,12 @@ EslovHandler::~EslovHandler()
 
 bool EslovHandler::begin()
 {
+  eslovBusy();
   Wire.begin(ESLOV_DEFAULT_ADDRESS);
   eslovActive = true;
   Wire.onReceive(EslovHandler::onReceive); 
   Wire.onRequest(EslovHandler::onRequest);
+  eslovAvailable();
   return true;
 }
 
@@ -33,6 +35,18 @@ void EslovHandler::onReceive(int length)
 void EslovHandler::onRequest()
 {
   eslovHandler.requestEvent();
+}
+
+void EslovHandler::eslovBusy()
+{
+  //Set Eslov INT pin
+  digitalWrite(p19, LOW);
+}
+
+void EslovHandler::eslovAvailable()
+{
+  //Release Eslov INT pin
+  digitalWrite(p19, HIGH);
 }
 
 void EslovHandler::requestEvent()
@@ -56,16 +70,6 @@ void EslovHandler::requestEvent()
       _debug->println(data.size);
     }
 
-  } else if (_state == ESLOV_DFU_ACK_STATE) {
-    uint8_t ack = dfuManager.acknowledgment();
-    if (_lastDfuPack && ack == 0x0F) {
-      dfuManager.closeDfu();
-    }
-    if (_debug) {
-      _debug->print("Ack: ");
-      _debug->println(ack);
-    }
-    Wire.write(ack);
   } else if (_state == ESLOV_SENSOR_ACK_STATE) {
     uint8_t ack = sensortec.acknowledgment();
     if (_debug) {
@@ -90,6 +94,7 @@ void EslovHandler::receiveEvent(int length)
 
   while(Wire.available())
   {
+    eslovBusy();
     _rxBuffer[_rxIndex++] = Wire.read(); 
 
     // Check if packet is complete depending on its opcode
@@ -97,28 +102,32 @@ void EslovHandler::receiveEvent(int length)
       if (_rxIndex == sizeof(DFUPacket) + 1) {
         dfuManager.processPacket(eslovDFU, DFU_EXTERNAL, &_rxBuffer[1]);
 
+        dump();
+
+        _rxIndex = 0;
+
+        //Last packet
         if (_rxBuffer[1]) {
-          _lastDfuPack = true;
+          dfuManager.closeDfu();
         }
 
-        _state = ESLOV_DFU_ACK_STATE;
-
-        dump();
-        _rxIndex = 0;
+        eslovAvailable();
       }
 
     } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
         dfuManager.processPacket(eslovDFU, DFU_INTERNAL, &_rxBuffer[1]);
 
+        dump();
+
+        _rxIndex = 0;
+
+        //Last packet
         if (_rxBuffer[1]) {
-          _lastDfuPack = true;
+          dfuManager.closeDfu();
         }
 
-        _state = ESLOV_DFU_ACK_STATE;
-
-        dump();
-        _rxIndex = 0;
+        eslovAvailable();
       }
 
     } else if (_rxBuffer[0] == ESLOV_SENSOR_CONFIG_OPCODE) {

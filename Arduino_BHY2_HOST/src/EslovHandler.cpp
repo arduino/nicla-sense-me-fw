@@ -35,35 +35,48 @@ void EslovHandler::update()
   while (Serial.available()) {
     _rxBuffer[_rxIndex++] = Serial.read();
 
-    if (_debug) {
-      _debug->println(_rxBuffer[_rxIndex-1]);
-    }
-
     if (_rxBuffer[0] == HOST_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == HOST_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
 
-        setEslovIntPin();
+        toggleEslovIntPin();
+
         if (!_dfuLedOn) {
           pinMode(LED_BUILTIN, OUTPUT);
           digitalWrite(LED_BUILTIN, HIGH);
         }
 
-        writeDfuPacket(_rxBuffer, sizeof(DFUPacket) + 1);
-        uint8_t ack = requestPacketAck();
+        pinMode(ESLOV_INT_PIN, INPUT);
 
-        dump();
+        //Wait for Nicla to set ESLOV_INT_PIN HIGH, meaning that is ready to receive
+        while(!digitalRead(ESLOV_INT_PIN)) {
+          if (_debug) _debug->println("Waiting for Eslov Int pin to be released");
+        }
+
+        writeDfuPacket(_rxBuffer, sizeof(DFUPacket) + 1);
+
+        if (digitalRead(ESLOV_INT_PIN)) {
+          if (_debug) _debug->println("Eslov INT pin HIGH.");
+        } else {
+          if (_debug) _debug->println("Eslov INT pin STILL LOW");
+          while(!digitalRead(ESLOV_INT_PIN)) {}
+        }
+
+        uint16_t index = _rxBuffer[2];
+
+        uint8_t ack = 15;
         if (_debug) {
           // print ack received
-          _debug->print("Sent Ack: ");
-          _debug->println(ack);
+          _debug->print("Packet received from Nicla. Index: ");
+          _debug->println(index);
         }
 
-        if (!_intPinCleared && ack == 15) {
-          clearEslovIntPin();
-        }
+        dump();
 
-        Serial.write(ack);
         _rxIndex = 0;
+
+        delay(ESLOV_DELAY);
+      
+        Serial.write(ack);
       }
 
     } else if (_rxBuffer[0] == HOST_READ_SENSOR_OPCODE) {
@@ -73,10 +86,6 @@ void EslovHandler::update()
       }
       uint8_t availableData = requestAvailableData();
       Serial.write(availableData);
-
-      if (!_intPinCleared && availableData) {
-        clearEslovIntPin();
-      }
 
       SensorDataPacket sensorData;
       while (availableData) {
@@ -92,7 +101,7 @@ void EslovHandler::update()
     } else if (_rxBuffer[0] == HOST_CONFIG_SENSOR_OPCODE) {
       if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
 
-        setEslovIntPin();
+        toggleEslovIntPin();
         SensorConfigurationPacket* config = (SensorConfigurationPacket*)&_rxBuffer[1];
         if (_debug) {
           _debug->print("received config: ");
@@ -109,10 +118,6 @@ void EslovHandler::update()
           // print ack received
           _debug->print("Sent Ack: ");
           _debug->println(ack);
-        }
-
-        if (!_intPinCleared && ack == 15) {
-          clearEslovIntPin();
         }
 
         Serial.write(ack);
@@ -139,7 +144,7 @@ void EslovHandler::writeDfuPacket(uint8_t *data, uint8_t length)
     _debug->print(ret);
     _debug->println();
   }
-  Wire.endTransmission(false);
+  Wire.endTransmission(true);
   if (*(data+1)) {
     //Last packet
     pinMode(LED_BUILTIN, OUTPUT);
@@ -210,7 +215,7 @@ bool EslovHandler::requestSensorData(SensorDataPacket &sData)
   return true;
 }
 
-void EslovHandler::setEslovIntPin()
+void EslovHandler::toggleEslovIntPin()
 {
   if (!_intPinAsserted) {
     // Indicates eslov presence
@@ -220,22 +225,15 @@ void EslovHandler::setEslovIntPin()
     if (_debug) {
       _debug->println("Eslov int LOW");
     }
-  }
-}
+    //Use 1 sec delay to let Nicla see the LOW pin and enable Eslov
+    delay(500);
 
-void EslovHandler::clearEslovIntPin()
-{
-  /*
-  If Eslov Int pin is never cleared, if Nicla reboots with the MKR board still running the Passthough application
-  and the Eslov cable still connected, Nicla will immediately re-enable Eslov communication.
-  To prevent this, clear Eslov Int pin once Eslov communication already successfully started.
-  */
-  if (_intPinAsserted) {
     digitalWrite(ESLOV_INT_PIN, HIGH);
     _intPinCleared = true;
     if (_debug) {
       _debug->println("Eslov int pin cleared");
     }
+    delay(500);
   }
 }
 

@@ -25,7 +25,6 @@ private:
 
   bool _lastDfuPack;
 
-  void writeDFUAcknowledgment();
   void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic);
 
   static void receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic);

@@ -125,21 +125,19 @@
 <script>
 const deviceName = 'NICLA';
 const dfuService = '34c2e3b8-34aa-11eb-adc1-0242ac120002';
-const dfuAckCharacteristic = '34c2e3be-34aa-11eb-adc1-0242ac120002';
 const dfuInternalCharacteristic = '34c2e3b9-34aa-11eb-adc1-0242ac120002';
 const dfuExternalCharacteristic = '34c2e3ba-34aa-11eb-adc1-0242ac120002';
 
 var bleDevice;
 var gattService;
-var gattAckCharacteristic;
 var gattInternalCharacteristic;
 var gattExternalCharacteristic;
 var dfuCharacteristic;
 
 var arrayFW;
 var fwLen;
-var bytesArray = new Uint8Array(195);
-var dataLen = 192;
+var bytesArray = new Uint8Array(235);
+var dataLen = 232;
 var iterations = 0;
 var spareBytes = 0;
 var updateIndex = 0;
@@ -250,7 +248,6 @@ function crc8() {
 function connect() {
   return getDeviceInfo()
   .then(connectGATTdfu)
-  .then(connectGATTack)
   .then(_ => { 
     console.log('Select the binary file that you want to send to Nicla');
     onConnection(); 
@@ -294,18 +291,6 @@ function connectGATTdfu() {
   });
 }
 
-function connectGATTack() {
-  return gattService.getCharacteristic(dfuAckCharacteristic)
-  .then(characteristic => {
-    gattAckCharacteristic = characteristic;
-    if (debug == true) {
-      console.log("gattAckCharacteristic:", gattAckCharacteristic);
-    }
-    //gattAckCharacteristic.addEventListener('characteristicvaluechanged', handleAckEvent)
-    //gattAckCharacteristic.startNotifications();
-  })
-}
-
 function onDisconnection(event) {
   var status = document.getElementById("connectionStatus");
   status.innerHTML = "Disconnected";
@@ -318,47 +303,17 @@ function onConnection() {
   status.className = "badge rounded-pill bg-success";
 }
 
-function readAck() {
-  if (debug == true) {
-    console.log('Reading Ack/Nack...');
-  }
-  gattAckCharacteristic.readValue()
-  .then(value => {
-    var ack = value.getUint8(0);
-    if (debug == true) {
-      console.log('AckVal is: ', ack);
-    }
-    handleAck(ack);
-  });
-}
-
-function handleAck(value) {
-  if (debug == true) {
-    console.log('Value is '+ value);
-  }
-  if (value == 15) {
-    if (debug == true) {
-      console.log('Ack received!');
-    }
+function increaseIndex() {
+  if (updateIndex < iterations - 1) {
     updateIndex++;
+    update(updateIndex);
   } else {
-    console.log('Nack received! Resend same packet');
-  }
-  if (updateIndex == iterations) {
     console.log('firmware sent');
     elem.style.width = 100 + "%";
     elem.style.backgroundColor = "#18b31d";
     document.getElementById("endPrint").innerHTML = "Fw upload completed!";
     return;
   }
-  update(updateIndex);
-  //setTimeout(_ => {update(updateIndex);}, 1);
-}
-
-function handleAckEvent(event) {
-  //clearTimeout(dfuTimeout);
-  let value = event.target.value.getUint8(0);
-  handleAck(value);
 }
 
 function update(index) {
@@ -418,18 +373,12 @@ function update(index) {
     var pb = (index/(iterations-1))*100;
     elem.style.width = Math.floor(pb) + "%";
 
-    //dfuTimeout = setTimeout(handleTimeout, 1000); 
-    setTimeout(readAck, 1);
+    increaseIndex();
     if (debug == true) {
       console.log('Written');
     }
   });
 }
 
-function handleTimeout() {
-  console.log('Ack did not arrive in time');
-  //updateIndex = 0;
-  update(updateIndex);
-}
 
 </script>
