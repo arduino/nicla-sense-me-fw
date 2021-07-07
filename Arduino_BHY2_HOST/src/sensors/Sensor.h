@@ -1,25 +1,49 @@
 #ifndef SENSOR_H_
 #define SENSOR_H_
 
-#include "sensors/SensorID.h"
-#include "sensors/DataParser.h"
+#include "SensorClass.h"
 
-class Sensor {
+class Sensor : public SensorClass {
 public:
-  __attribute__ ((error("Sensor requires an ID"))) Sensor();
-  Sensor(uint8_t id);
-  virtual ~Sensor();
+  Sensor() {} 
+  Sensor(uint8_t id) : SensorClass(id), _value(0.), _factor(0) {
+    for (int i = 0; i < NUM_SUPPORTEND_SENSOR; i++) {
+      if (SensorList[i].id == id) {
+        _factor = SensorList[i].scaleFactor;
+        _format = SensorList[i].payload;
+      }
+    }
+  }
 
-  uint8_t id();
-  void configure(float rate, uint32_t latency);
-  void disable();
+  float value() 
+  { 
+    return _value; 
+  }
 
-  virtual void setData(SensorDataPacket &data) = 0;
-  virtual String toString() = 0;
+  void setFactor(float factor)
+  {
+    _factor = factor;
+  }
 
-protected:
-  uint8_t _id;
-  bool _subscribed;
+  float getFactor()
+  {
+    return _factor;
+  }
+
+  void setData(SensorDataPacket &data)
+  {
+    DataParser::parseData(data, _value, _factor, _format);
+  }
+
+  String toString()
+  {
+    return (String)("Data value: " + String(_value, 3)  + "\n");
+  }
+
+private:
+  float _factor;
+  float _value;
+  SensorPayload _format;
 };
 
 #endif

@@ -10,7 +10,7 @@
 #include "Arduino.h"
 #include "Arduino_BHY2_HOST.h"
 
-SensorTemperature temp(SENSOR_ID_TEMP);
+Sensor temp(SENSOR_ID_TEMP);
 
 void setup()
 {
@@ -29,6 +29,6 @@ void loop()
 
   if (millis() - printTime >= 1000) {
     printTime = millis();
-    Serial.println(temp.toString());
+    Serial.println(String("Temperature: ") + String(temp.value(), 3));
   }
 }

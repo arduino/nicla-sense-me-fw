@@ -10,7 +10,6 @@
 #include "Arduino.h"
 #include "Arduino_BHY2_HOST.h"
 
-#define ORI_SCALE_FACTOR (360.0f / 32768.0f)
 SensorOrientation ori(SENSOR_ID_ORI);
 
 void setup()
@@ -20,7 +19,6 @@ void setup()
 
   BHY2_HOST.begin();
 
-  ori.setFactor(ORI_SCALE_FACTOR);
   ori.configure(1, 0);
 }
 

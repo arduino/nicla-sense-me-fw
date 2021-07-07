@@ -5,11 +5,11 @@
 #include "sensors/SensorTypes.h"
 #include "sensors/DataParser.h"
 
-#include "sensors/Sensor.h"
+#include "sensors/SensorClass.h"
 #include "sensors/SensorOrientation.h"
 #include "sensors/SensorXYZ.h"
 #include "sensors/SensorQuaternion.h"
-#include "sensors/SensorTemperature.h"
+#include "sensors/Sensor.h"
 
 #include "sensors/SensorID.h"
 

@@ -1,14 +1,20 @@
 #ifndef SENSOR_ORIENTATION_H_
 #define SENSOR_ORIENTATION_H_
 
-#include "Sensor.h"
+#include "SensorClass.h"
 
-class SensorOrientation : public Sensor {
+class SensorOrientation : public SensorClass {
 public:
   SensorOrientation() {} 
-  SensorOrientation(uint8_t id) : Sensor(id), _data(), _factor(0.01098) {}
+  SensorOrientation(uint8_t id) : SensorClass(id), _data(), _factor(0) {
+    for (int i = 0; i < NUM_SUPPORTEND_SENSOR; i++) {
+      if (SensorList[i].id == id) {
+        _factor = SensorList[i].scaleFactor;
+      }
+    }
+  }
 
-  float head() 
+  float heading() 
   { 
     return _data.heading; 
   }
@@ -25,9 +31,15 @@ public:
   {
     _factor = factor;
   }
+
+  float getFactor()
+  {
+    return _factor;
+  }
+
   void setData(SensorDataPacket &data)
   {
-    DataParser::parse(data, _data, _factor);
+    DataParser::parseEuler(data, _data, _factor);
   }
 
   String toString()

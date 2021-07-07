@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "sensors/SensorTypes.h"
+#include "SensorID.h"
 
 struct DataXYZ {
   int16_t x;
@@ -47,11 +48,11 @@ struct DataQuaternion {
 
 class DataParser {
 public:
-  static void parse(SensorDataPacket& data, DataXYZ& vector);
-  static void parse(SensorDataPacket& data, DataOrientation& vector);
-  static void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
-  static void parse(SensorDataPacket& data, DataQuaternion& vector);
-  static void parseTemperature(SensorDataPacket& data, float& value, float scaleFactor);
+  static void parse3DVector(SensorDataPacket& data, DataXYZ& vector);
+  static void parseEuler(SensorDataPacket& data, DataOrientation& vector);
+  static void parseEuler(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
+  static void parseQuaternion(SensorDataPacket& data, DataQuaternion& vector);
+  static void parseData(SensorDataPacket& data, float& value, float scaleFactor, SensorPayload format);
 };
 
 #endif

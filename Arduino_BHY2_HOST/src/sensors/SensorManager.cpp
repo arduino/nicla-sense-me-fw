@@ -16,12 +16,12 @@ void SensorManager::process(SensorDataPacket &data)
   }
 }
 
-void SensorManager::subscribe(Sensor *sensor)
+void SensorManager::subscribe(SensorClass *sensor)
 {
   _sensors[_sensorsLen++] = sensor;
 }
 
-void SensorManager::unsubscribe(Sensor *sensor)
+void SensorManager::unsubscribe(SensorClass *sensor)
 {
   for (int i = 0; i < _sensorsLen; i++) {
     if (sensor->id() == _sensors[i]->id()) {

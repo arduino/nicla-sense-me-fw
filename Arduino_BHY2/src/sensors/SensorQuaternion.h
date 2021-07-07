@@ -1,12 +1,12 @@
 #ifndef SENSOR_QUATERNION_H_
 #define SENSOR_QUATERNION_H_
 
-#include "Sensor.h"
+#include "SensorClass.h"
 
-class SensorQuaternion : public Sensor {
+class SensorQuaternion : public SensorClass {
 public:
   SensorQuaternion() {} 
-  SensorQuaternion(uint8_t id) : Sensor(id), _data() {}
+  SensorQuaternion(uint8_t id) : SensorClass(id), _data() {}
 
   int16_t x() 
   { 
@@ -27,7 +27,7 @@ public:
 
   void setData(SensorDataPacket &data)
   {
-    DataParser::parse(data, _data);
+    DataParser::parseQuaternion(data, _data);
   }
 
   String toString()

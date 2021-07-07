@@ -1,12 +1,12 @@
 #ifndef SENSOR_XYZ_H_
 #define SENSOR_XYZ_H_
 
-#include "Sensor.h"
+#include "SensorClass.h"
 
-class SensorXYZ : public Sensor {
+class SensorXYZ : public SensorClass {
 public:
   SensorXYZ() {}
-  SensorXYZ(uint8_t id) : Sensor(id), _data() {}
+  SensorXYZ(uint8_t id) : SensorClass(id), _data() {}
 
   int16_t x() 
   { 
@@ -23,7 +23,7 @@ public:
 
   void setData(SensorDataPacket &data)
   {
-    DataParser::parse(data, _data);
+    DataParser::parse3DVector(data, _data);
   }
 
   String toString()
@@ -33,6 +33,7 @@ public:
 
 private:
   DataXYZ _data;
+
 };
 
 #endif
