@@ -11,6 +11,7 @@
 SensorXYZ accel(SENSOR_ID_ACC);
 SensorXYZ gyro(SENSOR_ID_GYRO);
 SensorTemperature temp(SENSOR_ID_TEMP);
+SensorGas gas(SENSOR_ID_GAS);
 
 void setup()
 {
@@ -21,6 +22,8 @@ void setup()
   accel.configure(1, 0);
   gyro.configure(1, 0);
   temp.configure(1, 0);
+  gas.configure(1,0);
+  gas.setFactor(1.0);
 }
 
 void loop()
@@ -36,5 +39,6 @@ void loop()
     Serial.println(String("acceleration: ") + accel.toString());
     Serial.println(String("gyroscope: ") + gyro.toString());
     Serial.println(String("temperature: ") + String(int(temp.value())));
+    Serial.println(String("gas: ") + String(int(gas.value())));
   }
 }

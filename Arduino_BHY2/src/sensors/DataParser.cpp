@@ -27,3 +27,7 @@ void DataParser::parse(SensorDataPacket& data, DataQuaternion& vector) {
 void DataParser::parseTemperature(SensorDataPacket& data, float& value, float scaleFactor) {
   value = data.getInt16(0) * scaleFactor;
 }
+
+void DataParser::parseGas(SensorDataPacket& data, float& value, float scaleFactor) {
+  value = data.getUint32(0) * scaleFactor;
+}
