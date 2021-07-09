@@ -53,6 +53,7 @@ public:
   static void parseEuler(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
   static void parseQuaternion(SensorDataPacket& data, DataQuaternion& vector);
   static void parseData(SensorDataPacket& data, float& value, float scaleFactor, SensorPayload format);
+  static void parseActivity(SensorDataPacket& data, uint16_t& value);
 };
 
 #endif

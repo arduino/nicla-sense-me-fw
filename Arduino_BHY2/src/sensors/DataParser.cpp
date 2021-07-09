@@ -53,3 +53,7 @@ void DataParser::parseData(SensorDataPacket& data, float& value, float scaleFact
   }
 
 }
+
+void DataParser::parseActivity(SensorDataPacket& data, uint16_t& value) {
+  value = data.getUint16(0);
+}
