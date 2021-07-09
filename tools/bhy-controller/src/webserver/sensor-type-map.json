@@ -1,134 +1,499 @@
 {
   "1": {
     "name": "ACC_PASS",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
   },
 
   "3": {
     "name": "ACC_RAW",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
   },
 
   "4": {
     "name": "ACC",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
   },
 
   "5": {
     "name": "ACC_BIAS",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
   },
 
   "6": {
     "name": "ACC_WU",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
   },
 
   "7": {
     "name": "ACC_RAW_WU",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
   },
 
   "10": {
     "name": "GYRO_PASS",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
   },
 
   "12": {
     "name": "GYRO_RAW",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
   },
 
   "13": {
     "name": "GYRO",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
+  },
+
+  "14": {
+    "name": "GYRO_BIAS",
+    "scheme": "xyz"
+  },
+
+  "15": {
+    "name": "GYRO_WU",
+    "scheme": "xyz"
+  },
+
+  "16": {
+    "name": "GYRO_RAW_WU",
+    "scheme": "xyz"
+  },
+
+  "19": {
+    "name": "MAGNET_PASS",
+    "scheme": "xyz"
+  },
+
+  "21": {
+    "name": "MAGNET_RAW",
+    "scheme": "xyz"
   },
 
   "22": {
     "name": "MAGNET",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
+  },
+
+  "23": {
+    "name": "MAGNET_BIAS",
+    "scheme": "xyz"
   },
 
   "24": {
     "name": "MAGNET_WU",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
+  },
+
+  "25": {
+    "name": "MAGNET_RAW_WU",
+    "scheme": "xyz"
   },
 
   "28": {
     "name": "GRAVITY",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
+  },
+
+  "29": {
+    "name": "GRAVITY_WU",
+    "scheme": "xyz"
+  },
+
+  "31": {
+    "name": "LINEAR_ACC",
+    "scheme": "xyz"
   },
 
   "32": {
     "name": "LINEAR_ACC_WU",
-    "type": 5,
-    "type-name": "xyz"
+    "scheme": "xyz"
+  },
+
+  "34": {
+    "name": "ROTATION",
+    "scheme": "quaternion"
+  },
+
+  "35": {
+    "name": "ROTATION_WU",
+    "scheme": "quaternion"
+  },
+
+  "37": {
+    "name": "GAME_ROTATION",
+    "scheme": "quaternion"
+  },
+
+  "38": {
+    "name": "GAME_ROTATION_WU",
+    "scheme": "quaternion"
+  },
+
+  "40": {
+    "name": "GEO_MAGN_ROTATION",
+    "scheme": "quaternion"
+  },
+
+  "41": {
+    "name": "GEO_MAGN_ROTATION_WU",
+    "scheme": "quaternion"
   },
 
   "43": {
     "name": "ORI",
+    "scheme": "orientation"
+  },
+
+  "44": {
+    "name": "ORI_WU",
     "type": 6,
     "type-name": "orientation"
   },
 
+  "48": {
+    "name": "TILT_DETECTOR",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "50": {
+    "name": "STEP_DETECTOR",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "52": {
+    "name": "STEP_COUNTER",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint32", "scale-factor": 1}
+    ]
+  },
+
+  "53": {
+    "name": "STEP_COUNTER_WU",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint32", "scale-factor": 1}
+    ]
+  },
+
+  "55": {
+    "name": "SIGNIFICANT_MOTION",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "57": {
+    "name": "WAKE_GESTURE",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "59": {
+    "name": "GLANCE_GESTURE",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "61": {
+    "name": "GLANCE_GESTURE",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "63": {
+    "name": "ACTIVITY_RECOGN",
+    "scheme": "activity"
+  },
+
+  "67": {
+    "name": "WRIST_TILT_GESTURE",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "69": {
+    "name": "DEVICE_ORIENTATION",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 1}
+    ]
+  },
+
+  "70": {
+    "name": "DEVICE_ORIENTATION_WU",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 1}
+    ]
+  },
+
+  "75": {
+    "name": "STATIONARY_DET",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "77": {
+    "name": "MOTION_DET",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "91": {
+    "name": "ACC_BIAS_WU",
+    "scheme": "xyz"
+  },
+
+  "92": {
+    "name": "GYRO_BIAS_WU",
+    "scheme": "xyz"
+  },
+
+  "93": {
+    "name": "MAG_BIAS_WU",
+    "scheme": "xyz"
+  },
+
+  "94": {
+    "name": "STEP_DET_WU",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
   "128": {
     "name": "TEMPERATURE",
-    "type": 0,
-    "type-name": "temperature"
-  },
-
-  "132": {
-    "name": "TEMPERATURE_WU",
-    "type": 0,
-    "type-name": "temperature"
-  },
-
-  "130": {
-    "name": "HUMIDITY",
-    "type": 1,
-    "type-name": "humidity"
-  },
-
-  "134": {
-    "name": "HUMIDITY_WU",
-    "type": 1,
-    "type-name": "humidity"
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "int16", "scale-factor": 0.008}
+    ]
   },
 
   "129": {
     "name": "BAROMETER",
-    "type": 7,
-    "type-name": "barometer"
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint24", "scale-factor": 0.0078}
+    ]
   },
 
-  "133": {
-    "name": "BAROMETER_WU",
-    "type": 7,
-    "type-name": "barometer"
+  "130": {
+    "name": "HUMIDITY",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 1}
+    ]
   },
 
   "131": {
     "name": "GAS",
-    "type": 8,
-    "type-name": "gas"
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint32", "scale-factor": 1}
+    ]
+  },
+
+  "132": {
+    "name": "TEMPERATURE_WU",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "int16", "scale-factor": 1}
+    ]
+  },
+
+  "133": {
+    "name": "BAROMETER_WU",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint24", "scale-factor": 0.0078}
+    ]
+  },
+
+  "134": {
+    "name": "HUMIDITY_WU",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 1}
+    ]
   },
 
   "135": {
     "name": "GAS_WU",
-    "type": 8,
-    "type-name": "gas"
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint32", "scale-factor": 1}
+    ]
+  },
+
+  "136": {
+    "name": "STEP_CNT_HW",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint32", "scale-factor": 1}
+    ]
+  },
+
+  "137": {
+    "name": "STEP_DET_HW",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "138": {
+    "name": "SIGNIFICANT_MOT_HW",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "139": {
+    "name": "STEP_CNT_HW_WU",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint32", "scale-factor": 1}
+    ]
+  },
+
+  "140": {
+    "name": "STEP_DET_HW_WU",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "141": {
+    "name": "SIGNIFICANT_MOT_HW_WU",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "142": {
+    "name": "ANY_MOTION",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "143": {
+    "name": "ANY_MOTION_WU",
+    "scheme": "event",
+    "eventcount": 0
+  },
+
+  "144": {
+    "name": "EXT_CAMERA",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 1}
+    ]
+  },
+
+  "145": {
+    "name": "GPS",
+    "scheme": "xyz"
+  },
+
+  "146": {
+    "name": "LIGHT",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint16", "scale-factor": 1}
+    ]
+  },
+
+  "147": {
+    "name": "PROXIMITY",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 1}
+    ]
+  },
+
+  "148": {
+    "name": "LIGHT_WU",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint16", "scale-factor": 1}
+    ]
+  },
+
+  "149": {
+    "name": "PROXIMITY_WU",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 1}
+    ]
+  },
+
+  "245": {
+    "name": "TIMESTAMP_SMALL_WU",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 0.000015625}
+    ]
+  },
+
+  "246": {
+    "name": "TIMESTAMP_LARGE_WU",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 0.000015625}
+    ]
+  },
+
+  "247": {
+    "name": "TIMESTAMP_FULL_WU",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 0.000015625}
+    ]
+  },
+
+  "251": {
+    "name": "TIMESTAMP_SMALL",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 0.000015625}
+    ]
+  },
+
+  "252": {
+    "name": "TIMESTAMP_LARGE",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 0.000015625}
+    ]
+  },
+
+  "253": {
+    "name": "TIMESTAMP_FULL",
+    "scheme": "singleRead",
+    "parse-scheme": 
+    [
+      {"name": "val", "type": "uint8", "scale-factor": 0.000015625}
+    ]
   }
 
 }

@@ -4,42 +4,6 @@
 
     {
       "id": 0,
-      "type": "temperature",
-      "parse-scheme": 
-      [
-        {"name": "val", "type": "int16", "scale-factor": 0.01}
-      ]
-    },
-
-    {
-      "id": 1,
-      "type": "humidity",
-      "parse-scheme": 
-      [
-        {"name": "val", "type": "uint8", "scale-factor": 1}
-      ]
-    },
-
-    {
-      "id": 2,
-      "type": "pressure",
-      "parse-scheme": 
-      [
-        {"name": "val", "type": "uint24", "scale-factor": 0.008}
-      ]
-    },
-
-    {
-      "id": 3,
-      "type": "altitude",
-      "parse-scheme": 
-      [
-        {"name": "val", "type": "float", "scale-factor": 1}
-      ]
-    },
-
-    {
-      "id": 4,
       "type": "quaternion",
       "parse-scheme": 
       [
@@ -52,7 +16,7 @@
     },
 
     {
-      "id": 5,
+      "id": 1,
       "type": "xyz",
       "parse-scheme": 
       [
@@ -63,7 +27,7 @@
     },
 
     {
-      "id": 6,
+      "id": 2,
       "type": "orientation",
       "parse-scheme": 
       [
@@ -74,20 +38,20 @@
     },
 
     {
-      "id": 7,
-      "type": "barometer",
-      "parse-scheme":
+      "id": 3,
+      "type": "event",
+      "parse-scheme": 
       [
-        {"name": "val", "type": "uint24", "scale-factor": 0.008}
+        {"name": "Event count", "type": "none", "scale-factor": 1.00}
       ]
     },
 
     {
-      "id": 8,
-      "type": "gas",
-      "parse-scheme":
+      "id": 4,
+      "type": "activity",
+      "parse-scheme": 
       [
-        {"name": "val", "type": "uint32", "scale-factor": 1}
+        {"name": "val", "type": "int16", "scale-factor": 1.00}
       ]
     }
 

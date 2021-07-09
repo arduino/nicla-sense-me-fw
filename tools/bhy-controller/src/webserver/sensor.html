@@ -116,6 +116,7 @@ var sensorDataCharacteristic
 var sensorMap = new Map();
 var parseScheme;
 var sensorTypes;
+var sensorTypesLen;
 
 fetch("./parse-scheme.json")
   .then(response => response.json())
@@ -124,13 +125,16 @@ fetch("./parse-scheme.json")
     parseScheme = json;
   });
 
-//fetch("./sensor-type.json")
 fetch("./sensor-type-map.json")
   .then(response => response.json())
   .then(json => {
     console.log(json);
     sensorTypes = json;
+    var counter = 0;
+    sensorTypesLen = Object.keys(sensorTypes).length;
+    console.log("Json length: ", sensorTypesLen);
   });
+
 
 document.querySelector('#connectButton').addEventListener('click', function() {
   if (isWebBluetoothEnabled()) { 
@@ -283,15 +287,31 @@ function receiveSensorData(event) {
 }
 
 function parseData(sensor, data) {
-  var type = sensorTypes[sensor].type;
   var sensorName = sensorTypes[sensor].name;
-  var scheme = parseScheme["types"][type]["parse-scheme"];
+  var scheme = sensorTypes[sensor].scheme;
   var result = "";
-
+  var parse_scheme;
+  var eventcount;
   // dataIndex start from 2 because the first bytes of the packet indicate
   // the sensor id and the data size
   var dataIndex = 0 + 2;
-  scheme.forEach(element => {
+
+  if (scheme == "singleRead") {
+    parse_scheme = sensorTypes[sensor]["parse-scheme"];
+  } else if (scheme == "quaternion") {
+    parse_scheme = parseScheme["types"][0]["parse-scheme"];
+  } else if (scheme == "xyz") {
+    parse_scheme = parseScheme["types"][1]["parse-scheme"];
+  } else if (scheme == "orientation") {
+    parse_scheme = parseScheme["types"][2]["parse-scheme"];
+  } else if (scheme == "event") {
+    eventcount = sensorTypes[sensor].eventcount;
+    parse_scheme = parseScheme["types"][3]["parse-scheme"];
+  } else if (scheme == "activity") {
+    parse_scheme = parseScheme["types"][4]["parse-scheme"];
+  }
+
+  parse_scheme.forEach(element => {
     console.log(element);
     var name = element['name'];
     var valueType = element['type'];
@@ -302,26 +322,70 @@ function parseData(sensor, data) {
     if (valueType == "uint8") {
       value = data.getUint8(dataIndex, true) * scale; 
       size = 1;
+    } else if (valueType == "int8") {
+      value = data.getInt8(dataIndex, true) * scale; 
+      size = 1;
+    } else if (valueType == "uint16") {
+      value = data.getUint16(dataIndex, true) * scale; 
+      size = 2;
+    } else if (valueType == "int16") {
+      value = data.getInt16(dataIndex, true) * scale; 
+      size = 2;
     } else if (valueType == "uint24") {
       value = data.getUint16(dataIndex, true) + (data.getUint8(dataIndex+2, true) << 16);
       size = 3;
     } else if (valueType == "uint32") {
       value = data.getUint16(dataIndex, true) + (data.getUint16(dataIndex+2, true) << 16);
       size = 4;
-    } else if (valueType == "int16") {
-      value = data.getInt16(dataIndex, true) * scale; 
-      size = 2;
     } else if (valueType == "float") {
       value = data.getFloat32(dataIndex, true) * scale; 
       size = 4;
+    } else if (valueType == "none") {
+      value = eventcount + 1;
+      sensorTypes[sensor].eventcount = value;
+      size = 0;
     } else {
       console.log("Error: unknown type");
+    }
+
+    if (scheme == "activity") {
+      value = geActivityString(value);
     }
     result = result + element.name + ": " + value + "   ";
     console.log(dataIndex);
     dataIndex += size;
+
   });
+
   return [sensorName, result];
+}
+
+function geActivityString(value) {
+
+  const activityMessages = ["Still activity ended",
+                            "Walking activity ended",
+                            "Running activity ended",
+                            "On bicycle activity ended",
+                            "In vehicle activity ended",
+                            "Tilting activity ended",
+                            "In vehicle still ended",
+                            "",
+                            "Still activity started",
+                            "Walking activity started",
+                            "Running activity started",
+                            "On bicycle activity started",
+                            "In vehicle activity started",
+                            "Tilting activity started",
+                            "In vehicle still started",
+                            ""];
+
+  for (let i = 0; i < 16; i++) {
+    maskedVal = (value & (0x0001 << i)) >> i;
+    if (maskedVal) {
+      console.log(activityMessages[i]);
+      return [activityMessages[i]];
+    }
+  }
 }
 
 </script>
