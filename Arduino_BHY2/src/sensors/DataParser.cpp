@@ -48,6 +48,8 @@ void DataParser::parseData(SensorDataPacket& data, float& value, float scaleFact
     case P32BITUNSIGNED:
       value = data.getUint32(0) * scaleFactor;
       break;
+    case PEVENT:
+      value = 1;
     default:
       break;
   }

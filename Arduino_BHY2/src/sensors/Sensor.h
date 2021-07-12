@@ -37,6 +37,14 @@ public:
 
   String toString()
   {
+    if (_format == PEVENT) {
+      if (_value > 0) {
+        _value = 0;
+        return (String)("Event detected\n");
+      } else {
+        return (String)("");
+      }
+    }
     return (String)("Data value: " + String(_value, 3)  + "\n");
   }
 
