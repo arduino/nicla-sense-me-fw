@@ -10,10 +10,15 @@
 #include "Arduino.h"
 #include "Arduino_BHY2_HOST.h"
 
+#ifdef ARDUINO_ARCH_MBED
+#include "USB/PluggableUSBSerial.h"
+arduino::USBSerial SerialUSB2(false);
+#else
+Serial_ SerialUSB2(USBDevice);
+#endif
+
 // Set DEBUG to true in order to enable debug print
 #define DEBUG false
-
-Serial_ SerialUSB2(USBDevice);
 
 void setup()
 {
