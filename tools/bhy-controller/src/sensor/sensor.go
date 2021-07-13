@@ -55,6 +55,11 @@ func errCheck(e error) {
 	}
 }
 
+func LoadSensors() {
+	scheme = loadScheme()
+	types = loadTypes()
+}
+
 func openPort(usbPort string, baudRate int) serial.Port {
 	mode := &serial.Mode{
 		BaudRate: baudRate,

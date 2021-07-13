@@ -42,7 +42,7 @@
       "type": "event",
       "parse-scheme": 
       [
-        {"name": "Event count", "type": "none", "scale-factor": 1.00}
+        {"name": "Event count", "type": "none", "scale-factor": 1}
       ]
     },
 
@@ -51,7 +51,7 @@
       "type": "activity",
       "parse-scheme": 
       [
-        {"name": "val", "type": "int16", "scale-factor": 1.00}
+        {"name": "Activity status", "type": "uint16", "scale-factor": 1}
       ]
     }
 

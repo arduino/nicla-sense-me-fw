@@ -63,6 +63,7 @@ func sensorCommand() {
 		sensorError()
 		return
 	}
+	loadJsonScheme()
 	// parse the additional subcommand
 	switch os.Args[2] {
 	case "read":
@@ -72,6 +73,10 @@ func sensorCommand() {
 	default:
 		sensorError()
 	}
+}
+
+func loadJsonScheme() {
+	sensor.LoadSensors()
 }
 
 func sensorReadCommand() {
