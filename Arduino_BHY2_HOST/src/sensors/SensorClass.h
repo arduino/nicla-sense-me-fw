@@ -4,6 +4,11 @@
 #include "SensorID.h"
 #include "DataParser.h"
 
+enum CommunicationProtocol {
+  ESLOV = 0,
+  BLE_BRIDGE   = 1
+};
+
 class SensorClass {
 public:
   __attribute__ ((error("Sensor requires an ID"))) SensorClass();
@@ -11,7 +16,7 @@ public:
   virtual ~SensorClass();
 
   uint8_t id();
-  void configure(float rate, uint32_t latency);
+  void configure(float rate, uint32_t latency, CommunicationProtocol protocol = ESLOV);
   void disable();
 
   virtual void setData(SensorDataPacket &data) = 0;

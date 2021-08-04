@@ -25,15 +25,19 @@ uint8_t SensorClass::id()
   return _id;
 }
 
-void SensorClass::configure(float rate, uint32_t latency)
+void SensorClass::configure(float rate, uint32_t latency, CommunicationProtocol protocol)
 {
-  eslovHandler.toggleEslovIntPin();
   SensorConfigurationPacket config {_id, rate, latency};
 
-  uint8_t ack = 0;
-  while(ack != 15) {
-    BHY2_HOST.configureSensor(config);
-    ack = BHY2_HOST.requestAck();
+  if (protocol == ESLOV) {
+    eslovHandler.toggleEslovIntPin();
+    uint8_t ack = 0;
+    while(ack != 15) {
+      BHY2_HOST.configureSensor(config);
+      ack = BHY2_HOST.requestAck();
+    }
+  } else {
+      BHY2_HOST.configureSensor(config);
   }
 
   if (rate == 0 && _subscribed) {

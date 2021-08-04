@@ -20,6 +20,7 @@ public:
   virtual ~Arduino_BHY2_HOST();
 
   // Necessary API. Update function should be continuously polled if PASSTHORUGH is ENABLED
+  bool begin(CommunicationProtocol protocol);
   bool begin(bool passthrough = false);
   void update();
 
@@ -38,6 +39,7 @@ public:
 
 private:
   bool _passthrough;
+  CommunicationProtocol _protocol;
 };
 
 extern Arduino_BHY2_HOST BHY2_HOST;
