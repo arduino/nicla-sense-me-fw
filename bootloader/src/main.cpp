@@ -22,7 +22,7 @@
 #if defined(DEBUG)
 #define DEBUG_PRINTF(...) printf(__VA_ARGS__)
 #else
-#define DEBUG_PRINTF(...) (__VA_ARGS__)
+#define DEBUG_PRINTF(...)
 #endif
 
 #define WRONG_OTA_BINARY 	(-1)
@@ -391,7 +391,6 @@ int main()
     pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
     DEBUG_PRINTF("Push button ctrl reg: %04x\n", pb_reg);
 
-
     DEBUG_PRINTF("Bootloader starting\r\n");
 
     if (NRF_UICR->PSELRESET[0] != 0 || NRF_UICR->PSELRESET[1] != 00) {
@@ -434,8 +433,6 @@ int main()
         case 1:
             //Reset Anna
             DEBUG_PRINTF("Resetting Anna \r\n");
-            blink(blue);
-            loadApp();
             break;
 
         case 2:
@@ -461,11 +458,11 @@ int main()
             break;
         }
 
-    } else {
-
-        blink(blue);
-
-        loadApp();
-
     }
+
+    blink(blue, 200);
+    loadApp();
+
+    // never reaches this
+    while (1) {}
 }
