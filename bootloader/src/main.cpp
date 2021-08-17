@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define LDO_ALWAYS_ON
 
 #define MOUNT_PATH           "fs"
 #define ANNA_UPDATE_FILE_PATH   "/" MOUNT_PATH "/ANNA_UPDATE.BIN"
@@ -369,7 +370,7 @@ int main()
             - shift to lef by 2 positions: (0x0A << 2) = 0x28
             - set EN_LDO: 0xA8
     */
-#if defined(DEBUG)
+#if defined(DEBUG) || defined(LDO_ALWAYS_ON)
     //Enable LDO
     uint8_t ldo_reg = 0xE4;
     pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_LDO_CTRL, ldo_reg);
