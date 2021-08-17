@@ -96,9 +96,9 @@ void IS31FL3194::ledBlink(uint8_t color, uint32_t duration)
 
 
   // set rgb led current
-  writeByte(IS31FL3194_ADDRESS, IS31FL3194_OUT1, _out1); //maximum current
-  writeByte(IS31FL3194_ADDRESS, IS31FL3194_OUT2, _out2);
-  writeByte(IS31FL3194_ADDRESS, IS31FL3194_OUT3, _out3);
+  writeByte(IS31FL3194_ADDRESS, IS31FL3194_OUT1, _out1 >> 4); //maximum current
+  writeByte(IS31FL3194_ADDRESS, IS31FL3194_OUT2, _out2 >> 4);
+  writeByte(IS31FL3194_ADDRESS, IS31FL3194_OUT3, _out3 >> 4);
   writeByte(IS31FL3194_ADDRESS, IS31FL3194_COLOR_UPDATE, 0xC5); // write to color update register for changes to take effect
   ThisThread::sleep_for(duration);
   writeByte(IS31FL3194_ADDRESS, IS31FL3194_OUT1, 0x00); //maximum current

@@ -247,15 +247,15 @@ int try_update()
     mbed_start_application(POST_APPLICATION_ADDR);
 }
 
-void blink(uint8_t color)
+void blink(uint8_t color, int duration = 1000)
 {
     leds.reset();
     leds.init();
     leds.powerUp();
 
     for (int i = 0; i < 3; i++) {
-        leds.ledBlink(color, 1000);
-        ThisThread::sleep_for(1s);
+        leds.ledBlink(color, duration);
+        ThisThread::sleep_for(1000ms * duration / 1000);
     }
     leds.powerDown();
 }
