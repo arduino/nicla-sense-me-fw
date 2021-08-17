@@ -451,9 +451,8 @@ int main()
             mountFileSystem();
             blink(green);
             try_fail_safe();
-            while(1);
             break;
-        
+
         default:
             break;
         }
