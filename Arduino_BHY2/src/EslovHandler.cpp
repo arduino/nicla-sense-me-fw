@@ -8,7 +8,8 @@ EslovHandler::EslovHandler() :
   _rxBuffer(),
   _state(ESLOV_AVAILABLE_SENSOR_STATE),
   _debug(NULL),
-  _lastDfuPack(false)
+  _lastDfuPack(false),
+  _eslovIntPin(PIN_ESLOV_INT)
 {
 }
 
@@ -40,13 +41,13 @@ void EslovHandler::onRequest()
 void EslovHandler::eslovBusy()
 {
   //Set Eslov INT pin
-  digitalWrite(p19, LOW);
+  digitalWrite(_eslovIntPin, LOW);
 }
 
 void EslovHandler::eslovAvailable()
 {
   //Release Eslov INT pin
-  digitalWrite(p19, HIGH);
+  digitalWrite(_eslovIntPin, HIGH);
 }
 
 void EslovHandler::requestEvent()
@@ -84,6 +85,11 @@ void EslovHandler::end()
 {
   eslovActive = false;
   Wire.end();
+}
+
+void EslovHandler::niclaAsShield()
+{
+  _eslovIntPin = I2C_INT_PIN;
 }
 
 void EslovHandler::receiveEvent(int length)

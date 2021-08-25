@@ -2,8 +2,6 @@
 
 #define ESLOV_DELAY (10)
 
-#define ESLOV_INT_PIN (7)
-
 EslovHandler::EslovHandler() :
   _rxIndex(0),
   _rxBuffer(),
@@ -11,7 +9,8 @@ EslovHandler::EslovHandler() :
   _intPinAsserted(false),
   _intPinCleared(false),
   _dfuLedOn(false),
-  _debug(NULL)
+  _debug(NULL),
+  _eslovIntPin(ESLOV_INT_PIN)
 {
 }
 
@@ -21,6 +20,9 @@ EslovHandler::~EslovHandler()
 
 bool EslovHandler::begin(bool passthrough)
 {
+  pinMode(_eslovIntPin, OUTPUT);
+  digitalWrite(_eslovIntPin, LOW);
+
   Wire.begin();
   Wire.setClock(400000);
   if (passthrough) {
@@ -45,20 +47,20 @@ void EslovHandler::update()
           digitalWrite(LED_BUILTIN, HIGH);
         }
 
-        pinMode(ESLOV_INT_PIN, INPUT);
+        pinMode(_eslovIntPin, INPUT);
 
-        //Wait for Nicla to set ESLOV_INT_PIN HIGH, meaning that is ready to receive
-        while(!digitalRead(ESLOV_INT_PIN)) {
+        //Wait for Nicla to set _eslovIntPin HIGH, meaning that is ready to receive
+        while(!digitalRead(_eslovIntPin)) {
           if (_debug) _debug->println("Waiting for Eslov Int pin to be released");
         }
 
         writeDfuPacket(_rxBuffer, sizeof(DFUPacket) + 1);
 
-        if (digitalRead(ESLOV_INT_PIN)) {
+        if (digitalRead(_eslovIntPin)) {
           if (_debug) _debug->println("Eslov INT pin HIGH.");
         } else {
           if (_debug) _debug->println("Eslov INT pin STILL LOW");
-          while(!digitalRead(ESLOV_INT_PIN)) {}
+          while(!digitalRead(_eslovIntPin)) {}
         }
 
         uint16_t index = _rxBuffer[2];
@@ -219,8 +221,8 @@ void EslovHandler::toggleEslovIntPin()
 {
   if (!_intPinAsserted) {
     // Indicates eslov presence
-    pinMode(ESLOV_INT_PIN, OUTPUT);
-    digitalWrite(ESLOV_INT_PIN, LOW);
+    pinMode(_eslovIntPin, OUTPUT);
+    digitalWrite(_eslovIntPin, LOW);
     _intPinAsserted = true;
     if (_debug) {
       _debug->println("Eslov int LOW");
@@ -228,13 +230,18 @@ void EslovHandler::toggleEslovIntPin()
     //Use 1 sec delay to let Nicla see the LOW pin and enable Eslov
     delay(500);
 
-    digitalWrite(ESLOV_INT_PIN, HIGH);
+    digitalWrite(_eslovIntPin, HIGH);
     _intPinCleared = true;
     if (_debug) {
       _debug->println("Eslov int pin cleared");
     }
     delay(500);
   }
+}
+
+void EslovHandler::niclaAsShield()
+{
+  _eslovIntPin = I2C_INT_PIN;
 }
 
 void EslovHandler::debug(Stream &stream)

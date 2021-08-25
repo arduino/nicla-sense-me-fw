@@ -7,6 +7,8 @@
 #define ESLOV_MAX_LENGTH      255
 #define ESLOV_DEFAULT_ADDRESS 0x55
 
+#define I2C_INT_PIN (p24)
+
 enum EslovOpcode {
   ESLOV_DFU_INTERNAL_OPCODE,
   ESLOV_DFU_EXTERNAL_OPCODE,
@@ -34,6 +36,9 @@ public:
 
   bool eslovActive = false;
 
+protected:
+  void niclaAsShield();
+
 private:
   void receiveEvent(int length);
   void requestEvent();
@@ -52,6 +57,8 @@ private:
   void dump();
   Stream *_debug;
   bool _lastDfuPack;
+
+  PinName _eslovIntPin;
 };
 
 extern EslovHandler eslovHandler;

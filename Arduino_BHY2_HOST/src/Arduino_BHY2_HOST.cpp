@@ -12,9 +12,12 @@ Arduino_BHY2_HOST::~Arduino_BHY2_HOST()
 {
 }
 
-bool Arduino_BHY2_HOST::begin(bool passthrough)
+bool Arduino_BHY2_HOST::begin(bool passthrough, bool niclaUsedAsShield)
 {
   _passthrough = passthrough;
+  if (niclaUsedAsShield) {
+    eslovHandler.niclaAsShield();
+  }
   return eslovHandler.begin(passthrough);
 }
 
