@@ -13,7 +13,7 @@
 Arduino_BHY2::Arduino_BHY2() :
   _debug(NULL),
   _pingTime(0),
-  _timeout(60000),
+  _timeout(120000),
   _timeoutExpired(false),
   _eslovActive(false),
   _startTime(0),
