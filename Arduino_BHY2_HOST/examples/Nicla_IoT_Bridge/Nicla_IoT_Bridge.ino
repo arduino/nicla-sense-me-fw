@@ -19,8 +19,17 @@ void setup() {
   setDebugMessageLevel(2);
   ArduinoCloud.printDebugInfo();
 
+  while(!ArduinoCloud.connected()) {
+    ArduinoCloud.update();
+    delay(10);
+  }
   
+  Serial.println("Configuring Nicla...");
+#ifdef ARDUINO_ARCH_MBED
   BHY2_HOST.begin();
+#else
+  BHY2_HOST.begin(false, NICLA_AS_SHIELD);
+#endif
   tempSensor.configure(1, 0);
 }
 
