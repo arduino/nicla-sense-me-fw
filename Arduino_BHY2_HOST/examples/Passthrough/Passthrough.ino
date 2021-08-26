@@ -5,6 +5,9 @@
  * to your PC.
  * Now you can use the arduino-bhy tool, written in golang, 
  * to control nicla from either the PC command line or from a web page.
+ * 
+ * NOTE: if Nicla is used as a Shield on top of a MKR board,
+ * please use BHY2_HOST.begin(true, NICLA_AS_SHIELD)
 */
 
 #include "Arduino.h"
