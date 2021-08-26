@@ -62,9 +62,9 @@ void Arduino_BHY2::setLDOTimeout(int time) {
   _timeout = time;
 }
 
-bool Arduino_BHY2::begin(bool niclaUsedAsShield)
+bool Arduino_BHY2::begin(NiclaWiring niclaConnection)
 {
-  if (niclaUsedAsShield) {
+  if (niclaConnection == NICLA_AS_SHIELD) {
     _eslovIntPin = I2C_INT_PIN;
     eslovHandler.niclaAsShield();
   }
