@@ -52,6 +52,8 @@ void EslovHandler::eslovAvailable()
 
 void EslovHandler::requestEvent()
 {
+  eslovBusy();
+
   if (_debug) {
     _debug->print("Wire Request event. State: ");
     _debug->println(_state);
@@ -79,6 +81,8 @@ void EslovHandler::requestEvent()
     }
     Wire.write(ack);
   }
+
+  eslovAvailable();
 }
 
 void EslovHandler::end()
@@ -145,6 +149,8 @@ void EslovHandler::receiveEvent(int length)
 
         dump();
         _rxIndex = 0;
+
+        eslovAvailable();
       }
 
     } else if (_rxBuffer[0] == ESLOV_SENSOR_STATE_OPCODE) {
@@ -154,6 +160,8 @@ void EslovHandler::receiveEvent(int length)
         dump();
         _rxIndex = 0;
       }
+
+      eslovAvailable();
 
     } else {
       // Not valid opcode. Discarding packet

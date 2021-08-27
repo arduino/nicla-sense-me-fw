@@ -159,6 +159,7 @@ void EslovHandler::writeDfuPacket(uint8_t *data, uint8_t length)
 void EslovHandler::writeStateChange(EslovState state)
 {
   delay(ESLOV_DELAY);
+  while(!digitalRead(_eslovIntPin)) {}
   uint8_t packet[2] = {ESLOV_SENSOR_STATE_OPCODE, state};
   Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
   Wire.write((uint8_t*)packet, sizeof(packet));
@@ -196,6 +197,7 @@ uint8_t EslovHandler::requestPacketAck()
 uint8_t EslovHandler::requestAvailableData() 
 {
   writeStateChange(ESLOV_AVAILABLE_SENSOR_STATE);
+  while(!digitalRead(_eslovIntPin)) {}
   uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
   if (!ret) return 0;
   return Wire.read();
@@ -206,6 +208,7 @@ bool EslovHandler::requestSensorData(SensorDataPacket &sData)
 {
   if (_eslovState != ESLOV_READ_SENSOR_STATE) {
     writeStateChange(ESLOV_READ_SENSOR_STATE);
+    while(!digitalRead(_eslovIntPin)) {}
   }
   uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, sizeof(SensorDataPacket));
   if (!ret) return false;
