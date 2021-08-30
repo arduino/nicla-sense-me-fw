@@ -1,165 +1,197 @@
 {
   "1": {
     "name": "ACC_PASS",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "3": {
     "name": "ACC_RAW",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "4": {
     "name": "ACC",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 1
   },
 
   "5": {
     "name": "ACC_BIAS",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "6": {
     "name": "ACC_WU",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "7": {
     "name": "ACC_RAW_WU",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "10": {
     "name": "GYRO_PASS",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "12": {
     "name": "GYRO_RAW",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "13": {
     "name": "GYRO",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 1
   },
 
   "14": {
     "name": "GYRO_BIAS",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "15": {
     "name": "GYRO_WU",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "16": {
     "name": "GYRO_RAW_WU",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "19": {
     "name": "MAGNET_PASS",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "21": {
     "name": "MAGNET_RAW",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "22": {
     "name": "MAGNET",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "23": {
     "name": "MAGNET_BIAS",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "24": {
     "name": "MAGNET_WU",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "25": {
     "name": "MAGNET_RAW_WU",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "28": {
     "name": "GRAVITY",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "29": {
     "name": "GRAVITY_WU",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "31": {
     "name": "LINEAR_ACC",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "32": {
     "name": "LINEAR_ACC_WU",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "34": {
     "name": "ROTATION",
-    "scheme": "quaternion"
+    "scheme": "quaternion",
+    "dashboard": 1
   },
 
   "35": {
     "name": "ROTATION_WU",
-    "scheme": "quaternion"
+    "scheme": "quaternion",
+    "dashboard": 0
   },
 
   "37": {
     "name": "GAME_ROTATION",
-    "scheme": "quaternion"
+    "scheme": "quaternion",
+    "dashboard": 0
   },
 
   "38": {
     "name": "GAME_ROTATION_WU",
-    "scheme": "quaternion"
+    "scheme": "quaternion",
+    "dashboard": 0
   },
 
   "40": {
     "name": "GEO_MAGN_ROTATION",
-    "scheme": "quaternion"
+    "scheme": "quaternion",
+    "dashboard": 0
   },
 
   "41": {
     "name": "GEO_MAGN_ROTATION_WU",
-    "scheme": "quaternion"
+    "scheme": "quaternion",
+    "dashboard": 0
   },
 
   "43": {
     "name": "ORI",
-    "scheme": "orientation"
+    "scheme": "orientation",
+    "dashboard": 1
   },
 
   "44": {
     "name": "ORI_WU",
     "type": 6,
-    "type-name": "orientation"
+    "type-name": "orientation",
+    "dashboard": 0
   },
 
   "48": {
     "name": "TILT_DETECTOR",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "50": {
     "name": "STEP_DETECTOR",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 1
   },
 
   "52": {
@@ -168,7 +200,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint32", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 1
   },
 
   "53": {
@@ -177,42 +210,49 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint32", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "55": {
     "name": "SIGNIFICANT_MOTION",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "57": {
     "name": "WAKE_GESTURE",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "59": {
     "name": "GLANCE_GESTURE",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "61": {
-    "name": "GLANCE_GESTURE",
+    "name": "PICK_UP_GESTURE",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "63": {
     "name": "ACTIVITY_RECOGN",
-    "scheme": "activity"
+    "scheme": "activity",
+    "dashboard": 0
   },
 
   "67": {
     "name": "WRIST_TILT_GESTURE",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "69": {
@@ -221,7 +261,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 1
   },
 
   "70": {
@@ -230,40 +271,47 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "75": {
     "name": "STATIONARY_DET",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "77": {
     "name": "MOTION_DET",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 1
   },
 
   "91": {
     "name": "ACC_BIAS_WU",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "92": {
     "name": "GYRO_BIAS_WU",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "93": {
     "name": "MAG_BIAS_WU",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "94": {
     "name": "STEP_DET_WU",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "128": {
@@ -272,7 +320,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "int16", "scale-factor": 0.008}
-    ]
+    ],
+    "dashboard": 1
   },
 
   "129": {
@@ -281,7 +330,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint24", "scale-factor": 0.0078}
-    ]
+    ],
+    "dashboard": 1
   },
 
   "130": {
@@ -290,7 +340,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 1
   },
 
   "131": {
@@ -299,7 +350,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint32", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 1
   },
 
   "132": {
@@ -308,7 +360,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "int16", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "133": {
@@ -317,7 +370,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint24", "scale-factor": 0.0078}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "134": {
@@ -326,7 +380,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "135": {
@@ -335,7 +390,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint32", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "136": {
@@ -344,19 +400,22 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint32", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "137": {
     "name": "STEP_DET_HW",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "138": {
     "name": "SIGNIFICANT_MOT_HW",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "139": {
@@ -365,31 +424,36 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint32", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "140": {
     "name": "STEP_DET_HW_WU",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "141": {
     "name": "SIGNIFICANT_MOT_HW_WU",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "142": {
     "name": "ANY_MOTION",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "143": {
     "name": "ANY_MOTION_WU",
     "scheme": "event",
-    "eventcount": 0
+    "eventcount": 0,
+    "dashboard": 0
   },
 
   "144": {
@@ -398,12 +462,14 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "145": {
     "name": "GPS",
-    "scheme": "xyz"
+    "scheme": "xyz",
+    "dashboard": 0
   },
 
   "146": {
@@ -412,7 +478,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint16", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "147": {
@@ -421,7 +488,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "148": {
@@ -430,7 +498,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint16", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "149": {
@@ -439,7 +508,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 1}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "245": {
@@ -448,7 +518,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 0.000015625}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "246": {
@@ -457,7 +528,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 0.000015625}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "247": {
@@ -466,7 +538,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 0.000015625}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "251": {
@@ -475,7 +548,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 0.000015625}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "252": {
@@ -484,7 +558,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 0.000015625}
-    ]
+    ],
+    "dashboard": 0
   },
 
   "253": {
@@ -493,7 +568,8 @@
     "parse-scheme": 
     [
       {"name": "val", "type": "uint8", "scale-factor": 0.000015625}
-    ]
+    ],
+    "dashboard": 0
   }
 
 }
