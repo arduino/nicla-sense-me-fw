@@ -12,7 +12,7 @@
   },
 
   "4": {
-    "name": "ACC",
+    "name": "ACCELEROMETER",
     "scheme": "xyz",
     "dashboard": 1
   },
@@ -48,7 +48,7 @@
   },
 
   "13": {
-    "name": "GYRO",
+    "name": "GYROSCOPE",
     "scheme": "xyz",
     "dashboard": 1
   },
@@ -84,7 +84,7 @@
   },
 
   "22": {
-    "name": "MAGNET",
+    "name": "MAGNETOMETER",
     "scheme": "xyz",
     "dashboard": 0
   },
@@ -168,7 +168,7 @@
   },
 
   "43": {
-    "name": "ORI",
+    "name": "ORIENTATION",
     "scheme": "orientation",
     "dashboard": 1
   },
