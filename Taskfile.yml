@@ -1,7 +1,7 @@
 version: "3"
 
 includes:
-  dist-bhy-controller-tool: ./DistTasks.yml
+  dist: ./DistTasks.yml
 
 tasks:
   build-bhy-controller-tool:
@@ -11,7 +11,18 @@ tasks:
       - go build -v
 
 vars:
-  DIST_DIR:
-    sh: echo "`pwd`/dist"
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/release-go-task/Taskfile.yml
+  PROJECT_NAME: bhy
+  DIST_DIR: "dist"
+  # build vars
+  COMMIT:
+    sh: echo "$(git log --no-show-signature -n 1 --format=%h)"
+  TIMESTAMP:
+    sh: echo "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+  TIMESTAMP_SHORT:
+    sh: echo "{{now | date "20060102"}}"
+  TAG:
+    sh: echo "$(git tag --points-at=HEAD 2> /dev/null | head -n1)"
+  VERSION: "{{if .NIGHTLY}}nightly-{{.TIMESTAMP_SHORT}}{{else if .TAG}}{{.TAG}}{{else}}{{.PACKAGE_NAME_PREFIX}}git-snapshot{{end}}"
   TOOL_DIR:
     sh: echo "`pwd`/tools/bhy-controller/src"
