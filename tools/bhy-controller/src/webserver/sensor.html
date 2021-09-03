@@ -8,6 +8,8 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
+
     <title>Sensor page</title>
   </head>
   <body>
@@ -71,17 +73,17 @@
     </div>
     <br><hr><br>
 
-
     <!-- Read sensor data form -->
     <div class="container text-center">
       <h3>Read sensor data</h3>  
-      <table id="dataTable" class="table table-bordered" style="table-layout:fixed; width:100%"> 
+      <table id="dataTable" class="table table-bordered" style="table-layout:auto; width:100%;">
         <thead>
           <tr>
-            <th scope="col" style="width: 15%;">Sensor ID</th>
-            <th scope="col" style="width: 25%;">Sensor Name</th>
-            <th scope="col" style="width: 45%;">Data</th>
-            <th scope="col" style="width: 15%;">Status</th>
+            <th scope="col" style="width: 10%;">Sensor ID</th>
+            <th scope="col" style="width: 14%;">Sensor Name</th>
+            <th scope="col" style="width: 25%;">Data</th>
+            <th scope="col" style="width: 7%;">Status</th>
+            <th scope="col" style="width: 44%;">Chart</th>
           </tr>
         </thead>
         <tbody>
@@ -187,6 +189,9 @@ document.querySelector('#configureButton').addEventListener('click',
       cell = row.insertCell(3);
       cell.innerHTML = '<input id="Button" type="button" value="Enabled" onclick="updateSensorStatus(this, \'' + sensorId + '\');"/>'
       row.cells[3].firstChild.style.backgroundColor = "limegreen";
+      cell = row.insertCell(4);
+      var chartIdx = sensorTypes[sensorId].name;
+      cell.innerHTML = '<div id=\'' + chartIdx + '\'></div>';
     }
 
   }
@@ -321,6 +326,9 @@ function fillSensorTable() {
       cell.innerHTML = 0;
       cell = row.insertCell(3);
       cell.innerHTML = '<input id="Button" type="button" value="Enabled" onclick="updateSensorStatus(this, \'' + sensorIdx + '\');"/>'
+      cell = row.insertCell(4);
+      var chartIdx = sensorTypes[sensorIdx].name;
+      cell.innerHTML = '<div id=\'' + chartIdx + '\'></div>';
     }
   }
 }
@@ -333,7 +341,8 @@ function receiveSensorData(event) {
   console.log(value)
   var parsedData = parseData(sensor, value);
   parsedName = parsedData[0]
-  parsedValue = parsedData[1]
+  parsedStringValue = parsedData[1]
+  parsedValue = parsedData[2]
 
   var table = document.getElementById("dataTable");
   // If sensor is already in the table -> update its value
@@ -345,7 +354,24 @@ function receiveSensorData(event) {
     cell = row.cells[1];
     cell.innerHTML = parsedName;
     cell = row.cells[2];
-    cell.innerHTML = parsedValue;
+    cell.innerHTML = parsedStringValue;
+    cell = row.cells[4];
+    var chartIdx = parsedName;
+
+    if (sensorTypes[sensor].scheme == "singleRead") {
+
+      //Initial condition to draw the first chart point
+      if (sensorTypes[sensor].value == 0) {   //Plot doesn't exist yet because no valid data have been received
+        if (parsedValue != 0) {   //First valid data received: draw it in the chart
+          Plotly.newPlot(chartIdx,[{y:[parsedValue],type:'line'}]);
+          //Update json to signal that the reception started
+          sensorTypes[sensor].value = parsedValue;
+        }
+      } else {    //Plot already exists
+        Plotly.extendTraces(chartIdx,{y:[[parsedValue]]}, [0]);
+      }
+
+    }
   }
 }
 
@@ -358,6 +384,7 @@ function parseData(sensor, data) {
   // dataIndex start from 2 because the first bytes of the packet indicate
   // the sensor id and the data size
   var dataIndex = 0 + 2;
+  var value = 0;
 
   if (scheme == "singleRead") {
     parse_scheme = sensorTypes[sensor]["parse-scheme"];
@@ -379,7 +406,6 @@ function parseData(sensor, data) {
     var name = element['name'];
     var valueType = element['type'];
     var scale = element['scale-factor'];
-    var value = 0;
     var size = 0;
 
     if (valueType == "uint8") {
@@ -420,7 +446,7 @@ function parseData(sensor, data) {
 
   });
 
-  return [sensorName, result];
+  return [sensorName, result, value];
 }
 
 function geActivityString(value) {
