@@ -333,6 +333,8 @@ function fillSensorTable() {
   }
 }
 
+a=[]; b=[]; c=[];
+
 function receiveSensorData(event) {
   var value = event.target.value;
   // Get sensor data
@@ -369,6 +371,25 @@ function receiveSensorData(event) {
         }
       } else {    //Plot already exists
         Plotly.extendTraces(chartIdx,{y:[[parsedValue]]}, [0]);
+      }
+
+    } else if (sensorTypes[sensor].scheme == "xyz") {
+        //Parse 3D axes values
+        const arrXYZValues = parsedStringValue.split(" ");
+        console.log("Split: ", arrXYZValues);
+        console.log("Split[1]: ", arrXYZValues[1]);
+        console.log("Split[5]: ", arrXYZValues[5]);
+        console.log("Split[9]: ", arrXYZValues[9]);
+
+      //Initial condition to draw the first chart point
+      if (sensorTypes[sensor].value == 0) {   //Plot doesn't exist yet because no valid data have been received
+        if (parsedValue != 0) {   //First valid data received: draw it in the chart
+          Plotly.newPlot(chartIdx,[{x:[arrXYZValues[1]],y:[arrXYZValues[5]],z:[arrXYZValues[9]],type:'mesh3d'}]);
+          //Update json to signal that the reception started
+          sensorTypes[sensor].value = parsedValue;
+        }
+      } else {    //Plot already exists
+        Plotly.extendTraces(chartIdx,{x:[[arrXYZValues[1]]],y:[[arrXYZValues[5]]],z:[[arrXYZValues[9]]]}, [0]);
       }
 
     }

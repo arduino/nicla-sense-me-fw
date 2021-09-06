@@ -2,132 +2,154 @@
   "1": {
     "name": "ACC_PASS",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "3": {
     "name": "ACC_RAW",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "4": {
     "name": "ACCELEROMETER",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 1
   },
 
   "5": {
     "name": "ACC_BIAS",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "6": {
     "name": "ACC_WU",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "7": {
     "name": "ACC_RAW_WU",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "10": {
     "name": "GYRO_PASS",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "12": {
     "name": "GYRO_RAW",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "13": {
     "name": "GYROSCOPE",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 1
   },
 
   "14": {
     "name": "GYRO_BIAS",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "15": {
     "name": "GYRO_WU",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "16": {
     "name": "GYRO_RAW_WU",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "19": {
     "name": "MAGNET_PASS",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "21": {
     "name": "MAGNET_RAW",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "22": {
     "name": "MAGNETOMETER",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "23": {
     "name": "MAGNET_BIAS",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "24": {
     "name": "MAGNET_WU",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "25": {
     "name": "MAGNET_RAW_WU",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "28": {
     "name": "GRAVITY",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "29": {
     "name": "GRAVITY_WU",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "31": {
     "name": "LINEAR_ACC",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "32": {
     "name": "LINEAR_ACC_WU",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
@@ -300,18 +322,21 @@
   "91": {
     "name": "ACC_BIAS_WU",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "92": {
     "name": "GYRO_BIAS_WU",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
   "93": {
     "name": "MAG_BIAS_WU",
     "scheme": "xyz",
+    "value": 0,
     "dashboard": 0
   },
 
