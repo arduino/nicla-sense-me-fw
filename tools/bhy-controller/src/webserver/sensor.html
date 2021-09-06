@@ -360,6 +360,8 @@ function receiveSensorData(event) {
     cell = row.cells[4];
     var chartIdx = parsedName;
 
+    var cnt = 0;
+
     if (sensorTypes[sensor].scheme == "singleRead") {
 
       //Initial condition to draw the first chart point
@@ -367,10 +369,21 @@ function receiveSensorData(event) {
         if (parsedValue != 0) {   //First valid data received: draw it in the chart
           Plotly.newPlot(chartIdx,[{y:[parsedValue],type:'line'}]);
           //Update json to signal that the reception started
-          sensorTypes[sensor].value = parsedValue;
+          cnt = cnt + 1;
+          sensorTypes[sensor].value = cnt;
         }
       } else {    //Plot already exists
         Plotly.extendTraces(chartIdx,{y:[[parsedValue]]}, [0]);
+        cnt = sensorTypes[sensor].value;
+        sensorTypes[sensor].value = cnt + 1;
+      }
+
+      if (cnt > 200) {
+        Plotly.relayout(chartIdx,{
+          xaxis: {
+            range: [cnt-200,cnt]
+          }
+        });
       }
 
     } else if (sensorTypes[sensor].scheme == "xyz") {
