@@ -309,6 +309,8 @@ function parseData(sensor, data) {
     parse_scheme = parseScheme["types"][3]["parse-scheme"];
   } else if (scheme == "activity") {
     parse_scheme = parseScheme["types"][4]["parse-scheme"];
+  } else if (scheme == "BSECOutput") {
+    parse_scheme = parseScheme["types"][5]["parse-scheme"];
   }
 
   parse_scheme.forEach(element => {

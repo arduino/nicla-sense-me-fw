@@ -442,6 +442,11 @@
     ]
   },
 
+  "171": {
+    "name": "BSEC Output",
+    "scheme": "BSECOutput"
+  },
+
   "245": {
     "name": "TIMESTAMP_SMALL_WU",
     "scheme": "singleRead",

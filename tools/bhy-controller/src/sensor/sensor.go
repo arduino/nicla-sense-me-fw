@@ -84,6 +84,13 @@ func readSensorData(buffer []byte, port serial.Port) {
 	var data SensorData
 	data.id = uint8(dataPacket[0])
 	data.size = uint8(dataPacket[1])
+    // Some sensors have a frame size bigger than 10 (such as Sensor id 171)
+    // but the Arduino_BHY2 library only copies up to 10 bytes (SENSOR_DATA_FIXED_LENGTH in SensorTypes.h)
+    // otherwise without this size check the tool would crash for such sensors
+    if data.size > 10 {
+        data.size = 10
+    }
+
 	data.data = dataPacket[2:(2 + data.size)]
 	parseData(&data)
 }

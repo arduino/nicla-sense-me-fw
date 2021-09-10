@@ -4,7 +4,6 @@ go 1.15
 
 require (
 	github.com/cheggaaa/pb/v3 v3.0.8 // indirect
-	github.com/mattn/go-runewidth v0.0.12 // indirect
 	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4
 	github.com/schollz/progressbar/v3 v3.8.0
 	github.com/sirupsen/logrus v1.8.1
