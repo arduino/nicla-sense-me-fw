@@ -7,11 +7,11 @@
       "type": "quaternion",
       "parse-scheme": 
       [
-        {"name": "x", "type": "int16", "scale-factor": 1},
-        {"name": "y", "type": "int16", "scale-factor": 1},
-        {"name": "z", "type": "int16", "scale-factor": 1},
-        {"name": "w", "type": "int16", "scale-factor": 1},
-        {"name": "accuracy", "type": "uint16", "scale-factor": 1}
+        {"name": "x", "type": "int16", "scale-factor": 0.000061035},
+        {"name": "y", "type": "int16", "scale-factor": 0.0000610351},
+        {"name": "z", "type": "int16", "scale-factor": 0.000061035},
+        {"name": "w", "type": "int16", "scale-factor": 0.000061035},
+        {"name": "accuracy", "type": "uint16", "scale-factor": 0.000061035}
       ]
     },
 
@@ -31,9 +31,9 @@
       "type": "orientation",
       "parse-scheme": 
       [
-        {"name": "heading", "type": "int16", "scale-factor": 0.01098},
-        {"name": "pitch", "type": "int16", "scale-factor": 0.01098},
-        {"name": "roll", "type": "int16", "scale-factor": 0.01098}
+        {"name": "heading", "type": "int16", "scale-factor": 0.010986},
+        {"name": "pitch", "type": "int16", "scale-factor": 0.010986},
+        {"name": "roll", "type": "int16", "scale-factor": 0.010986}
       ]
     },
 

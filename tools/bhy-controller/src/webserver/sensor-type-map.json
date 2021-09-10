@@ -271,7 +271,7 @@
     "scheme": "singleRead",
     "parse-scheme": 
     [
-      {"name": "val", "type": "int16", "scale-factor": 0.008}
+      {"name": "val", "type": "int16", "scale-factor": 0.01}
     ]
   },
 
@@ -280,7 +280,7 @@
     "scheme": "singleRead",
     "parse-scheme": 
     [
-      {"name": "val", "type": "uint24", "scale-factor": 0.0078}
+      {"name": "val", "type": "uint24", "scale-factor": 0.0078125}
     ]
   },
 
@@ -316,7 +316,7 @@
     "scheme": "singleRead",
     "parse-scheme": 
     [
-      {"name": "val", "type": "uint24", "scale-factor": 0.0078}
+      {"name": "val", "type": "uint24", "scale-factor": 0.0078125}
     ]
   },
 
@@ -411,7 +411,7 @@
     "scheme": "singleRead",
     "parse-scheme": 
     [
-      {"name": "val", "type": "uint16", "scale-factor": 1}
+      {"name": "val", "type": "uint16", "scale-factor": 46.296296}
     ]
   },
 
@@ -429,7 +429,7 @@
     "scheme": "singleRead",
     "parse-scheme": 
     [
-      {"name": "val", "type": "uint16", "scale-factor": 1}
+      {"name": "val", "type": "uint16", "scale-factor": 46.296296}
     ]
   },
 
