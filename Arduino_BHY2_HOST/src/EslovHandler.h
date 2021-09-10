@@ -65,6 +65,9 @@ private:
 
 private:
   friend class Arduino_BHY2_HOST;
+
+  void flushWire();
+
   void debug(Stream &stream);
   void dump();
   Stream *_debug;

@@ -45,6 +45,7 @@ void EslovHandler::update()
         if (!_dfuLedOn) {
           pinMode(LED_BUILTIN, OUTPUT);
           digitalWrite(LED_BUILTIN, HIGH);
+          flushWire();
         }
 
         pinMode(_eslovIntPin, INPUT);
@@ -245,6 +246,13 @@ void EslovHandler::toggleEslovIntPin()
 void EslovHandler::niclaAsShield()
 {
   _eslovIntPin = I2C_INT_PIN;
+}
+
+void EslovHandler::flushWire()
+{
+  Wire.end();
+  Wire.begin();
+  Wire.setClock(400000);
 }
 
 void EslovHandler::debug(Stream &stream)
