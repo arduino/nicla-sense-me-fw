@@ -8,6 +8,8 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
+
     <title>Sensor page</title>
   </head>
   <body>
@@ -71,16 +73,17 @@
     </div>
     <br><hr><br>
 
-
     <!-- Read sensor data form -->
     <div class="container text-center">
       <h3>Read sensor data</h3>  
-      <table id="dataTable" class="table table-bordered" style="table-layout:fixed; width:100%"> 
+      <table id="dataTable" class="table table-bordered" style="table-layout:auto; width:100%;">
         <thead>
           <tr>
-            <th scope="col" style="width: 15%;">Sensor ID</th>
-            <th scope="col" style="width: 25%;">Sensor Name</th>
-            <th scope="col" style="width: 60%;">Data</th>
+            <th scope="col" style="width: 10%;">Sensor ID</th>
+            <th scope="col" style="width: 14%;">Sensor Name</th>
+            <th scope="col" style="width: 25%;">Data</th>
+            <th scope="col" style="width: 7%;">Status</th>
+            <th scope="col" style="width: 44%;">Chart</th>
           </tr>
         </thead>
         <tbody>
@@ -133,6 +136,7 @@ fetch("./sensor-type-map.json")
     var counter = 0;
     sensorTypesLen = Object.keys(sensorTypes).length;
     console.log("Json length: ", sensorTypesLen);
+    fillSensorTable();
   });
 
 
@@ -165,6 +169,31 @@ document.querySelector('#configureButton').addEventListener('click',
     .then(_ => {  
       console.log('Configuration written');
     });
+
+    //Handle individual Enabled buttons
+    var table = document.getElementById("dataTable");
+    if (sensorMap.has(sensorId)) {
+      rowIndex = sensorMap.get(sensorId);
+      var row = table.rows[rowIndex];
+      row.cells[3].firstChild.style.backgroundColor = "limegreen";
+    } else {
+      var tableLength = table.rows.length;
+      sensorMap.set(sensorId, tableLength);
+      var row = table.insertRow(tableLength);
+      var cell = row.insertCell(0);
+      cell.innerHTML = sensorId;
+      cell = row.insertCell(1);
+      cell.innerHTML = sensorTypes[sensorId].name;
+      cell = row.insertCell(2);
+      cell.innerHTML = 0;
+      cell = row.insertCell(3);
+      cell.innerHTML = '<input id="Button" type="button" value="Enabled" onclick="updateSensorStatus(this, \'' + sensorId + '\');"/>'
+      row.cells[3].firstChild.style.backgroundColor = "limegreen";
+      cell = row.insertCell(4);
+      var chartIdx = sensorTypes[sensorId].name;
+      cell.innerHTML = '<div id=\'' + chartIdx + '\'></div>';
+    }
+
   }
 );
 
@@ -250,6 +279,62 @@ function getSensorCharacteristics() {
   });
 }
 
+function updateSensorStatus(_this, sensor) {
+  var configPacket = new Uint8Array(9);
+  configPacket[0] = sensor;
+
+  if (_this.style.backgroundColor == "limegreen") {
+    //Turn sensor OFF
+    console.log("Disable sensor ", sensor);
+    configPacket.set(floatToBytes(0), 1);
+    configPacket.set(intToBytes(0), 5);
+    console.log(configPacket);
+    sensorConfigCharacteristic.writeValue(configPacket)
+    .then(_ => {  
+      console.log('Configuration written');
+    });
+    _this.style.backgroundColor = "";
+  } else {
+    //Turn sensor ON
+    console.log("Enable sensor ", sensor);
+    configPacket.set(floatToBytes(1), 1);
+    console.log(configPacket);
+    sensorConfigCharacteristic.writeValue(configPacket)
+    .then(_ => {  
+      console.log('Configuration written');
+    });
+    _this.style.backgroundColor = "limegreen";
+  }
+}
+
+function fillSensorTable() {
+  var table = document.getElementById("dataTable");
+  var tableLength = table.rows.length;
+
+  for (let i = 0; i < sensorTypesLen - 1; i++) {
+    var key = Object.keys(sensorTypes)[i];
+    if (sensorTypes[key].dashboard == 1) {
+      var tableLength = table.rows.length;
+      var sensorIdx = parseInt(key)
+      sensorMap.set(sensorIdx, tableLength);
+      var row = table.insertRow(tableLength);
+      var cell = row.insertCell(0);
+      cell.innerHTML = key;
+      cell = row.insertCell(1);
+      cell.innerHTML = sensorTypes[key].name;
+      cell = row.insertCell(2);
+      cell.innerHTML = 0;
+      cell = row.insertCell(3);
+      cell.innerHTML = '<input id="Button" type="button" value="Enabled" onclick="updateSensorStatus(this, \'' + sensorIdx + '\');"/>'
+      cell = row.insertCell(4);
+      var chartIdx = sensorTypes[sensorIdx].name;
+      cell.innerHTML = '<div id=\'' + chartIdx + '\'></div>';
+    }
+  }
+}
+
+a=[]; b=[]; c=[];
+
 function receiveSensorData(event) {
   var value = event.target.value;
   // Get sensor data
@@ -258,7 +343,8 @@ function receiveSensorData(event) {
   console.log(value)
   var parsedData = parseData(sensor, value);
   parsedName = parsedData[0]
-  parsedValue = parsedData[1]
+  parsedStringValue = parsedData[1]
+  parsedValue = parsedData[2]
 
   var table = document.getElementById("dataTable");
   // If sensor is already in the table -> update its value
@@ -270,19 +356,56 @@ function receiveSensorData(event) {
     cell = row.cells[1];
     cell.innerHTML = parsedName;
     cell = row.cells[2];
-    cell.innerHTML = parsedValue;
+    cell.innerHTML = parsedStringValue;
+    cell = row.cells[4];
+    var chartIdx = parsedName;
 
-  // If sensor is NOT in the table -> insert a new row filled with sensor data
-  } else {
-    var tableLength = table.rows.length;
-    sensorMap.set(sensor, tableLength);
-    var row = table.insertRow(tableLength);
-    var cell = row.insertCell(0);
-    cell.innerHTML = sensor;
-    cell = row.insertCell(1);
-    cell.innerHTML = parsedName;
-    cell = row.insertCell(2);
-    cell.innerHTML = parsedValue;
+    var cnt = 0;
+
+    if (sensorTypes[sensor].scheme == "singleRead") {
+
+      //Initial condition to draw the first chart point
+      if (sensorTypes[sensor].value == 0) {   //Plot doesn't exist yet because no valid data have been received
+        if (parsedValue != 0) {   //First valid data received: draw it in the chart
+          Plotly.newPlot(chartIdx,[{y:[parsedValue],type:'line'}]);
+          //Update json to signal that the reception started
+          cnt = cnt + 1;
+          sensorTypes[sensor].value = cnt;
+        }
+      } else {    //Plot already exists
+        Plotly.extendTraces(chartIdx,{y:[[parsedValue]]}, [0]);
+        cnt = sensorTypes[sensor].value;
+        sensorTypes[sensor].value = cnt + 1;
+      }
+
+      if (cnt > 200) {
+        Plotly.relayout(chartIdx,{
+          xaxis: {
+            range: [cnt-200,cnt]
+          }
+        });
+      }
+
+    } else if (sensorTypes[sensor].scheme == "xyz") {
+        //Parse 3D axes values
+        const arrXYZValues = parsedStringValue.split(" ");
+        console.log("Split: ", arrXYZValues);
+        console.log("Split[1]: ", arrXYZValues[1]);
+        console.log("Split[5]: ", arrXYZValues[5]);
+        console.log("Split[9]: ", arrXYZValues[9]);
+
+      //Initial condition to draw the first chart point
+      if (sensorTypes[sensor].value == 0) {   //Plot doesn't exist yet because no valid data have been received
+        if (parsedValue != 0) {   //First valid data received: draw it in the chart
+          Plotly.newPlot(chartIdx,[{x:[arrXYZValues[1]],y:[arrXYZValues[5]],z:[arrXYZValues[9]],type:'mesh3d'}]);
+          //Update json to signal that the reception started
+          sensorTypes[sensor].value = parsedValue;
+        }
+      } else {    //Plot already exists
+        Plotly.extendTraces(chartIdx,{x:[[arrXYZValues[1]]],y:[[arrXYZValues[5]]],z:[[arrXYZValues[9]]]}, [0]);
+      }
+
+    }
   }
 }
 
@@ -295,6 +418,7 @@ function parseData(sensor, data) {
   // dataIndex start from 2 because the first bytes of the packet indicate
   // the sensor id and the data size
   var dataIndex = 0 + 2;
+  var value = 0;
 
   if (scheme == "singleRead") {
     parse_scheme = sensorTypes[sensor]["parse-scheme"];
@@ -316,7 +440,6 @@ function parseData(sensor, data) {
     var name = element['name'];
     var valueType = element['type'];
     var scale = element['scale-factor'];
-    var value = 0;
     var size = 0;
 
     if (valueType == "uint8") {
@@ -357,7 +480,7 @@ function parseData(sensor, data) {
 
   });
 
-  return [sensorName, result];
+  return [sensorName, result, value];
 }
 
 function geActivityString(value) {
