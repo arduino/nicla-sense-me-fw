@@ -1,4 +1,26 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/release-go-task/DistTasks.yml
 version: "3"
+
+# This taskfile is ideally meant to be project agnostic and could be dropped in
+# on other Go projects with minimal or no changes.
+#
+# To use it simply add the following lines to your main taskfile:
+#   includes:
+#     dist: ./DistTasks.yml
+#
+# The following variables must be declared in the including taskfile for the
+# build process to work correctly:
+# * DIST_DIR: the folder that will contain the final binaries and packages
+# * PROJECT_NAME: the name of the project, used in package name
+# * VERSION: the version of the project, used in package name and checksum file
+# * LD_FLAGS: flags used at build time
+#
+# The project MUST contain a LICENSE.txt file in the root folder or packaging will fail.
+
+vars:
+  CONTAINER: "docker.elastic.co/beats-dev/golang-crossbuild"
+  GO_VERSION: "1.14.15"
+  CHECKSUM_FILE: "{{.VERSION}}-checksums.txt"
 
 tasks:
   all:
@@ -12,99 +34,123 @@ tasks:
 
   Windows_32bit:
     desc: Builds Windows 32 bit binaries
-    dir: "{{ .DIST_DIR }}"
+    dir: "{{.TOOL_DIR}}/{{.DIST_DIR}}"
     cmds:
       - |
-        docker run -v {{ .TOOL_DIR }}:/home/build \
-        -v {{ .DIST_DIR }}:/dist \
-        -w /home/build \
+        docker run -v {{ .TOOL_DIR }}:/home/build -w /home/build \
         -e CGO_ENABLED=1 \
-        {{ .CONTAINER }}:{{ .CONTAINER_TAG }} \
-        --build-cmd "{{ .BUILD_COMMAND }}" \
-        -p "{{ .BUILD_PLATFORM }}"
+        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
+        --build-cmd "{{.BUILD_COMMAND}}" \
+        -p "{{.BUILD_PLATFORM}}"
+
+        zip {{.PACKAGE_NAME}} {{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe ../LICENSE.txt -j
+        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
+
     vars:
-      PLATFORM_DIR: "windows32"
-      BUILD_COMMAND: "go build -o /dist/{{ .PLATFORM_DIR }}/bhy.exe"
+      PLATFORM_DIR: "{{.PROJECT_NAME}}_windows_386"
+      BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe {{.LDFLAGS}}"
       BUILD_PLATFORM: "windows/386"
+      CONTAINER_TAG: "{{.GO_VERSION}}-main"
       PACKAGE_PLATFORM: "Windows_32bit"
-      CONTAINER_TAG: "{{ .GO_VERSION }}-main"
+      PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.zip"
 
   Windows_64bit:
     desc: Builds Windows 64 bit binaries
-    dir: "{{ .DIST_DIR }}"
+    dir: "{{.TOOL_DIR}}/{{.DIST_DIR}}"
     cmds:
       - |
-        docker run -v {{ .TOOL_DIR }}:/home/build \
-        -v {{ .DIST_DIR }}:/dist \
-        -w /home/build \
+        docker run -v {{ .TOOL_DIR }}:/home/build -w /home/build \
         -e CGO_ENABLED=1 \
-        {{ .CONTAINER }}:{{ .CONTAINER_TAG }} \
-        --build-cmd "{{ .BUILD_COMMAND }}" \
-        -p "{{ .BUILD_PLATFORM }}"
+        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
+        --build-cmd "{{.BUILD_COMMAND}}" \
+        -p "{{.BUILD_PLATFORM}}"
+
+        zip {{.PACKAGE_NAME}} {{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe ../LICENSE.txt -j
+        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
+
     vars:
-      PLATFORM_DIR: "windows64"
-      BUILD_COMMAND: "go build -o /dist/{{ .PLATFORM_DIR }}/bhy.exe"
+      PLATFORM_DIR: "{{.PROJECT_NAME}}_windows_amd64"
+      BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe {{.LDFLAGS}}"
       BUILD_PLATFORM: "windows/amd64"
+      CONTAINER_TAG: "{{.GO_VERSION}}-main"
       PACKAGE_PLATFORM: "Windows_64bit"
-      CONTAINER_TAG: "{{ .GO_VERSION }}-main"
+      PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.zip"
 
   Linux_32bit:
     desc: Builds Linux 32 bit binaries
-    dir: "{{ .DIST_DIR }}"
+    dir: "{{.TOOL_DIR}}/{{.DIST_DIR}}"
     cmds:
       - |
-        docker run -v {{ .TOOL_DIR }}:/home/build \
-        -v {{ .DIST_DIR }}:/dist \
-        -w /home/build \
+        docker run -v {{ .TOOL_DIR }}:/home/build -w /home/build \
         -e CGO_ENABLED=1 \
-        {{ .CONTAINER }}:{{ .CONTAINER_TAG }} \
-        --build-cmd "{{ .BUILD_COMMAND }}" \
-        -p "{{ .BUILD_PLATFORM }}"
+        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
+        --build-cmd "{{.BUILD_COMMAND}}" \
+        -p "{{.BUILD_PLATFORM}}"
+
+        tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
+        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
+
     vars:
-      PLATFORM_DIR: "linux32"
-      BUILD_COMMAND: "go build -o /dist/{{ .PLATFORM_DIR }}/bhy"
+      PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_amd32"
+      BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}"
       BUILD_PLATFORM: "linux/386"
+      CONTAINER_TAG: "{{.GO_VERSION}}-main"
       PACKAGE_PLATFORM: "Linux_32bit"
-      CONTAINER_TAG: "{{ .GO_VERSION }}-main"
+      PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
 
   Linux_64bit:
     desc: Builds Linux 64 bit binaries
-    dir: "{{ .DIST_DIR }}"
+    dir: "{{.TOOL_DIR}}/{{.DIST_DIR}}"
     cmds:
       - |
-        docker run -v {{ .TOOL_DIR }}:/home/build \
-        -v {{ .DIST_DIR }}:/dist \
-        -w /home/build \
+        docker run -v {{ .TOOL_DIR }}:/home/build -w /home/build \
         -e CGO_ENABLED=1 \
-        {{ .CONTAINER }}:{{ .CONTAINER_TAG }} \
-        --build-cmd "{{ .BUILD_COMMAND }}" \
-        -p "{{ .BUILD_PLATFORM }}"
+        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
+        --build-cmd "{{.BUILD_COMMAND}}" \
+        -p "{{.BUILD_PLATFORM}}"
+
+        tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
+        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
+
     vars:
-      PLATFORM_DIR: "linux64"
-      BUILD_COMMAND: "go build -o /dist/{{ .PLATFORM_DIR }}/bhy"
+      PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_amd64"
+      BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}"
       BUILD_PLATFORM: "linux/amd64"
+      CONTAINER_TAG: "{{.GO_VERSION}}-main"
       PACKAGE_PLATFORM: "Linux_64bit"
-      CONTAINER_TAG: "{{ .GO_VERSION }}-main"
+      PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
 
   macOS_64bit:
     desc: Builds Mac OS X 64 bit binaries
-    dir: "{{ .DIST_DIR }}"
+    dir: "{{.TOOL_DIR}}/{{.DIST_DIR}}"
     cmds:
       - |
-        docker run -v {{ .TOOL_DIR }}:/home/build \
-        -v {{ .DIST_DIR }}:/dist \
-        -w /home/build \
+        docker run -v {{ .TOOL_DIR }}:/home/build -w /home/build \
         -e CGO_ENABLED=1 \
-        {{ .CONTAINER }}:{{ .CONTAINER_TAG }} \
-        --build-cmd "{{ .BUILD_COMMAND }}" \
-        -p "{{ .BUILD_PLATFORM }}"
-    vars:
-      PLATFORM_DIR: "macos64"
-      BUILD_COMMAND: "go build -o /dist/{{ .PLATFORM_DIR }}/bhy"
-      BUILD_PLATFORM: "darwin/amd64"
-      PACKAGE_PLATFORM: "macOS_64bit"
-      CONTAINER_TAG: "{{ .GO_VERSION }}-darwin"
+        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
+        --build-cmd "{{.BUILD_COMMAND}}" \
+        -p "{{.BUILD_PLATFORM}}"
 
-vars:
-  CONTAINER: "docker.elastic.co/beats-dev/golang-crossbuild"
-  GO_VERSION: "1.14.15"
+        tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
+        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
+
+    vars:
+      PLATFORM_DIR: "{{.PROJECT_NAME}}_osx_darwin_amd64"
+      BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}"
+      BUILD_PLATFORM: "darwin/amd64"
+      # We are experiencing the following error with macOS_64bit build:
+      #
+      #   Undefined symbols for architecture x86_64:
+      #     "_clock_gettime", referenced from:
+      #         _runtime.walltime_trampoline in go.o
+      #   ld: symbol(s) not found for architecture x86_64
+      #   clang: error: linker command failed with exit code 1 (use -v to see invocation)
+      #
+      # The reason seems that go 1.16.x use a macos API which is available since 10.12
+      #    https://github.com/techknowlogick/xgo/issues/100#issuecomment-780894190
+      #
+      # To compile it we need an SDK >=10.12 so we use the debian10 based container that
+      # has the SDK 10.14 installed.
+      CONTAINER_TAG: "{{.GO_VERSION}}-darwin-debian10"
+      PACKAGE_PLATFORM: "macOS_64bit"
+      PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
