@@ -5,6 +5,9 @@
  * 
  * In this example, the orientation sensor is enabled and its
  * values are periodically read and then printed to the serial channel
+ * 
+ * NOTE: if Nicla is used as a Shield on top of a MKR board,
+ * please use BHY2_HOST.begin(false, NICLA_AS_SHIELD)
 */
 
 #include "Arduino.h"

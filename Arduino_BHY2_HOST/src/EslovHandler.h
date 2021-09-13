@@ -9,6 +9,10 @@
 #define ESLOV_MAX_LENGTH      255
 #define ESLOV_DEFAULT_ADDRESS 0x55
 
+#define ESLOV_INT_PIN (7)
+
+#define I2C_INT_PIN (0)
+
 enum EslovOpcode {
   ESLOV_DFU_INTERNAL_OPCODE,
   ESLOV_DFU_EXTERNAL_OPCODE,
@@ -47,6 +51,9 @@ public:
   bool requestSensorData(SensorDataPacket &sData);
   void toggleEslovIntPin();
 
+protected:
+  void niclaAsShield();
+
 private:
   int _rxIndex;
   uint8_t _rxBuffer[ESLOV_MAX_LENGTH];
@@ -58,9 +65,14 @@ private:
 
 private:
   friend class Arduino_BHY2_HOST;
+
+  void flushWire();
+
   void debug(Stream &stream);
   void dump();
   Stream *_debug;
+
+  uint8_t _eslovIntPin;
 };
 
 extern EslovHandler eslovHandler;

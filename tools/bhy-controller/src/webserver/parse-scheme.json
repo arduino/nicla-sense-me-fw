@@ -53,7 +53,16 @@
       [
         {"name": "Activity status", "type": "uint16", "scale-factor": 1}
       ]
-    }
+    },
 
+    {
+      "id": 5,
+      "type": "BSECOutput",
+      "parse-scheme":
+      [
+        {"name": "Temperature (compensated)", "type": "float", "scale-factor": 1},
+        {"name": "Humidity (compensated)", "type": "float", "scale-factor": 1}
+      ]
+    }
   ]
 }

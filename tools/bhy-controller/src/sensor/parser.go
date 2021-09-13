@@ -9,6 +9,7 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
+	"math"
 )
 
 type SensorType struct {
@@ -86,6 +87,8 @@ func parseData(data *SensorData) {
 		typeScheme = typeMap[3].(map[string]interface{})
   } else if (sensorScheme == "activity") {
 		typeScheme = typeMap[4].(map[string]interface{})
+  } else if (sensorScheme == "BSECOutput") {
+		typeScheme = typeMap[5].(map[string]interface{})
   }
 
 	fields := typeScheme["parse-scheme"].([]interface{})
@@ -127,7 +130,7 @@ func parseData(data *SensorData) {
 			value = float32(uint32(binary.LittleEndian.Uint32(data.data[index:index+4]))) * fieldFactor
       fieldSize = 4;
     } else if fieldType == "float" {
-			value = float32(binary.LittleEndian.Uint32(data.data[index:index+4])) * fieldFactor
+			value = float32(math.Float32frombits(binary.LittleEndian.Uint32(data.data[index:index+4]))) * fieldFactor
 			fieldSize = 4
 		} else if fieldType == "none" {
       eventcount = eventcount + 1

@@ -218,6 +218,19 @@ int apply_update(FILE *file, uint32_t address)
     return 1;
 }
 
+void blink(uint8_t color, int duration = 1000)
+{
+    leds.reset();
+    leds.init();
+    leds.powerUp();
+
+    for (int i = 0; i < 3; i++) {
+        leds.ledBlink(color, duration);
+        ThisThread::sleep_for(1000ms * duration / 1000);
+    }
+    leds.powerDown();
+}
+
 
 int try_update()
 {
@@ -234,8 +247,10 @@ int try_update()
 
         if (update) {
             DEBUG_PRINTF("Starting new application\r\n");
+            blink(green, 200);
         } else {
             DEBUG_PRINTF("Unable to load the new application. Loading the previous one...\r\n");
+            blink(red, 200);
         }
 
     } else {
@@ -246,19 +261,6 @@ int try_update()
     spif.deinit();
 
     mbed_start_application(POST_APPLICATION_ADDR);
-}
-
-void blink(uint8_t color, int duration = 1000)
-{
-    leds.reset();
-    leds.init();
-    leds.powerUp();
-
-    for (int i = 0; i < 3; i++) {
-        leds.ledBlink(color, duration);
-        ThisThread::sleep_for(1000ms * duration / 1000);
-    }
-    leds.powerDown();
 }
 
 
