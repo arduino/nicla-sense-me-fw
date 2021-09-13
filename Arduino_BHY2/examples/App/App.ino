@@ -3,6 +3,9 @@
  * an external device acting as a host.
  * Here, nicla just reacts to external stimuli coming from
  * the eslov port or through BLE 
+ * 
+ * NOTE: if Nicla is used as a Shield on top of a MKR board,
+ * please use BHY2.begin(NICLA_AS_SHIELD)
 */
 
 #include "Arduino.h"

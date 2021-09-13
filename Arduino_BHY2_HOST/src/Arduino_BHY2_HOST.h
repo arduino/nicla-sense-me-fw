@@ -14,13 +14,18 @@
 
 #include "sensors/SensorID.h"
 
+enum NiclaWiring {
+  NICLA_VIA_ESLOV = 0,
+  NICLA_AS_SHIELD
+};
+
 class Arduino_BHY2_HOST {
 public:
   Arduino_BHY2_HOST();
   virtual ~Arduino_BHY2_HOST();
 
   // Necessary API. Update function should be continuously polled if PASSTHORUGH is ENABLED
-  bool begin(bool passthrough = false);
+  bool begin(bool passthrough = false, NiclaWiring niclaConnection = NICLA_VIA_ESLOV);
   void update();
 
   // Functions for controlling the BHY when PASSTHROUGH is DISABLED

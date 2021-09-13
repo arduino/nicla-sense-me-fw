@@ -8,7 +8,8 @@ EslovHandler::EslovHandler() :
   _rxBuffer(),
   _state(ESLOV_AVAILABLE_SENSOR_STATE),
   _debug(NULL),
-  _lastDfuPack(false)
+  _lastDfuPack(false),
+  _eslovIntPin(PIN_ESLOV_INT)
 {
 }
 
@@ -40,17 +41,19 @@ void EslovHandler::onRequest()
 void EslovHandler::eslovBusy()
 {
   //Set Eslov INT pin
-  digitalWrite(p19, LOW);
+  digitalWrite(_eslovIntPin, LOW);
 }
 
 void EslovHandler::eslovAvailable()
 {
   //Release Eslov INT pin
-  digitalWrite(p19, HIGH);
+  digitalWrite(_eslovIntPin, HIGH);
 }
 
 void EslovHandler::requestEvent()
 {
+  eslovBusy();
+
   if (_debug) {
     _debug->print("Wire Request event. State: ");
     _debug->println(_state);
@@ -78,12 +81,19 @@ void EslovHandler::requestEvent()
     }
     Wire.write(ack);
   }
+
+  eslovAvailable();
 }
 
 void EslovHandler::end()
 {
   eslovActive = false;
   Wire.end();
+}
+
+void EslovHandler::niclaAsShield()
+{
+  _eslovIntPin = I2C_INT_PIN;
 }
 
 void EslovHandler::receiveEvent(int length)
@@ -139,6 +149,8 @@ void EslovHandler::receiveEvent(int length)
 
         dump();
         _rxIndex = 0;
+
+        eslovAvailable();
       }
 
     } else if (_rxBuffer[0] == ESLOV_SENSOR_STATE_OPCODE) {
@@ -148,6 +160,8 @@ void EslovHandler::receiveEvent(int length)
         dump();
         _rxIndex = 0;
       }
+
+      eslovAvailable();
 
     } else {
       // Not valid opcode. Discarding packet

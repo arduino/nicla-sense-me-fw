@@ -14,13 +14,18 @@
 
 #include "sensors/SensorID.h"
 
+enum NiclaWiring {
+  NICLA_VIA_ESLOV = 0,
+  NICLA_AS_SHIELD
+};
+
 class Arduino_BHY2 {
 public:
   Arduino_BHY2();
   virtual ~Arduino_BHY2();
 
   // Necessary API. Update function should be continuously polled 
-  bool begin();
+  bool begin(NiclaWiring niclaConnection = NICLA_VIA_ESLOV);
   void update(); // remove this to enforce a sleep
   void update(unsigned long ms); // Update and then sleep
   void delay(unsigned long ms); // to be used instead of arduino delay()
@@ -51,6 +56,8 @@ private:
   int _startTime;
   bool _timeoutExpired;
   bool _eslovActive;
+
+  PinName _eslovIntPin;
 };
 
 extern Arduino_BHY2 BHY2;
