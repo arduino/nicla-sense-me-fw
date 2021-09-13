@@ -369,7 +369,7 @@ function receiveSensorData(event) {
         if (parsedValue != 0) {   //First valid data received: draw it in the chart
           Plotly.newPlot(chartIdx,[{y:[parsedValue],type:'line'}]);
           //Update json to signal that the reception started
-          cnt = cnt + 1;
+          cnt = sensorTypes[sensor].value + 1;
           sensorTypes[sensor].value = cnt;
         }
       } else {    //Plot already exists
@@ -404,6 +404,38 @@ function receiveSensorData(event) {
       } else {    //Plot already exists
         Plotly.extendTraces(chartIdx,{x:[[arrXYZValues[1]]],y:[[arrXYZValues[5]]],z:[[arrXYZValues[9]]]}, [0]);
       }
+
+    } else if (sensorTypes[sensor].scheme == "BSECOutput") {
+        //Parse BSEC values
+        const BSECValues = parsedStringValue.split(" ");
+        console.log("Split: ", BSECValues);
+        console.log("Split[1]: ", BSECValues[2]);
+        console.log("Split[7]: ", BSECValues[7]);
+
+        var val1 = BSECValues[2];
+        var val2 = BSECValues[7];
+
+        if (sensorTypes[sensor].value == 0) {   //Plot doesn't exist yet because no valid data have been received
+          if (val1 != 0 && val2 != 0) {   //First valid data received: draw it in the chart
+            Plotly.newPlot(chartIdx,[{y:[val1],name: 'Temp',type:'line'},{y:[val2],name: 'Humidity',type:'line'}]);
+            //Update json to signal that the reception started
+            cnt = sensorTypes[sensor].value + 1;
+            sensorTypes[sensor].value = cnt;
+          }
+        } else {    //Plot already exists
+          Plotly.extendTraces(chartIdx,{y:[[val1]]}, [0]);
+          Plotly.extendTraces(chartIdx,{y:[[val2]]}, [1]);
+          cnt = sensorTypes[sensor].value;
+          sensorTypes[sensor].value = cnt + 1;
+        }
+
+        if (cnt > 150) {
+          Plotly.relayout(chartIdx,{
+            xaxis: {
+              range: [cnt-150,cnt]
+            }
+          });
+        }
 
     }
   }

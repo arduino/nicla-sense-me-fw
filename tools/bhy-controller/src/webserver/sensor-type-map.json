@@ -577,7 +577,9 @@
 
   "171": {
     "name": "BSEC Output",
-    "scheme": "BSECOutput"
+    "scheme": "BSECOutput",
+    "value": 0,
+    "dashboard": 0
   },
 
   "245": {
