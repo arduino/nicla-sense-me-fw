@@ -52,6 +52,10 @@ extern "C" {
 #include <stdint.h>
 #endif /*~ __KERNEL__ */
 
+#ifndef BHY2_CFG_DELEGATE_FIFO_PARSE_CB_INFO_MGMT
+#define BHY2_CFG_DELEGATE_FIFO_PARSE_CB_INFO_MGMT 1
+#endif
+
 #ifndef UNUSED
 #define UNUSED(__x__) ((void)(__x__))
 #endif /*~ UNUSED */
@@ -560,7 +564,11 @@ struct BHY2_PACKED bhy2_fifo_parse_callback_table
 struct bhy2_dev
 {
     struct bhy2_hif_dev hif;
+#if BHY2_CFG_DELEGATE_FIFO_PARSE_CB_INFO_MGMT
+    uint8_t event_size_tab_regular[BHY2_SPECIAL_SENSOR_ID_OFFSET];
+#else
     struct bhy2_fifo_parse_callback_table table[BHY2_N_VIRTUAL_SENSOR_MAX];
+#endif
     uint64_t last_time_stamp[BHY2_FIFO_TYPE_MAX];
 };
 

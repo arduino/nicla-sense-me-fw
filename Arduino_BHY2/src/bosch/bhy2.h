@@ -562,6 +562,21 @@ int8_t bhy2_soft_passthrough_transfer(union bhy2_soft_passthrough_conf *conf,
 
 int8_t bhy2_set_data_injection_mode(enum bhy2_data_inj_mode mode, struct bhy2_dev *dev);
 
+#if BHY2_CFG_DELEGATE_FIFO_PARSE_CB_INFO_MGMT
+/**
+ * @brief Function This function is called to get the callback info for a particular sensor when its frame is extracted from the FIFO
+ * @param[in] sensor_id     : Sensor ID of the virtal sensor
+ * @param[out] info         : Reference of the callback function,
+ *                            callee is expected to fill the fields of callback and callback_ref only (no need to provide event_size)
+ * @param[in] dev           : Device reference
+ */
+
+void bhy2_get_callback_info_delegate(uint8_t sensor_id,
+                                struct bhy2_fifo_parse_callback_table *info,
+                                const struct bhy2_dev *dev);
+#endif
+
+
 #ifdef __cplusplus
 }
 #endif /*__cplusplus */

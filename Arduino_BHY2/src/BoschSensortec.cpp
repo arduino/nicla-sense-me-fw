@@ -156,5 +156,37 @@ void BoschSensortec::debug(Stream &stream)
   _debug = &stream;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif /*__cplusplus */
+
+#if BHY2_CFG_DELEGATE_FIFO_PARSE_CB_INFO_MGMT
+void bhy2_get_fifo_parse_callback_info_delegate(uint8_t sensor_id,
+                                struct bhy2_fifo_parse_callback_table *info,
+                                const struct bhy2_dev *dev)
+{
+    info->callback_ref = NULL;
+    if (sensor_id < BHY2_SENSOR_ID_MAX) {
+        info->callback = BoschParser::parseData;
+    } else {
+        switch (sensor_id) {
+            case BHY2_SYS_ID_META_EVENT:
+            case BHY2_SYS_ID_META_EVENT_WU:
+                info->callback = BoschParser::parseMetaEvent;
+                break;
+            case BHY2_SYS_ID_DEBUG_MSG:
+                info->callback = BoschParser::parseDebugMessage;
+                break;
+            default:
+                info->callback = NULL;
+        }
+    }
+}
+#endif
+
+#ifdef __cplusplus
+}
+#endif /*__cplusplus */
+
 
 BoschSensortec sensortec;
