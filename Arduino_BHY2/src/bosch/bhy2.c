@@ -1157,8 +1157,11 @@ int8_t bhy2_register_fifo_parse_callback(uint8_t sensor_id,
     }
     else
     {
+#if BHY2_CFG_DELEGATE_FIFO_PARSE_CB_INFO_MGMT
+#else
         dev->table[sensor_id].callback = callback;
         dev->table[sensor_id].callback_ref = callback_ref;
+#endif
     }
 
     return rslt;
@@ -1184,7 +1187,11 @@ int8_t bhy2_update_virtual_sensor_list(struct bhy2_dev *dev)
         if (rslt == BHY2_OK)
         {
             /* Padding: Sensor id*/
+#if BHY2_CFG_DELEGATE_FIFO_PARSE_CB_INFO_MGMT
+            dev->event_size_tab_regular[0] = 1;
+#else
             dev->table[0].event_size = 1;
+#endif
 
             for (sensor_id = 1; (sensor_id < BHY2_SPECIAL_SENSOR_ID_OFFSET) && (rslt == BHY2_OK); sensor_id++)
             {
@@ -1203,16 +1210,24 @@ int8_t bhy2_update_virtual_sensor_list(struct bhy2_dev *dev)
                         }
                         else
                         {
+#if BHY2_CFG_DELEGATE_FIFO_PARSE_CB_INFO_MGMT
+                            if (sensor_id < BHY2_SPECIAL_SENSOR_ID_OFFSET) {
+                                dev->event_size_tab_regular[sensor_id] = info.event_size;
+                            }
+#else
                             dev->table[sensor_id].event_size = info.event_size;
+#endif
                         }
                     }
                 }
             }
 
+#if !BHY2_CFG_DELEGATE_FIFO_PARSE_CB_INFO_MGMT
             for (sensor_id = BHY2_N_VIRTUAL_SENSOR_MAX - 1; sensor_id >= BHY2_SPECIAL_SENSOR_ID_OFFSET; sensor_id--)
             {
                 dev->table[sensor_id].event_size = bhy2_sysid_event_size[sensor_id - BHY2_SPECIAL_SENSOR_ID_OFFSET];
             }
+#endif
         }
     }
 
@@ -1332,7 +1347,16 @@ static int8_t get_callback_info(uint8_t sensor_id,
 
     if ((dev != NULL) && (info != NULL))
     {
+#if BHY2_CFG_DELEGATE_FIFO_PARSE_CB_INFO_MGMT
+        bhy2_get_fifo_parse_callback_info_delegate(sensor_id, info, dev);
+        if (sensor_id < BHY2_SPECIAL_SENSOR_ID_OFFSET) {
+            info->event_size = dev->event_size_tab_regular[sensor_id];
+        } else {
+            info->event_size = bhy2_sysid_event_size[sensor_id - BHY2_SPECIAL_SENSOR_ID_OFFSET];
+        }
+#else
         *info = dev->table[sensor_id];
+#endif
         if ((sensor_id >= BHY2_SPECIAL_SENSOR_ID_OFFSET) && (info->event_size == 0))
         {
             info->callback = NULL;
