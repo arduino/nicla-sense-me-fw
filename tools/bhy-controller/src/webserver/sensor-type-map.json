@@ -347,6 +347,13 @@
     "dashboard": 0
   },
 
+  "115": {
+    "name": "BSEC Output",
+    "scheme": "BSECOutputV2",
+    "value": 0,
+    "dashboard": 1
+  },
+
   "128": {
     "name": "TEMPERATURE",
     "scheme": "singleRead",
@@ -576,7 +583,7 @@
   },
 
   "171": {
-    "name": "BSEC Output",
+    "name": "BSEC Output (deprecated)",
     "scheme": "BSECOutput",
     "value": 0,
     "dashboard": 0

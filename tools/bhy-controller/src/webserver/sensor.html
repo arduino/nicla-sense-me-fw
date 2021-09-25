@@ -436,6 +436,44 @@ function receiveSensorData(event) {
             }
           });
         }
+    } else if (sensorTypes[sensor].scheme == "BSECOutputV2") {
+        //Parse BSEC values
+        const BSECValues = parsedStringValue.split(" ");
+        console.log("Split: ", BSECValues);
+
+        var val1 = BSECValues[1];   //iaq
+        var val2 = BSECValues[5];   //iaq-s
+        var val3 = BSECValues[9] * 1000;   //b-voc-eq
+        var val4 = BSECValues[13];  //co2-eq
+        var val5 = BSECValues[17];  //status
+
+        if (sensorTypes[sensor].value == 0) {   //Plot doesn't exist yet because no valid data have been received
+          if (val4 != 0) {   //First valid data received: draw it in the chart, valid CO2-eq output is always greater than 0
+              Plotly.newPlot(chartIdx,
+                  [
+                      {y:[val1],name:'IAQ',type:'line'}, {y:[val2],name:'IAQ-S',type:'line'},
+                      {y:[val3],name:'bVOC-eq (ppb)',type:'line'}, {y:[val4],name:'CO2-eq (ppm)',type:'line'}
+                  ]);
+            //Update json to signal that the reception started
+            cnt = sensorTypes[sensor].value + 1;
+            sensorTypes[sensor].value = cnt;
+          }
+        } else {    //Plot already exists
+          Plotly.extendTraces(chartIdx,{y:[[val1]]}, [0]);
+          Plotly.extendTraces(chartIdx,{y:[[val2]]}, [1]);
+          Plotly.extendTraces(chartIdx,{y:[[val3]]}, [2]);
+          Plotly.extendTraces(chartIdx,{y:[[val4]]}, [3]);
+          cnt = sensorTypes[sensor].value;
+          sensorTypes[sensor].value = cnt + 1;
+        }
+
+        if (cnt > 150) {
+          Plotly.relayout(chartIdx,{
+            xaxis: {
+              range: [cnt-150,cnt]
+            }
+          });
+        }
 
     }
   }
@@ -467,6 +505,13 @@ function parseData(sensor, data) {
     parse_scheme = parseScheme["types"][4]["parse-scheme"];
   } else if (scheme == "BSECOutput") {
     parse_scheme = parseScheme["types"][5]["parse-scheme"];
+  } else if (scheme == "BSECOutputV2") {
+      var size = data.getUint8(1);
+      if (size <= 10) {
+         parse_scheme = parseScheme["types"][6]["parse-scheme"];
+      } else {
+         parse_scheme = parseScheme["types"][7]["parse-scheme"];
+      }
   }
 
   parse_scheme.forEach(element => {

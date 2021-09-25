@@ -63,6 +63,36 @@
         {"name": "Temperature (compensated)", "type": "float", "scale-factor": 1},
         {"name": "Humidity (compensated)", "type": "float", "scale-factor": 1}
       ]
+    },
+
+    {
+      "id": 6,
+      "type": "BSECOutputV2",
+      "parse-scheme":
+      [
+        {"name": "IAQ(Mobile)", "type": "uint16", "scale-factor": 1},
+        {"name": "IAQ(Stationary)", "type": "uint16", "scale-factor": 1},
+        {"name": "bVOC-Equivalents(ppm)", "type": "uint16", "scale-factor": 0.01},
+        {"name": "CO2-Equivalents(ppm)", "type": "uint24", "scale-factor": 1},
+        {"name": "Accuracy", "type": "uint8", "scale-factor": 1}
+      ]
+    },
+
+    {
+      "id": 7,
+      "type": "BSECOutputV2Full",
+      "parse-scheme":
+      [
+        {"name": "IAQ(Mobile)", "type": "uint16", "scale-factor": 1},
+        {"name": "IAQ(Stationary)", "type": "uint16", "scale-factor": 1},
+        {"name": "b-VOC-Equivalents(ppm)", "type": "uint16", "scale-factor": 0.01},
+        {"name": "CO2-Equivalents(ppm)", "type": "uint24", "scale-factor": 1},
+        {"name": "Accuracy", "type": "uint8", "scale-factor": 1},
+        {"name": "Compensated-Temperature(°C)", "type": "int16", "scale-factor": 0.003906},
+        {"name": "Compensated-Humidity(%)", "type": "uint16", "scale-factor": 0.002},
+        {"name": "Compensated-Gas Resistance(Ohms)", "type": "float", "scale-factor": 1}
+      ]
     }
+
   ]
 }
