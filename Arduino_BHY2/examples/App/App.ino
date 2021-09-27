@@ -4,8 +4,11 @@
  * Here, nicla just reacts to external stimuli coming from
  * the eslov port or through BLE 
  * 
- * NOTE: if Nicla is used as a Shield on top of a MKR board,
- * please use BHY2.begin(NICLA_AS_SHIELD)
+ * NOTE: Remember to choose your Nicla configuration! 
+ * If Nicla is used as a Shield, provide the NICLA_AS_SHIELD parameter.
+ * If you want to enable just one between I2C and BLE,
+ * use NICLA_I2C or NICLA_BLE parameters.
+ *
 */
 
 #include "Arduino.h"

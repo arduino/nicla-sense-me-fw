@@ -17,7 +17,8 @@ Arduino_BHY2::Arduino_BHY2() :
   _timeoutExpired(false),
   _eslovActive(false),
   _startTime(0),
-  _eslovIntPin(PIN_ESLOV_INT)
+  _eslovIntPin(PIN_ESLOV_INT),
+  _niclaConfig(NICLA_BLE_AND_I2C)
 {
 }
 
@@ -62,8 +63,10 @@ void Arduino_BHY2::setLDOTimeout(int time) {
   _timeout = time;
 }
 
-bool Arduino_BHY2::begin(NiclaWiring niclaConnection)
+bool Arduino_BHY2::begin(NiclaConfig config, NiclaWiring niclaConnection)
 {
+  _niclaConfig = config;
+
   if (niclaConnection == NICLA_AS_SHIELD) {
     _eslovIntPin = I2C_INT_PIN;
     eslovHandler.niclaAsShield();
@@ -78,8 +81,10 @@ bool Arduino_BHY2::begin(NiclaWiring niclaConnection)
   if (!sensortec.begin()) {
     return false;
   }
-  if (!bleHandler.begin()) {
-    return false;
+  if (_niclaConfig & NICLA_BLE) {
+    if (!bleHandler.begin()) {
+      return false;
+    }
   }
   if (!dfuManager.begin()) {
     return false;
@@ -93,32 +98,58 @@ bool Arduino_BHY2::begin(NiclaWiring niclaConnection)
   return true;
 }
 
+bool Arduino_BHY2::begin(NiclaSettings& settings)
+{
+  uint8_t niclaSettings = settings.getConfiguration();
+  if ((niclaSettings & NICLA_I2C) && (niclaSettings & NICLA_BLE)) {
+    _niclaConfig = NICLA_BLE_AND_I2C;
+  }
+  else if (niclaSettings & NICLA_I2C) {
+    _niclaConfig = NICLA_I2C;
+  }
+  else {
+    _niclaConfig = NICLA_BLE;
+  }
+  if (niclaSettings & NICLA_AS_SHIELD) {
+    return begin(_niclaConfig, NICLA_AS_SHIELD);
+  } else {
+    return begin(_niclaConfig, NICLA_VIA_ESLOV);
+  }
+}
+
 void Arduino_BHY2::update()
 {
   pingI2C();
 
-  if (!_timeoutExpired && !_eslovActive) {
-    checkEslovInt();
+  if (_niclaConfig & NICLA_I2C) {
+    if (!_timeoutExpired && !_eslovActive) {
+      checkEslovInt();
+    }
   }
 
   sensortec.update();
-  bleHandler.update();
+  if (_niclaConfig & NICLA_BLE) {
+    bleHandler.update();
+  }
 
   // While updating fw, detach the library from the sketch
   if (dfuManager.isPending()) {
     if (_debug) _debug->println("Start DFU procedure. Sketch execution is stopped.");
-    // TODO: abort dfu
     while (dfuManager.isPending()) {
-      if (dfuManager.dfuSource() == bleDFU && bleHandler.bleActive) {
-        bleHandler.update();
+      if (_niclaConfig & NICLA_BLE) {
+        if (dfuManager.dfuSource() == bleDFU && bleHandler.bleActive) {
+          bleHandler.update();
+        }
       }
       pingI2C();
     }
     // Wait some time for acknowledgment retrieval
-    if (dfuManager.dfuSource() == bleDFU) {
-      auto timeRef = millis();
-      while (millis() - timeRef < 1000) {
-        bleHandler.update();
+    if (_niclaConfig & NICLA_BLE) {
+      if (dfuManager.dfuSource() == bleDFU) {
+        auto timeRef = millis();
+        while (millis() - timeRef < 1000) {
+          bleHandler.update();
+        }
       }
     }
 
@@ -139,9 +170,11 @@ void Arduino_BHY2::delay(unsigned long ms)
 {
   unsigned long start = millis();
   unsigned long elapsed = 0;
-  while (elapsed < ms) {
-    bleHandler.poll(ms - elapsed);
-    elapsed = millis() - start;
+  if (_niclaConfig & NICLA_BLE) {
+    while (elapsed < ms) {
+      bleHandler.poll(ms - elapsed);
+      elapsed = millis() - start;
+    }
   }
 }
 
@@ -197,8 +230,12 @@ void Arduino_BHY2::parse(SensorDataPacket& data, DataOrientation& vector, float 
 void Arduino_BHY2::debug(Stream &stream)
 {
   _debug = &stream;
-  eslovHandler.debug(stream);
-  BLEHandler::debug(stream);
+  if (_niclaConfig & NICLA_I2C) {
+    eslovHandler.debug(stream);
+  }
+  if (_niclaConfig & NICLA_BLE) {
+    BLEHandler::debug(stream);
+  }
   sensortec.debug(stream);
   dfuManager.debug(stream);
   BoschParser::debug(stream);
