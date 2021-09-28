@@ -1,0 +1,60 @@
+name: Update Library Mirrors
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/update-libraries.ya?ml"
+      - "Arduino_BHY2/**"
+      - "Arduino_BHY2Host/**"
+
+jobs:
+  update:
+    if: github.repository == 'arduino/nicla-sense-me-fw'  # Workflow would fail in forks
+    name: ${{ matrix.library.source }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        library:
+          - source: Arduino_BHY2
+            repo: https://github.com/arduino-libraries/Arduino_BHY2
+          - source: Arduino_BHY2Host
+            repo: https://github.com/arduino-libraries/Arduino_BHY2Host
+
+    steps:
+      - name: Checkout filter-repo tool repository
+        uses: actions/checkout@v2
+        with:
+          repository: newren/git-filter-repo
+          ref: v2.33.0  # See: https://github.com/newren/git-filter-repo/releases
+
+      - name: Install filter-repo
+        run: |
+          INSTALL_PATH="${{ runner.temp }}/filter-repo"
+          mkdir --parents "$INSTALL_PATH"
+          cp --archive . "$INSTALL_PATH"
+          # Add installation to PATH:
+          # See: https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#adding-a-system-path
+          echo "$INSTALL_PATH" >> "$GITHUB_PATH"
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.LIBRARY_REPO_TOKEN }}
+          fetch-depth: 0
+
+      - name: Install Python for running filter-repo script
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Filter repository to library history
+        run: |
+          git filter-repo \
+            --path "${{ matrix.library.source }}" \
+            --path-rename "${{ matrix.library.source }}"/:
+
+      - name: Update library mirror repository
+        run: git push ${{ matrix.library.repo }}
