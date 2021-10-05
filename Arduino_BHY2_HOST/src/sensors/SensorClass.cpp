@@ -17,12 +17,18 @@ SensorClass::SensorClass(uint8_t id) :
 
 SensorClass::~SensorClass()
 {
-  disable();
+  end();
 }
 
 uint8_t SensorClass::id() 
 {
   return _id;
+}
+
+bool SensorClass::begin(float rate, uint32_t latency)
+{
+  configure(rate, latency);
+  return true;
 }
 
 void SensorClass::configure(float rate, uint32_t latency)
@@ -48,7 +54,7 @@ void SensorClass::configure(float rate, uint32_t latency)
 
 }
 
-void SensorClass::disable()
+void SensorClass::end()
 {
   configure(0, 0);
 }

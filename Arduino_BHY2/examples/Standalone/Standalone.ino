@@ -20,10 +20,10 @@ void setup()
 
   BHY2.begin();
 
-  accel.configure(1, 0);
-  gyro.configure(1, 0);
-  temp.configure(1, 0);
-  gas.configure(1,0);
+  accel.begin();
+  gyro.begin();
+  temp.begin();
+  gas.begin();
 }
 
 void loop()
