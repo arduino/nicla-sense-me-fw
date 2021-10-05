@@ -140,14 +140,23 @@ void EslovHandler::update()
 
 void EslovHandler::writeDfuPacket(uint8_t *data, uint8_t length)
 {
-  Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
-  int ret = Wire.write(data, length);
-  if (_debug){
-    _debug->print("Write returned: ");
-    _debug->print(ret);
-    _debug->println();
+  uint8_t attempts = 0;
+  uint8_t bytesToWrite = length;
+  while(bytesToWrite && (attempts < 3)) {
+    Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
+    int ret = Wire.write(data, length);
+    if (_debug){
+      _debug->print("Write returned: ");
+      _debug->print(ret);
+      _debug->println();
+    }
+    /*
+    endTransmission returns 0 if the number of bytes written
+    *  is equal to the total length. Otherwise, a positive number is returned
+    */
+    bytesToWrite = Wire.endTransmission(true);
+    attempts++;
   }
-  Wire.endTransmission(true);
   if (*(data+1)) {
     //Last packet
     pinMode(LED_BUILTIN, OUTPUT);
