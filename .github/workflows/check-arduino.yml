@@ -1,0 +1,48 @@
+name: Check Arduino
+
+# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/check-arduino.ya?ml"
+      - "Arduino_BHY2/**"
+      - "Arduino_BHY2Host/**"
+  pull_request:
+    paths:
+      - ".github/workflows/check-arduino.ya?ml"
+      - "Arduino_BHY2/**"
+      - "Arduino_BHY2Host/**"
+  schedule:
+    # Run every Tuesday at 8 AM UTC to catch breakage caused by new rules added to Arduino Lint.
+    - cron: "0 8 * * TUE"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  lint:
+    name: ${{ matrix.project.path }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        project:
+          - path: Arduino_BHY2
+            project-type: library
+          - path: Arduino_BHY2Host
+            project-type: library
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Arduino Lint
+        uses: arduino/arduino-lint-action@v1
+        with:
+          path: ${{ matrix.project.path }}
+          project-type: ${{ matrix.project.project-type }}
+          compliance: strict
+          library-manager: update
+          # Always use this setting for official repositories. Remove for 3rd party projects.
+          official: true
