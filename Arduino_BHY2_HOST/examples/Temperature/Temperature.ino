@@ -22,7 +22,7 @@ void setup()
 
   BHY2_HOST.begin();
 
-  temp.configure(1, 0);
+  temp.begin();
 }
 
 void loop()

@@ -22,7 +22,7 @@ void setup()
 
   BHY2_HOST.begin();
 
-  ori.configure(1, 0);
+  ori.begin();
 }
 
 void loop()

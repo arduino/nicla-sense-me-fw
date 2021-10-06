@@ -30,7 +30,7 @@ void setup() {
 #else
   BHY2_HOST.begin(false, NICLA_AS_SHIELD);
 #endif
-  tempSensor.configure(1, 0);
+  tempSensor.begin();
 }
 
 void loop() {

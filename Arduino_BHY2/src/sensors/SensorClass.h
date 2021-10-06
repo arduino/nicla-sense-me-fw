@@ -12,8 +12,9 @@ public:
   virtual ~SensorClass();
 
   uint8_t id();
+  bool begin(float rate = 1, uint32_t latency = 0);
   void configure(float rate, uint32_t latency);
-  void disable();
+  void end();
 
   virtual void setData(SensorDataPacket &data) = 0;
   virtual String toString() = 0;

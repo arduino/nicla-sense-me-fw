@@ -23,7 +23,7 @@ void setup()
 
   BHY2_HOST.begin();
 
-  accel.configure(1, 0);
+  accel.begin();
 }
 
 void loop()
