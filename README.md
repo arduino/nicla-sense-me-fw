@@ -1,6 +1,7 @@
 # Nicla
 
 [![Check Arduino status](https://github.com/arduino/nicla-sense-me-fw/actions/workflows/check-arduino.yml/badge.svg)](https://github.com/arduino/nicla-sense-me-fw/actions/workflows/check-arduino.yml)
+[![Compile Examples status](https://github.com/arduino/nicla-sense-me-fw/actions/workflows/compile-examples.yml/badge.svg)](https://github.com/arduino/nicla-sense-me-fw/actions/workflows/compile-examples.yml)
 
 This repo contains everything needed to program Nicla Sense ME and to control it from another device. Further documentation can be found on the [Arduino Docs website](https://docs.arduino.cc/hardware/nicla-sense-me).
 
