@@ -1,6 +1,6 @@
 #include "thingProperties.h"
 
-#include "Arduino_BHY2_HOST.h"
+#include "Arduino_BHY2Host.h"
 #include <ArduinoIoTCloud.h>
 #include <Arduino_ConnectionHandler.h>
 

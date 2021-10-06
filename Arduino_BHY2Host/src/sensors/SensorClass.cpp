@@ -1,6 +1,6 @@
 #include "SensorClass.h"
 #include "SensorManager.h"
-#include "Arduino_BHY2_HOST.h"
+#include "Arduino_BHY2Host.h"
 #include "EslovHandler.h"
 
 SensorClass::SensorClass() : 

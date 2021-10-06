@@ -24,11 +24,11 @@ In [examples](Arduino_BHY2/examples) there are already working examples for both
 - Upload a Fail Safe Firmware - [Fail_Safe_flasher](Arduino_BHY2/examples/Fail_Safe_flasher/Fail_Safe_flasher.ino) uploads a binary to Anna's QSPIFlash. Pressing the button 3 times, Nicla checks if a Fail Safe firmware is present and, if it is valid, runs it.
 ------------
 
-[Arduino_BHY2_HOST](Arduino_BHY2_HOST) - is the library that an arduino board should include in order to control Uninsense through the eslov port.
+[Arduino_BHY2Host](Arduino_BHY2Host) - is the library that an arduino board should include in order to control Uninsense through the eslov port.
   It can also act as a passthrough, to allow the control of Nicla from a PC.
-  There is an example for both these use cases in [examples](Arduino_BHY2_HOST/examples):
-  - Act as passthrough - [Passthrough](Arduino_BHY2_HOST/examples/Passthrough/Passthrough.ino)
-  - Control Nicla sensors directly - [Accelerometer](Arduino_BHY2_HOST/examples/Accelerometer/Accelerometer.ino), [Orientation](Arduino_BHY2_HOST/examples/Orientation/Orientation.ino), [Temperature](Arduino_BHY2_HOST/examples/Temperature/Temperature.ino)
+  There is an example for both these use cases in [examples](Arduino_BHY2Host/examples):
+  - Act as passthrough - [Passthrough](Arduino_BHY2Host/examples/Passthrough/Passthrough.ino)
+  - Control Nicla sensors directly - [Accelerometer](Arduino_BHY2Host/examples/Accelerometer/Accelerometer.ino), [Orientation](Arduino_BHY2Host/examples/Orientation/Orientation.ino), [Temperature](Arduino_BHY2Host/examples/Temperature/Temperature.ino)
   
 ------------
 
@@ -52,7 +52,7 @@ In this use case, Nicla will be able to control its own sensors without the need
 
 ### Control Nicla from an arduino board through eslov
 - Upload the [App](Arduino_BHY2/examples/App/App.ino) example to Nicla.
-- Use an Arduino board, like a MKR, acting as a host by importing [Arduino_BHY2_HOST](Arduino_BHY2_HOST) and following the [example](Arduino_BHY2_HOST/examples/Accelerometer/Accelerometer.ino).
+- Use an Arduino board, like a MKR, acting as a host by importing [Arduino_BHY2Host](Arduino_BHY2Host) and following the [example](Arduino_BHY2Host/examples/Accelerometer/Accelerometer.ino).
 - Upload the host sketch to the Arduino MKR board.
 - Connect Nicla to the MKR board with an Eslov cable or I2C pins.
 
@@ -76,7 +76,7 @@ There are two web pages
 The command line tool can be used to update the firmware of Nicla or bhi, manage Nicla's sensors and read their values in real time. Refer to [tools](tools/bhy-controller) for the list of available commands. 
 Here the eslov protocol is employed, so an arduino board is needed between Nicla and the PC.
 - Upload the [App](Arduino_BHY2/examples/App/App.ino) example to Nicla.
-- Upload the [Passthrough](Arduino_BHY2_HOST/examples/Passthrough/Passthrough.ino) example to an arduino board.
+- Upload the [Passthrough](Arduino_BHY2Host/examples/Passthrough/Passthrough.ino) example to an arduino board.
 - Connect the arduino board to your PC via USB.
 - Connect the arduino board to Nicla through the eslov port.
 - Access the command line tool folder

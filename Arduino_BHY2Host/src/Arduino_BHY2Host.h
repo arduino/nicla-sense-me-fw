@@ -19,10 +19,10 @@ enum NiclaWiring {
   NICLA_AS_SHIELD
 };
 
-class Arduino_BHY2_HOST {
+class Arduino_BHY2Host {
 public:
-  Arduino_BHY2_HOST();
-  virtual ~Arduino_BHY2_HOST();
+  Arduino_BHY2Host();
+  virtual ~Arduino_BHY2Host();
 
   // Necessary API. Update function should be continuously polled if PASSTHORUGH is ENABLED
   bool begin(bool passthrough = false, NiclaWiring niclaConnection = NICLA_VIA_ESLOV);
@@ -45,6 +45,6 @@ private:
   bool _passthrough;
 };
 
-extern Arduino_BHY2_HOST BHY2_HOST;
+extern Arduino_BHY2Host BHY2_HOST;
 
 #endif

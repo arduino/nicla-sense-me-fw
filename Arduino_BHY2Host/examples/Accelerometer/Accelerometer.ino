@@ -3,7 +3,7 @@
  * An host board can configure the sensors of nicla and then read their values.
  * The host board should be connected to nicla through the eslov connector.
  * 
- * In this example, the temperature sensor is enabled and its
+ * In this example, the accelerometer sensor is enabled and its
  * values are periodically read and then printed to the serial channel
  * 
  * NOTE: if Nicla is used as a Shield on top of a MKR board,
@@ -11,18 +11,19 @@
 */
 
 #include "Arduino.h"
-#include "Arduino_BHY2_HOST.h"
+#include "Arduino_BHY2Host.h"
 
-Sensor temp(SENSOR_ID_TEMP);
+SensorXYZ accel(SENSOR_ID_ACC);
 
 void setup()
 {
+  // debug port
   Serial.begin(115200);
   while(!Serial);
 
   BHY2_HOST.begin();
 
-  temp.begin();
+  accel.begin();
 }
 
 void loop()
@@ -32,6 +33,6 @@ void loop()
 
   if (millis() - printTime >= 1000) {
     printTime = millis();
-    Serial.println(String("Temperature: ") + String(temp.value(), 3));
+    Serial.println(String("Acceleration values: ") + accel.toString());
   }
 }

@@ -11,7 +11,7 @@
 */
 
 #include "Arduino.h"
-#include "Arduino_BHY2_HOST.h"
+#include "Arduino_BHY2Host.h"
 
 SensorOrientation ori(SENSOR_ID_ORI);
 
