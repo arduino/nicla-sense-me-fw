@@ -1,18 +1,18 @@
-#include "Arduino_BHY2_HOST.h"
+#include "Arduino_BHY2Host.h"
 
 #include "EslovHandler.h"
 #include "sensors/SensorManager.h"
 
-Arduino_BHY2_HOST::Arduino_BHY2_HOST() :
+Arduino_BHY2Host::Arduino_BHY2Host() :
   _passthrough(false)
 {
 }
 
-Arduino_BHY2_HOST::~Arduino_BHY2_HOST()
+Arduino_BHY2Host::~Arduino_BHY2Host()
 {
 }
 
-bool Arduino_BHY2_HOST::begin(bool passthrough, NiclaWiring niclaConnection)
+bool Arduino_BHY2Host::begin(bool passthrough, NiclaWiring niclaConnection)
 {
   _passthrough = passthrough;
   if (niclaConnection == NICLA_AS_SHIELD) {
@@ -21,7 +21,7 @@ bool Arduino_BHY2_HOST::begin(bool passthrough, NiclaWiring niclaConnection)
   return eslovHandler.begin(passthrough);
 }
 
-void Arduino_BHY2_HOST::update()
+void Arduino_BHY2Host::update()
 {
   if (_passthrough){
     eslovHandler.update();
@@ -35,12 +35,12 @@ void Arduino_BHY2_HOST::update()
 
 }
 
-void Arduino_BHY2_HOST::configureSensor(SensorConfigurationPacket& config)
+void Arduino_BHY2Host::configureSensor(SensorConfigurationPacket& config)
 {
   eslovHandler.writeConfigPacket(config);
 }
 
-void Arduino_BHY2_HOST::configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency)
+void Arduino_BHY2Host::configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency)
 {
   SensorConfigurationPacket config;
   config.sensorId = sensorId;
@@ -49,39 +49,39 @@ void Arduino_BHY2_HOST::configureSensor(uint8_t sensorId, float sampleRate, uint
   eslovHandler.writeConfigPacket(config);
 }
 
-uint8_t Arduino_BHY2_HOST::requestAck()
+uint8_t Arduino_BHY2Host::requestAck()
 {
   return eslovHandler.requestPacketAck();
 }
 
-uint8_t Arduino_BHY2_HOST::availableSensorData()
+uint8_t Arduino_BHY2Host::availableSensorData()
 {
   return eslovHandler.requestAvailableData();
 }
 
-bool Arduino_BHY2_HOST::readSensorData(SensorDataPacket &data)
+bool Arduino_BHY2Host::readSensorData(SensorDataPacket &data)
 {
   return eslovHandler.requestSensorData(data);
 }
 
-void Arduino_BHY2_HOST::parse(SensorDataPacket& data, DataXYZ& vector)
+void Arduino_BHY2Host::parse(SensorDataPacket& data, DataXYZ& vector)
 {
   DataParser::parse3DVector(data, vector);
 }
 
-void Arduino_BHY2_HOST::parse(SensorDataPacket& data, DataOrientation& vector)
+void Arduino_BHY2Host::parse(SensorDataPacket& data, DataOrientation& vector)
 {
   DataParser::parseEuler(data, vector);
 }
 
-void Arduino_BHY2_HOST::parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor)
+void Arduino_BHY2Host::parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor)
 {
   DataParser::parseEuler(data, vector, scaleFactor);
 }
 
-void Arduino_BHY2_HOST::debug(Stream &stream)
+void Arduino_BHY2Host::debug(Stream &stream)
 {
   eslovHandler.debug(stream);
 }
 
-Arduino_BHY2_HOST BHY2_HOST;
+Arduino_BHY2Host BHY2Host;

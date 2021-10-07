@@ -64,7 +64,7 @@ private:
   bool _dfuLedOn;
 
 private:
-  friend class Arduino_BHY2_HOST;
+  friend class Arduino_BHY2Host;
 
   void flushWire();
 

@@ -7,11 +7,11 @@
  * values are periodically read and then printed to the serial channel
  * 
  * NOTE: if Nicla is used as a Shield on top of a MKR board,
- * please use BHY2_HOST.begin(false, NICLA_AS_SHIELD)
+ * please use BHY2Host.begin(false, NICLA_AS_SHIELD)
 */
 
 #include "Arduino.h"
-#include "Arduino_BHY2_HOST.h"
+#include "Arduino_BHY2Host.h"
 
 Sensor temp(SENSOR_ID_TEMP);
 
@@ -20,7 +20,7 @@ void setup()
   Serial.begin(115200);
   while(!Serial);
 
-  BHY2_HOST.begin();
+  BHY2Host.begin();
 
   temp.begin();
 }
@@ -28,7 +28,7 @@ void setup()
 void loop()
 {
   static auto printTime = millis();
-  BHY2_HOST.update();
+  BHY2Host.update();
 
   if (millis() - printTime >= 1000) {
     printTime = millis();
