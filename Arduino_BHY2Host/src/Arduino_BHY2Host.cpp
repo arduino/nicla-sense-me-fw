@@ -84,4 +84,4 @@ void Arduino_BHY2Host::debug(Stream &stream)
   eslovHandler.debug(stream);
 }
 
-Arduino_BHY2Host BHY2_HOST;
+Arduino_BHY2Host BHY2Host;

@@ -26,16 +26,16 @@ void setup() {
   
   Serial.println("Configuring Nicla...");
 #ifdef ARDUINO_ARCH_MBED
-  BHY2_HOST.begin();
+  BHY2Host.begin();
 #else
-  BHY2_HOST.begin(false, NICLA_AS_SHIELD);
+  BHY2Host.begin(false, NICLA_AS_SHIELD);
 #endif
   tempSensor.begin();
 }
 
 void loop() {
   static auto printTime = millis();
-  BHY2_HOST.update();
+  BHY2Host.update();
 
   if (millis() - printTime > 1000) {
     printTime = millis();

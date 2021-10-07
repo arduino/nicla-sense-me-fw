@@ -1,5 +1,5 @@
-#ifndef ARDUINO_BHY2_HOST_H_
-#define ARDUINO_BHY2_HOST_H_
+#ifndef ARDUINO_BHY2HOST_H_
+#define ARDUINO_BHY2HOST_H_
 
 #include "Arduino.h"
 #include "sensors/SensorTypes.h"
@@ -45,6 +45,6 @@ private:
   bool _passthrough;
 };
 
-extern Arduino_BHY2Host BHY2_HOST;
+extern Arduino_BHY2Host BHY2Host;
 
 #endif

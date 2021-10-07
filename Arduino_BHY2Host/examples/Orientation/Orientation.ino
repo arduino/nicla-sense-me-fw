@@ -7,7 +7,7 @@
  * values are periodically read and then printed to the serial channel
  * 
  * NOTE: if Nicla is used as a Shield on top of a MKR board,
- * please use BHY2_HOST.begin(false, NICLA_AS_SHIELD)
+ * please use BHY2Host.begin(false, NICLA_AS_SHIELD)
 */
 
 #include "Arduino.h"
@@ -20,7 +20,7 @@ void setup()
   Serial.begin(115200);
   while(!Serial);
 
-  BHY2_HOST.begin();
+  BHY2Host.begin();
 
   ori.begin();
 }
@@ -28,7 +28,7 @@ void setup()
 void loop()
 {
   static auto printTime = millis();
-  BHY2_HOST.update();
+  BHY2Host.update();
 
   if (millis() - printTime >= 1000) {
     printTime = millis();

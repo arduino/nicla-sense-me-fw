@@ -7,7 +7,7 @@
  * to control nicla from either the PC command line or from a web page.
  * 
  * NOTE: if Nicla is used as a Shield on top of a MKR board,
- * please use BHY2_HOST.begin(true, NICLA_AS_SHIELD)
+ * please use BHY2Host.begin(true, NICLA_AS_SHIELD)
 */
 
 #include "Arduino.h"
@@ -31,10 +31,10 @@ void setup()
 #if DEBUG
   // When the passthrough is enabled, Serial is busy ->
   // so it cannot be used for debugging. Serial1 is used instead
-  BHY2_HOST.debug(Serial1);
+  BHY2Host.debug(Serial1);
 #endif
 
-  BHY2_HOST.begin(true);
+  BHY2Host.begin(true);
 }
 
 void loop()
@@ -42,5 +42,5 @@ void loop()
   if (Serial1.available()) {
     SerialUSB2.write(Serial1.read());
   }
-  BHY2_HOST.update();
+  BHY2Host.update();
 }

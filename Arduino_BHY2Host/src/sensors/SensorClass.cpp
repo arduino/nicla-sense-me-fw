@@ -38,8 +38,8 @@ void SensorClass::configure(float rate, uint32_t latency)
 
   uint8_t ack = 0;
   while(ack != 15) {
-    BHY2_HOST.configureSensor(config);
-    ack = BHY2_HOST.requestAck();
+    BHY2Host.configureSensor(config);
+    ack = BHY2Host.requestAck();
   }
 
   if (rate == 0 && _subscribed) {
