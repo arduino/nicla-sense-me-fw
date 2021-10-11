@@ -1,5 +1,5 @@
 # Nicla
-This repo contains everything needed to program Nicla Sense ME and to control it from another device.
+This repo contains everything needed to program Nicla Sense ME and to control it from another device. Further documentation can be found on the [Arduino Docs website](https://docs.arduino.cc/hardware/nicla-sense-me).
 
 Nicla Sense ME belongs to Arduino Mbed OS boards and its core is available [here](https://github.com/arduino/ArduinoCore-mbed).
 The packaged core can also be downloaded from Arduino IDE as 'Arduino Mbed OS Nicla Boards'
