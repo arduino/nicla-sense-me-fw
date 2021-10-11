@@ -1,0 +1,194 @@
+name: Compile Examples
+
+# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/compile-examples.ya?ml"
+      - "Arduino_BHY2/library.properties"
+      - "Arduino_BHY2/examples/**"
+      - "Arduino_BHY2/src/**"
+      - "Arduino_BHY2Host/library.properties"
+      - "Arduino_BHY2Host/examples/**"
+      - "Arduino_BHY2Host/src/**"
+  pull_request:
+    paths:
+      - ".github/workflows/compile-examples.ya?ml"
+      - "Arduino_BHY2/library.properties"
+      - "Arduino_BHY2/examples/**"
+      - "Arduino_BHY2/src/**"
+      - "Arduino_BHY2Host/library.properties"
+      - "Arduino_BHY2Host/examples/**"
+      - "Arduino_BHY2Host/src/**"
+  schedule:
+    # Run every Tuesday at 8 AM UTC to catch breakage caused by changes to external resources (libraries, platforms).
+    - cron: "0 8 * * TUE"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.board.fqbn }}
+    runs-on: ubuntu-latest
+
+    env:
+      SKETCHES_REPORTS_PATH: sketches-reports
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        board:
+          - fqbn: arduino:mbed_nicla:nicla_sense
+            platforms: |
+              - name: arduino:mbed_nicla
+            bhy2: true
+            bhy2host: false
+            arduinoiotcloud: false
+            passthrough: false
+          - fqbn: arduino:mbed_portenta:envie_m4
+            platforms: |
+              - name: arduino:mbed_portenta
+            libraries: |
+              - name: Arduino_Portenta_OTA
+            bhy2: false
+            bhy2host: true
+            arduinoiotcloud: true
+            passthrough: false
+          - fqbn: arduino:mbed_portenta:envie_m7
+            platforms: |
+              - name: arduino:mbed_portenta
+            libraries: |
+              - name: Arduino_Portenta_OTA
+            bhy2: false
+            bhy2host: true
+            arduinoiotcloud: true
+            passthrough: true
+          - fqbn: arduino:samd:mkrzero
+            platforms: |
+              - name: arduino:samd
+            bhy2: false
+            bhy2host: true
+            arduinoiotcloud: false
+            passthrough: true
+          - fqbn: arduino:samd:mkr1000
+            platforms: |
+              - name: arduino:samd
+            bhy2: false
+            bhy2host: true
+            arduinoiotcloud: true
+            passthrough: true
+          - fqbn: arduino:samd:mkrwifi1010
+            platforms: |
+              - name: arduino:samd
+            bhy2: false
+            bhy2host: true
+            arduinoiotcloud: true
+            passthrough: true
+          - fqbn: arduino:samd:mkrwan1310
+            platforms: |
+              - name: arduino:samd
+            bhy2: false
+            bhy2host: true
+            arduinoiotcloud: false
+            passthrough: true
+          - fqbn: arduino:samd:mkrgsm1400
+            platforms: |
+              - name: arduino:samd
+            bhy2: false
+            bhy2host: true
+            arduinoiotcloud: false
+            passthrough: true
+          - fqbn: arduino:samd:mkrnb1500
+            platforms: |
+              - name: arduino:samd
+            bhy2: false
+            bhy2host: true
+            arduinoiotcloud: false
+            passthrough: true
+
+        # Make board type-specific customizations to the matrix jobs
+        include:
+          - board:
+              # Boards supported by Arduino_BHY2 library
+              bhy2: true
+            # Install these libraries
+            bhy2-libraries: |
+              # Install the library from the local path.
+              - source-path: Arduino_BHY2
+              - name: ArduinoBLE
+            # Compile these sketches
+            bhy2-sketch-paths: |
+              - Arduino_BHY2/examples
+          - board:
+              bhy2: false
+            bhy2-libraries: ""
+            bhy2-sketch-paths: ""
+          - board:
+              # Boards supported by Arduino_BHY2Host library
+              bhy2host: true
+            # Install these libraries
+            bhy2host-libraries: |
+              # Install the library from the local path.
+              - source-path: Arduino_BHY2Host
+            # Compile these sketches
+            bhy2host-sketch-paths: |
+              - Arduino_BHY2Host/examples/Accelerometer
+              - Arduino_BHY2Host/examples/Orientation
+              - Arduino_BHY2Host/examples/Temperature
+          - board:
+              bhy2host: false
+            bhy2host-libraries: ""
+            bhy2host-sketch-paths: ""
+          - board:
+              # Boards supported by Arduino IoT Cloud
+              arduinoiotcloud: true
+            # Install these libraries in addition to the universal ones
+            arduinoiotcloud-libraries: |
+              - name: ArduinoIoTCloud
+            # Compile these sketches in addition to the universal ones
+            arduinoiotcloud-sketch-paths: |
+              - Arduino_BHY2Host/examples/Nicla_IoT_Bridge
+          - board:
+              arduinoiotcloud: false
+            arduinoiotcloud-libraries: ""
+            arduinoiotcloud-sketch-paths: ""
+          - board:
+              # Boards with passthrough capability
+              passthrough: true
+            # Compile these sketches in addition to the universal ones
+            passthrough-sketch-paths: |
+              - Arduino_BHY2Host/examples/Passthrough
+          - board:
+              passthrough: false
+            passthrough-sketch-paths: ""
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Compile examples
+        uses: arduino/compile-sketches@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fqbn: ${{ matrix.board.fqbn }}
+          platforms: ${{ matrix.board.platforms }}
+          libraries: |
+            # Board-specific libraries
+            ${{ matrix.bhy2-libraries }}
+            ${{ matrix.bhy2host-libraries }}
+            ${{ matrix.board.libraries }}
+            ${{ matrix.arduinoiotcloud-libraries }}
+          sketch-paths: |
+            ${{ matrix.bhy2-sketch-paths }}
+            ${{ matrix.bhy2host-sketch-paths }}
+            ${{ matrix.arduinoiotcloud-sketch-paths }}
+          enable-deltas-report: true
+          sketches-report-path: ${{ env.SKETCHES_REPORTS_PATH }}
+
+      - name: Save sketches report as workflow artifact
+        uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: error
+          path: ${{ env.SKETCHES_REPORTS_PATH }}
+          name: ${{ env.SKETCHES_REPORTS_PATH }}
