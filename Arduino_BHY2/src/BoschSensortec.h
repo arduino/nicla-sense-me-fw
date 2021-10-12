@@ -32,7 +32,7 @@ public:
   virtual ~BoschSensortec();
 
   // sketch-side API
-  bool begin(); 
+  bool begin();
   void update();
   void configureSensor(SensorConfigurationPacket& config);
 
@@ -47,12 +47,15 @@ public:
 
   uint8_t acknowledgment();
 
+  int getSensorCfg(uint8_t sensorId, struct bhy2_virt_sensor_conf *virt_sensor_conf);
+
+
 private:
   mbed::CircularBuffer<SensorDataPacket, SENSOR_QUEUE_SIZE, uint8_t> _sensorQueue;
 
   uint8_t _workBuffer[WORK_BUFFER_SIZE];
   uint8_t _acknowledgment;
-  
+
   struct bhy2_dev _bhy2;
   uint8_t _sensorsPresent[32];
 

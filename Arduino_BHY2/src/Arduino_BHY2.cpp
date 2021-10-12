@@ -158,7 +158,7 @@ void Arduino_BHY2::update(unsigned long ms)
   delay(ms);
 }
 
-void Arduino_BHY2::delay(unsigned long ms) 
+void Arduino_BHY2::delay(unsigned long ms)
 {
   unsigned long start = millis();
   unsigned long elapsed = 0;
@@ -217,6 +217,12 @@ void Arduino_BHY2::parse(SensorDataPacket& data, DataOrientation& vector)
 void Arduino_BHY2::parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor)
 {
   DataParser::parseEuler(data, vector, scaleFactor);
+}
+
+
+int Arduino_BHY2::getSensorCfg(uint8_t sensorId, struct bhy2_virt_sensor_conf *virt_sensor_conf)
+{
+    return sensortec.getSensorCfg(sensorId, virt_sensor_conf);
 }
 
 void Arduino_BHY2::debug(Stream &stream)

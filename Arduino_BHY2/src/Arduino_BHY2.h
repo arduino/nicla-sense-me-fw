@@ -44,7 +44,7 @@ public:
   Arduino_BHY2();
   virtual ~Arduino_BHY2();
 
-  // Necessary API. Update function should be continuously polled 
+  // Necessary API. Update function should be continuously polled
   bool begin(NiclaConfig config = NICLA_BLE_AND_I2C, NiclaWiring niclaConnection = NICLA_VIA_ESLOV);
   bool begin(NiclaSettings& settings);
   void update(); // remove this to enforce a sleep
@@ -62,6 +62,8 @@ public:
   void parse(SensorDataPacket& data, DataXYZ& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
+
+  int getSensorCfg(uint8_t sensorId, struct bhy2_virt_sensor_conf *virt_sensor_conf);
 
   void checkEslovInt();
   void setLDOTimeout(int time);
