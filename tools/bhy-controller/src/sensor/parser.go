@@ -89,6 +89,10 @@ func parseData(data *SensorData) {
 		typeScheme = typeMap[4].(map[string]interface{})
   } else if (sensorScheme == "BSECOutput") {
 		typeScheme = typeMap[5].(map[string]interface{})
+  } else if (sensorScheme == "BSECOutputV2") {
+		typeScheme = typeMap[6].(map[string]interface{})
+  } else if (sensorScheme == "BSECOutputV2Full") {
+		typeScheme = typeMap[6].(map[string]interface{})
   }
 
 	fields := typeScheme["parse-scheme"].([]interface{})
