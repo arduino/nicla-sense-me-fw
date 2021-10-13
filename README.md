@@ -42,6 +42,7 @@ In [examples](Arduino_BHY2/examples) there are already working examples for both
 
 [tools](tools/bhy-controller) - contains the source code of the command line tool to control Nicla from a PC.
   There is also a webserver mode that allows to control Nicla from a browser on your PC.
+  The `bhy-controller` executable files for the main operating systems can be downloaded from the [latest release](https://github.com/arduino/nicla-sense-me-fw/releases/latest#:~:text=Assets).
 
 ------------
 
