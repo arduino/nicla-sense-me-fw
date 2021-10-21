@@ -1,10 +1,13 @@
 #include "Arduino_BHY2Host.h"
 
 #include "EslovHandler.h"
+#include "BLEHandler.h"
 #include "sensors/SensorManager.h"
 
 Arduino_BHY2Host::Arduino_BHY2Host() :
-  _passthrough(false)
+  _passthrough(false),
+  _wiring(NICLA_VIA_ESLOV),
+  _debug(NULL)
 {
 }
 
@@ -15,6 +18,13 @@ Arduino_BHY2Host::~Arduino_BHY2Host()
 bool Arduino_BHY2Host::begin(bool passthrough, NiclaWiring niclaConnection)
 {
   _passthrough = passthrough;
+  _wiring = niclaConnection;
+  if (niclaConnection == NICLA_VIA_BLE) {
+    if (_debug) {
+      _debug->println("NICLA_VIA_BLE selected");
+    }
+    return bleHandler.begin();
+  }
   if (niclaConnection == NICLA_AS_SHIELD) {
     eslovHandler.niclaAsShield();
   }
@@ -23,21 +33,34 @@ bool Arduino_BHY2Host::begin(bool passthrough, NiclaWiring niclaConnection)
 
 void Arduino_BHY2Host::update()
 {
-  if (_passthrough){
-    eslovHandler.update();
+  if (_wiring == NICLA_VIA_BLE) {
+    bleHandler.update();
   } else {
-    while (availableSensorData() > 0) {
-      SensorDataPacket data;
-      readSensorData(data);
-      sensorManager.process(data);
+    if (_passthrough){
+      eslovHandler.update();
+    } else {
+      while (availableSensorData() > 0) {
+        SensorDataPacket data;
+        readSensorData(data);
+        sensorManager.process(data);
+      }
     }
   }
+}
 
+void Arduino_BHY2Host::update(unsigned long ms)
+{
+  update();
+  delay(ms);
 }
 
 void Arduino_BHY2Host::configureSensor(SensorConfigurationPacket& config)
 {
-  eslovHandler.writeConfigPacket(config);
+  if (_wiring == NICLA_VIA_BLE) {
+    bleHandler.writeConfigPacket(config);
+  } else {
+    eslovHandler.writeConfigPacket(config);
+  }
 }
 
 void Arduino_BHY2Host::configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency)
@@ -46,7 +69,11 @@ void Arduino_BHY2Host::configureSensor(uint8_t sensorId, float sampleRate, uint3
   config.sensorId = sensorId;
   config.sampleRate = sampleRate;
   config.latency = latency;
-  eslovHandler.writeConfigPacket(config);
+  if (_wiring == NICLA_VIA_BLE) {
+    bleHandler.writeConfigPacket(config);
+  } else {
+    eslovHandler.writeConfigPacket(config);
+  }
 }
 
 uint8_t Arduino_BHY2Host::requestAck()
@@ -81,7 +108,9 @@ void Arduino_BHY2Host::parse(SensorDataPacket& data, DataOrientation& vector, fl
 
 void Arduino_BHY2Host::debug(Stream &stream)
 {
+  _debug = &stream;
   eslovHandler.debug(stream);
+  bleHandler.debug(stream);
 }
 
 Arduino_BHY2Host BHY2Host;

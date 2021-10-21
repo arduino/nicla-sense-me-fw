@@ -5,13 +5,15 @@
 
 SensorClass::SensorClass() : 
   _id(0),
-  _subscribed(false)
+  _subscribed(false),
+  _wiring(NICLA_VIA_ESLOV)
 {
 }
 
 SensorClass::SensorClass(uint8_t id) : 
   _id(id),
-  _subscribed(false)
+  _subscribed(false),
+  _wiring(NICLA_VIA_ESLOV)
 {
 }
 
@@ -25,7 +27,13 @@ uint8_t SensorClass::id()
   return _id;
 }
 
-bool SensorClass::begin(float rate, uint32_t latency)
+bool SensorClass::begin(NiclaWiring wiring)
+{
+  _wiring = wiring;
+  return begin(1,0,wiring);
+}
+
+bool SensorClass::begin(float rate, uint32_t latency, NiclaWiring wiring)
 {
   configure(rate, latency);
   return true;
@@ -33,13 +41,17 @@ bool SensorClass::begin(float rate, uint32_t latency)
 
 void SensorClass::configure(float rate, uint32_t latency)
 {
-  eslovHandler.toggleEslovIntPin();
   SensorConfigurationPacket config {_id, rate, latency};
 
-  uint8_t ack = 0;
-  while(ack != 15) {
+  if (_wiring == NICLA_VIA_BLE) {
     BHY2Host.configureSensor(config);
-    ack = BHY2Host.requestAck();
+  } else {
+    eslovHandler.toggleEslovIntPin();
+    uint8_t ack = 0;
+    while(ack != 15) {
+      BHY2Host.configureSensor(config);
+      ack = BHY2Host.requestAck();
+    }
   }
 
   if (rate == 0 && _subscribed) {
