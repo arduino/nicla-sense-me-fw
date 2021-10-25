@@ -39,7 +39,7 @@ void setup() {
   while (!BHY2Host.begin(false, NICLA_VIA_BLE)) {}
   Serial.println("NICLA device found!");
 
-  tempSensor.begin(NICLA_VIA_BLE);
+  tempSensor.begin();
 
   printTime = millis();
 }

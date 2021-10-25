@@ -106,6 +106,11 @@ void Arduino_BHY2Host::parse(SensorDataPacket& data, DataOrientation& vector, fl
   DataParser::parseEuler(data, vector, scaleFactor);
 }
 
+NiclaWiring Arduino_BHY2Host::getNiclaConnection()
+{
+  return _wiring;
+}
+
 void Arduino_BHY2Host::debug(Stream &stream)
 {
   _debug = &stream;

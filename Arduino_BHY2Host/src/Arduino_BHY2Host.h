@@ -13,13 +13,13 @@
 #include "sensors/Sensor.h"
 
 #include "sensors/SensorID.h"
-/*
+
 enum NiclaWiring {
   NICLA_VIA_ESLOV = 0,
   NICLA_AS_SHIELD,
   NICLA_VIA_BLE
 };
-*/
+
 class Arduino_BHY2Host {
 public:
   Arduino_BHY2Host();
@@ -40,6 +40,8 @@ public:
   void parse(SensorDataPacket& data, DataXYZ& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
+
+  NiclaWiring getNiclaConnection();
 
   void debug(Stream &stream);
 
