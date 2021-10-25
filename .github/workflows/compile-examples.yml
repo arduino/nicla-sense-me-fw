@@ -131,6 +131,7 @@ jobs:
             bhy2host-libraries: |
               # Install the library from the local path.
               - source-path: Arduino_BHY2Host
+              - name: ArduinoBLE
             # Compile these sketches
             bhy2host-sketch-paths: |
               - Arduino_BHY2Host/examples/Accelerometer
