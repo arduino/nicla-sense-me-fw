@@ -1,3 +1,7 @@
+#include "Arduino_BHY2Host.h"
+
+#ifdef __BHY2_HOST_BLE_SUPPORTED__
+
 #include "BLEHandler.h"
 #include "sensors/SensorManager.h"
 
@@ -193,3 +197,5 @@ void BLEHandler::debug(Stream &stream)
 }
 
 BLEHandler bleHandler;
+
+#endif //__BHY2_HOST_BLE_SUPPORTED__

@@ -1,7 +1,6 @@
 #include "Arduino_BHY2Host.h"
 
 #include "EslovHandler.h"
-#include "BLEHandler.h"
 #include "sensors/SensorManager.h"
 
 Arduino_BHY2Host::Arduino_BHY2Host() :
@@ -20,10 +19,17 @@ bool Arduino_BHY2Host::begin(bool passthrough, NiclaWiring niclaConnection)
   _passthrough = passthrough;
   _wiring = niclaConnection;
   if (niclaConnection == NICLA_VIA_BLE) {
+#ifdef __BHY2_HOST_BLE_SUPPORTED__
     if (_debug) {
       _debug->println("NICLA_VIA_BLE selected");
     }
     return bleHandler.begin();
+#else
+    if (_debug) {
+      _debug->println("Unsupported board!");
+    }
+    return false;
+#endif
   }
   if (niclaConnection == NICLA_AS_SHIELD) {
     eslovHandler.niclaAsShield();
@@ -34,7 +40,9 @@ bool Arduino_BHY2Host::begin(bool passthrough, NiclaWiring niclaConnection)
 void Arduino_BHY2Host::update()
 {
   if (_wiring == NICLA_VIA_BLE) {
+#ifdef __BHY2_HOST_BLE_SUPPORTED__
     bleHandler.update();
+#endif
   } else {
     if (_passthrough){
       eslovHandler.update();
@@ -57,7 +65,9 @@ void Arduino_BHY2Host::update(unsigned long ms)
 void Arduino_BHY2Host::configureSensor(SensorConfigurationPacket& config)
 {
   if (_wiring == NICLA_VIA_BLE) {
+#ifdef __BHY2_HOST_BLE_SUPPORTED__
     bleHandler.writeConfigPacket(config);
+#endif
   } else {
     eslovHandler.writeConfigPacket(config);
   }
@@ -70,7 +80,9 @@ void Arduino_BHY2Host::configureSensor(uint8_t sensorId, float sampleRate, uint3
   config.sampleRate = sampleRate;
   config.latency = latency;
   if (_wiring == NICLA_VIA_BLE) {
+#ifdef __BHY2_HOST_BLE_SUPPORTED__
     bleHandler.writeConfigPacket(config);
+#endif
   } else {
     eslovHandler.writeConfigPacket(config);
   }
@@ -115,7 +127,9 @@ void Arduino_BHY2Host::debug(Stream &stream)
 {
   _debug = &stream;
   eslovHandler.debug(stream);
+#ifdef __BHY2_HOST_BLE_SUPPORTED__
   bleHandler.debug(stream);
+#endif
 }
 
 Arduino_BHY2Host BHY2Host;

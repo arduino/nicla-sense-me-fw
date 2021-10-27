@@ -14,6 +14,11 @@
 
 #include "sensors/SensorID.h"
 
+#if defined(ARDUINO_PORTENTA_H7) || defined(ARDUINO_SAMD_MKRWIFI1010)
+#define __BHY2_HOST_BLE_SUPPORTED__
+#include "BLEHandler.h"
+#endif
+
 enum NiclaWiring {
   NICLA_VIA_ESLOV = 0,
   NICLA_AS_SHIELD,
