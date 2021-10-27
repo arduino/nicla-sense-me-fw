@@ -71,13 +71,6 @@ jobs:
             bhy2host: true
             arduinoiotcloud: false
             passthrough: true
-          - fqbn: arduino:samd:mkr1000
-            platforms: |
-              - name: arduino:samd
-            bhy2: false
-            bhy2host: true
-            arduinoiotcloud: true
-            passthrough: true
           - fqbn: arduino:samd:mkrwifi1010
             platforms: |
               - name: arduino:samd
