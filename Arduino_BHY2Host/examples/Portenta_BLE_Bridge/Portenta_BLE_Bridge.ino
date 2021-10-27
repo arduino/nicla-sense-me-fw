@@ -13,6 +13,10 @@ void setup() {
   // Initialize serial and wait for port to open:
   Serial.begin(115200);
   while(!Serial) {}
+#ifndef TARGET_PORTENTA_H7
+  Serial.println("Unsupported board!");
+  while(1);
+#endif
 
 #if DEBUG
   BHY2.debug(Serial);
