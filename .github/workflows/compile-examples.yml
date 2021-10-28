@@ -46,6 +46,7 @@ jobs:
             bhy2host: false
             arduinoiotcloud: false
             passthrough: false
+            blebridge: false
           - fqbn: arduino:mbed_portenta:envie_m4
             platforms: |
               - name: arduino:mbed_portenta
@@ -55,6 +56,7 @@ jobs:
             bhy2host: true
             arduinoiotcloud: true
             passthrough: false
+            blebridge: true
           - fqbn: arduino:mbed_portenta:envie_m7
             platforms: |
               - name: arduino:mbed_portenta
@@ -64,6 +66,7 @@ jobs:
             bhy2host: true
             arduinoiotcloud: true
             passthrough: true
+            blebridge: true
           - fqbn: arduino:samd:mkrzero
             platforms: |
               - name: arduino:samd
@@ -71,13 +74,7 @@ jobs:
             bhy2host: true
             arduinoiotcloud: false
             passthrough: true
-          - fqbn: arduino:samd:mkr1000
-            platforms: |
-              - name: arduino:samd
-            bhy2: false
-            bhy2host: true
-            arduinoiotcloud: true
-            passthrough: true
+            blebridge: false
           - fqbn: arduino:samd:mkrwifi1010
             platforms: |
               - name: arduino:samd
@@ -85,6 +82,7 @@ jobs:
             bhy2host: true
             arduinoiotcloud: true
             passthrough: true
+            blebridge: false
           - fqbn: arduino:samd:mkrwan1310
             platforms: |
               - name: arduino:samd
@@ -92,6 +90,7 @@ jobs:
             bhy2host: true
             arduinoiotcloud: false
             passthrough: true
+            blebridge: false
           - fqbn: arduino:samd:mkrgsm1400
             platforms: |
               - name: arduino:samd
@@ -99,6 +98,7 @@ jobs:
             bhy2host: true
             arduinoiotcloud: false
             passthrough: true
+            blebridge: false
           - fqbn: arduino:samd:mkrnb1500
             platforms: |
               - name: arduino:samd
@@ -106,6 +106,7 @@ jobs:
             bhy2host: true
             arduinoiotcloud: false
             passthrough: true
+            blebridge: false
 
         # Make board type-specific customizations to the matrix jobs
         include:
@@ -131,6 +132,7 @@ jobs:
             bhy2host-libraries: |
               # Install the library from the local path.
               - source-path: Arduino_BHY2Host
+              - name: ArduinoBLE
             # Compile these sketches
             bhy2host-sketch-paths: |
               - Arduino_BHY2Host/examples/Accelerometer
@@ -162,6 +164,19 @@ jobs:
           - board:
               passthrough: false
             passthrough-sketch-paths: ""
+          - board:
+              # Boards supported by Arduino_BHY2 library
+              blebridge: true
+            # Install these libraries
+            blebridge-libraries: |
+              - name: ArduinoIoTCloud
+            # Compile these sketches
+            blebridge-sketch-paths: |
+              - Arduino_BHY2Host/examples/Portenta_BLE_Bridge
+          - board:
+              blebridge: false
+            blebridge-libraries: ""
+            blebridge-sketch-paths: ""
 
     steps:
       - name: Checkout repository
@@ -179,10 +194,12 @@ jobs:
             ${{ matrix.bhy2host-libraries }}
             ${{ matrix.board.libraries }}
             ${{ matrix.arduinoiotcloud-libraries }}
+            ${{ matrix.blebridge-libraries }}
           sketch-paths: |
             ${{ matrix.bhy2-sketch-paths }}
             ${{ matrix.bhy2host-sketch-paths }}
             ${{ matrix.arduinoiotcloud-sketch-paths }}
+            ${{ matrix.blebridge-sketch-paths }}
           enable-deltas-report: true
           sketches-report-path: ${{ env.SKETCHES_REPORTS_PATH }}
 

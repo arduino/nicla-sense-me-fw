@@ -14,9 +14,15 @@
 
 #include "sensors/SensorID.h"
 
+#if defined(ARDUINO_PORTENTA_H7) || defined(ARDUINO_SAMD_MKRWIFI1010)
+#define __BHY2_HOST_BLE_SUPPORTED__
+#include "BLEHandler.h"
+#endif
+
 enum NiclaWiring {
   NICLA_VIA_ESLOV = 0,
-  NICLA_AS_SHIELD
+  NICLA_AS_SHIELD,
+  NICLA_VIA_BLE
 };
 
 class Arduino_BHY2Host {
@@ -27,6 +33,7 @@ public:
   // Necessary API. Update function should be continuously polled if PASSTHORUGH is ENABLED
   bool begin(bool passthrough = false, NiclaWiring niclaConnection = NICLA_VIA_ESLOV);
   void update();
+  void update(unsigned long ms); // Update and then sleep
 
   // Functions for controlling the BHY when PASSTHROUGH is DISABLED
   void configureSensor(SensorConfigurationPacket& config);
@@ -39,10 +46,14 @@ public:
   void parse(SensorDataPacket& data, DataOrientation& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
 
+  NiclaWiring getNiclaConnection();
+
   void debug(Stream &stream);
 
 private:
   bool _passthrough;
+  NiclaWiring _wiring;
+  Stream *_debug;
 };
 
 extern Arduino_BHY2Host BHY2Host;

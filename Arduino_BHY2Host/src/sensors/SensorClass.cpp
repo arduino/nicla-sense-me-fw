@@ -33,13 +33,17 @@ bool SensorClass::begin(float rate, uint32_t latency)
 
 void SensorClass::configure(float rate, uint32_t latency)
 {
-  eslovHandler.toggleEslovIntPin();
   SensorConfigurationPacket config {_id, rate, latency};
 
-  uint8_t ack = 0;
-  while(ack != 15) {
+  if (BHY2Host.getNiclaConnection() == NICLA_VIA_BLE) {
     BHY2Host.configureSensor(config);
-    ack = BHY2Host.requestAck();
+  } else {
+    eslovHandler.toggleEslovIntPin();
+    uint8_t ack = 0;
+    while(ack != 15) {
+      BHY2Host.configureSensor(config);
+      ack = BHY2Host.requestAck();
+    }
   }
 
   if (rate == 0 && _subscribed) {
