@@ -64,9 +64,3 @@ void loop() {
   ArduinoCloud.update(); 
   
 }
-
-void onTemperatureChange() {
-}
-
-void onSecondsChange() {
-}
