@@ -1,3 +1,16 @@
+/* 
+ * Upload this sketch to a Host board to use it as an I2C bridge between 
+ * Nicla Sense ME and the Arduino Cloud. 
+ * Nicla Sense ME board needs to run the basic App.ino sketch and to be plugged
+ * as a shield on top of the Host board.
+ * 
+ * Before uploading this sketch to the Host board:
+ * - add your Host device to Arduino Cloud
+ * - setup temperature and seconds Things in Arduino Cloud
+ * - get the THING_ID and copy it in thingProperties.h
+ * - create a Dashboard in Arduino Cloud, like a live chart of the temperature
+*/
+
 #include "thingProperties.h"
 
 #include "Arduino_BHY2Host.h"
