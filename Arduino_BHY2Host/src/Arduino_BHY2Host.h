@@ -14,7 +14,7 @@
 
 #include "sensors/SensorID.h"
 
-#if defined(ARDUINO_PORTENTA_H7) || defined(ARDUINO_SAMD_MKRWIFI1010)
+#if defined(ARDUINO_PORTENTA_H7_M7) || defined(ARDUINO_SAMD_MKRWIFI1010)
 #define __BHY2_HOST_BLE_SUPPORTED__
 #include "BLEHandler.h"
 #endif
