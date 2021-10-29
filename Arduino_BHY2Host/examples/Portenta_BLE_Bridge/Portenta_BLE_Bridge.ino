@@ -19,7 +19,7 @@ void setup() {
 #endif
 
 #if DEBUG
-  BHY2.debug(Serial);
+  BHY2Host.debug(Serial);
 #endif
 
   // Defined in thingProperties.h
