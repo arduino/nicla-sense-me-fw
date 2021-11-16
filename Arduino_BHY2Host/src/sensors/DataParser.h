@@ -30,18 +30,18 @@ struct DataOrientation {
 };
 
 struct DataQuaternion {
-  int16_t x;
-  int16_t y;
-  int16_t z;
-  int16_t w;
-  uint16_t accuracy;
+  float x;
+  float y;
+  float z;
+  float w;
+  float accuracy;
 
   String toString() {
-    return (String)("Quaternion values - X: " + String(x)
-                    + "   Y: " + String(y)
-                    + "   Z: " + String(z) 
-                    + "   W: " + String(w) 
-                    + "   Accuracy: " + String(accuracy) 
+    return (String)("Quaternion values - X: " + String(x, 3)
+                    + "   Y: " + String(y, 3)
+                    + "   Z: " + String(z, 3) 
+                    + "   W: " + String(w, 3) 
+                    + "   Accuracy: " + String(accuracy, 3) 
                     + "\n");
   }
 };
@@ -51,7 +51,7 @@ public:
   static void parse3DVector(SensorDataPacket& data, DataXYZ& vector);
   static void parseEuler(SensorDataPacket& data, DataOrientation& vector);
   static void parseEuler(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
-  static void parseQuaternion(SensorDataPacket& data, DataQuaternion& vector);
+  static void parseQuaternion(SensorDataPacket& data, DataQuaternion& vector, float scaleFactor);
   static void parseData(SensorDataPacket& data, float& value, float scaleFactor, SensorPayload format);
   static void parseActivity(SensorDataPacket& data, uint16_t value);
 };

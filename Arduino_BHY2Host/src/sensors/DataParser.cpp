@@ -16,12 +16,12 @@ void DataParser::parseEuler(SensorDataPacket& data, DataOrientation& vector) {
   parseEuler(data, vector, 1.f);
 }
 
-void DataParser::parseQuaternion(SensorDataPacket& data, DataQuaternion& vector) {
-  vector.x = data.getInt16(0);
-  vector.y = data.getInt16(2);
-  vector.z = data.getInt16(4);
-  vector.w = data.getInt16(6);
-  vector.accuracy = data.getUint16(8);
+void DataParser::parseQuaternion(SensorDataPacket& data, DataQuaternion& vector, float scaleFactor) {
+  vector.x = data.getInt16(0) * scaleFactor;
+  vector.y = data.getInt16(2) * scaleFactor;
+  vector.z = data.getInt16(4) * scaleFactor;
+  vector.w = data.getInt16(6) * scaleFactor;
+  vector.accuracy = data.getUint16(8) * scaleFactor;
 }
 
 void DataParser::parseData(SensorDataPacket& data, float& value, float scaleFactor, SensorPayload format) {
