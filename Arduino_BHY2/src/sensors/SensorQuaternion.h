@@ -6,28 +6,37 @@
 class SensorQuaternion : public SensorClass {
 public:
   SensorQuaternion() {} 
-  SensorQuaternion(uint8_t id) : SensorClass(id), _data() {}
+  SensorQuaternion(uint8_t id) : SensorClass(id), _data(), _factor(0.000061035) {}
 
-  int16_t x() 
+  float x() 
   { 
     return _data.x; 
   }
-  int16_t y()
+  float y()
   {
     return _data.y;
   }
-  int16_t z()
+  float z()
   {
     return _data.z;
   }
-  int16_t w()
+  float w()
   {
     return _data.w;
+  }
+  float accuracy()
+  {
+    return _data.accuracy;
+  }
+
+  float getFactor()
+  {
+    return _factor;
   }
 
   void setData(SensorDataPacket &data)
   {
-    DataParser::parseQuaternion(data, _data);
+    DataParser::parseQuaternion(data, _data, _factor);
   }
 
   String toString()
@@ -36,6 +45,7 @@ public:
   }
 
 private:
+  float _factor;
   DataQuaternion _data;
 };
 
