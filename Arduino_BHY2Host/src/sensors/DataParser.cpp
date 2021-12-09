@@ -24,6 +24,34 @@ void DataParser::parseQuaternion(SensorDataPacket& data, DataQuaternion& vector,
   vector.accuracy = data.getUint16(8) * scaleFactor;
 }
 
+void DataParser::parseBSEC(SensorDataPacket& data, DataBSEC& vector) {
+  const float SCALE_BSEC_BVOC_EQ = 0.01f;
+  const float SCALE_BSEC_COMP_T = 1.0f / 256;
+  const float SCALE_BSEC_COMP_H = 1.0f / 500;
+
+  vector.iaq = data.getUint16(0);
+  vector.iaq_s = data.getUint16(2);
+  vector.b_voc_eq = data.getUint16(4) * SCALE_BSEC_BVOC_EQ;  //b-VOC-eq in the FIFO frame is scaled up by 100
+  vector.co2_eq = data.getUint24(6);
+  vector.accuracy = data.getUint8(9);
+  vector.comp_t = data.getInt16(10) * SCALE_BSEC_COMP_T;
+  vector.comp_h = data.getUint16(12) * SCALE_BSEC_COMP_H;
+  vector.comp_g = (uint32_t)(data.getFloat(14));
+}
+
+void DataParser::parseBSECLegacy(SensorDataPacket& data, DataBSEC& vector) {
+  vector.comp_t = data.getFloat(0);
+  vector.comp_h = data.getFloat(4);
+  //note that: SENSOR_DATA_FIXED_LENGTH is defined as 10 by default,
+  //so all the fields below are 0 unless it's redefined to 29 and above
+  vector.comp_g = (uint32_t)(data.getFloat(8));
+  vector.iaq = (uint16_t)(data.getFloat(12));
+  vector.iaq_s = (uint16_t)(data.getFloat(16));
+  vector.co2_eq = (uint32_t)data.getFloat(20);
+  vector.b_voc_eq = data.getFloat(24);
+  vector.accuracy = data.getUint8(28);
+}
+
 void DataParser::parseData(SensorDataPacket& data, float& value, float scaleFactor, SensorPayload format) {
   uint8_t id = data.sensorId;
   switch (format) {

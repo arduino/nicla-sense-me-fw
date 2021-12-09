@@ -52,6 +52,7 @@ enum SensorID {
   SENSOR_ID_GYRO_BIAS_WU             = 92,  /* Gyroscope offset wake up */
   SENSOR_ID_MAG_BIAS_WU              = 93,  /* Magnetometer offset wake up */
   SENSOR_ID_STD_WU                   = 94,  /* Step detector wake up */
+  SENSOR_ID_BSEC                     = 115,  /* BSEC 1.x output */
   SENSOR_ID_TEMP                     = 128, /* Temperature */
   SENSOR_ID_BARO                     = 129, /* Barometer */
   SENSOR_ID_HUM                      = 130, /* Humidity */
@@ -74,6 +75,7 @@ enum SensorID {
   SENSOR_ID_PROX                     = 147, /* Proximity */
   SENSOR_ID_LIGHT_WU                 = 148, /* Light wake up */
   SENSOR_ID_PROX_WU                  = 149, /* Proximity wake up */
+  SENSOR_ID_BSEC_LEGACY              = 171, /* BSEC 1.x output (legacy, deprecated) */
   DEBUG_DATA_EVENT                   = 250, /* Binary or string debug data */
   TIMESTAMP_SMALL_DELTA              = 251, /* Incremental time change from previous read */
   TIMESTAMP_SMALL_DELTA_WU           = 245, /* Incremental time change from previous read wake up */

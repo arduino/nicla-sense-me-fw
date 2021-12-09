@@ -46,12 +46,37 @@ struct DataQuaternion {
   }
 };
 
+struct DataBSEC {
+  uint16_t  iaq;         //iaq value for regular use case
+  uint16_t  iaq_s;       //iaq value for stationary use cases
+  float     b_voc_eq;    //breath VOC equivalent (ppm)
+  uint32_t  co2_eq;      //CO2 equivalent (ppm) [400,]
+  float     comp_t;      //compensated temperature (celcius)
+  float     comp_h;      //compensated humidity
+  uint32_t  comp_g;      //compensated gas resistance (Ohms)
+  uint8_t   accuracy;    //accuracy level: [0-3]
+
+  String toString() {
+    return (String)("BSEC output values - iaq: " + String(iaq)
+                    + "   iaq_s: " + String(iaq_s)
+                    + "   b_voc_eq: " + String(b_voc_eq, 2)
+                    + "   co2_eq: " + String(co2_eq)
+                    + "   accuracy: " + String(accuracy)
+                    + "   comp_t: " + String(comp_t, 2)
+                    + "   comp_h: " + String(comp_h, 2)
+                    + "   comp_g: " + String(comp_g)
+                    + "\n");
+  }
+};
+
 class DataParser {
 public:
   static void parse3DVector(SensorDataPacket& data, DataXYZ& vector);
   static void parseEuler(SensorDataPacket& data, DataOrientation& vector);
   static void parseEuler(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
   static void parseQuaternion(SensorDataPacket& data, DataQuaternion& vector, float scaleFactor);
+  static void parseBSEC(SensorDataPacket& data, DataBSEC& vector);
+  static void parseBSECLegacy(SensorDataPacket& data, DataBSEC& vector);
   static void parseData(SensorDataPacket& data, float& value, float scaleFactor, SensorPayload format);
   static void parseActivity(SensorDataPacket& data, uint16_t value);
 };
