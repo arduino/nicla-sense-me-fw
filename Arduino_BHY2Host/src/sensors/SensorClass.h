@@ -11,7 +11,14 @@ public:
   virtual ~SensorClass();
 
   uint8_t id();
-  bool begin(float rate = 1, uint32_t latency = 0);
+  /* 
+   * Sample rate: it indicates the frequency at which a sensor is sampled.
+   *              It is expressed in Hz.
+   * Latency: it indicates how much ms time a new value is retained in its fifo
+   *          before a notification to the host is sent via interrupt.
+   *          It is expressed in ms.
+   */
+  bool begin(float rate = 1000, uint32_t latency = 0);
   void configure(float rate, uint32_t latency);
   void end();
 
