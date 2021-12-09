@@ -40,15 +40,15 @@ public:
   bool hasSensor(uint8_t sensorId);
 
   uint8_t availableSensorData();
-  bool readSensorData(SensorDataPacket &data);
+  bool readSensorData(SensorLongDataPacket &data);
 
   // ANNA <-> BOSCH interface
-  void addSensorData(SensorDataPacket &sensorData);
+  void addSensorData(SensorLongDataPacket &sensorData);
 
   uint8_t acknowledgment();
 
 private:
-  mbed::CircularBuffer<SensorDataPacket, SENSOR_QUEUE_SIZE, uint8_t> _sensorQueue;
+  mbed::CircularBuffer<SensorLongDataPacket, SENSOR_QUEUE_SIZE, uint8_t> _sensorQueue;
 
   uint8_t _workBuffer[WORK_BUFFER_SIZE];
   uint8_t _acknowledgment;

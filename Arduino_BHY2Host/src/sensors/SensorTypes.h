@@ -3,7 +3,7 @@
 
 #include "stdint.h"
 
-#define SENSOR_DATA_FIXED_LENGTH (10)
+#define SENSOR_DATA_FIXED_LENGTH (18)
 
 struct __attribute__((packed)) SensorConfigurationPacket {
   uint8_t sensorId;

@@ -64,9 +64,13 @@ void EslovHandler::requestEvent()
     Wire.write(availableData);
 
   } else if (_state == ESLOV_READ_SENSOR_STATE) {
-    SensorDataPacket data;
+    SensorLongDataPacket data;
     sensortec.readSensorData(data);
-    Wire.write((uint8_t*)&data, sizeof(SensorDataPacket));
+    if (data.sensorId == 115 | data.sensorId == 171) {
+      Wire.write((uint8_t*)&data, sizeof(SensorLongDataPacket));
+    } else {
+      Wire.write((uint8_t*)&data, sizeof(SensorDataPacket));
+    }
     if (_debug) {
       _debug->print("data: ");
       _debug->println(data.sensorId);

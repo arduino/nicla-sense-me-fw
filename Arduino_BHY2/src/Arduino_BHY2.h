@@ -54,8 +54,10 @@ public:
   // API for using the bosch sensortec from sketch
   void configureSensor(SensorConfigurationPacket& config);
   void configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency);
+  void addSensorData(SensorLongDataPacket &sensorData);
   void addSensorData(SensorDataPacket &sensorData);
   uint8_t availableSensorData();
+  bool readSensorData(SensorLongDataPacket &data);
   bool readSensorData(SensorDataPacket &data);
   bool hasSensor(uint8_t sensorId);
 

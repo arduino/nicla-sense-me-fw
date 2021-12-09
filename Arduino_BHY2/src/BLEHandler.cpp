@@ -14,6 +14,7 @@ BLEService sensorService("34c2e3bb-34aa-11eb-adc1-0242ac120002");
 auto sensorDataUuid = "34c2e3bc-34aa-11eb-adc1-0242ac120002";
 auto sensorConfigUuid = "34c2e3bd-34aa-11eb-adc1-0242ac120002";
 BLECharacteristic sensorDataCharacteristic(sensorDataUuid, (BLERead | BLENotify), sizeof(SensorDataPacket));
+BLECharacteristic sensorLongDataCharacteristic(sensorDataUuid, (BLERead | BLENotify), sizeof(SensorLongDataPacket));
 BLECharacteristic sensorConfigCharacteristic(sensorConfigUuid, BLEWrite, sizeof(SensorConfigurationPacket));
 
 Stream* BLEHandler::_debug = NULL;
@@ -92,6 +93,7 @@ bool BLEHandler::begin()
   BLE.setAdvertisedService(sensorService);
   sensorService.addCharacteristic(sensorConfigCharacteristic);
   sensorService.addCharacteristic(sensorDataCharacteristic);
+  sensorService.addCharacteristic(sensorLongDataCharacteristic);
   BLE.addService(sensorService);
   sensorConfigCharacteristic.setEventHandler(BLEWritten, receivedSensorConfig);
 
@@ -105,14 +107,20 @@ void BLEHandler::update()
   BLE.poll();
 
   // This check doesn't work with more than one client at the same time
-  if (sensorDataCharacteristic.subscribed()) {
+  if (sensorDataCharacteristic.subscribed() || sensorLongDataCharacteristic.subscribed()) {
 
     // Simulate a request for reading new sensor data
     uint8_t availableData = sensortec.availableSensorData();
     while (availableData) {
-      SensorDataPacket data;
+      SensorLongDataPacket data;
       sensortec.readSensorData(data);
-      sensorDataCharacteristic.writeValue(&data, sizeof(SensorDataPacket));
+      if (data.sensorId == 115 || data.sensorId == 171) {
+        sensorLongDataCharacteristic.writeValue(&data, sizeof(SensorLongDataPacket));
+      } else {
+        SensorDataPacket shortData;
+        memcpy(&shortData, &data, sizeof(SensorDataPacket));
+        sensorDataCharacteristic.writeValue(&shortData, sizeof(SensorDataPacket));
+      }
       --availableData;
     }
 

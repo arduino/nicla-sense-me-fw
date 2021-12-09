@@ -121,12 +121,12 @@ uint8_t BoschSensortec::availableSensorData()
   return _sensorQueue.size();
 }
 
-bool BoschSensortec::readSensorData(SensorDataPacket &data)
+bool BoschSensortec::readSensorData(SensorLongDataPacket &data)
 {
   return _sensorQueue.pop(data);
 }
 
-void BoschSensortec::addSensorData(SensorDataPacket &sensorData)
+void BoschSensortec::addSensorData(SensorLongDataPacket &sensorData)
 {
   // Overwrites oldest data when fifo is full 
   _sensorQueue.push(sensorData);

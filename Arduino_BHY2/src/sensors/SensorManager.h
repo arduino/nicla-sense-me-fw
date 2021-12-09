@@ -6,7 +6,7 @@
 class SensorManager {
 public:
   SensorManager();
-  void process(SensorDataPacket &data);
+  void process(SensorLongDataPacket &data);
 
   void subscribe(SensorClass *sensor);
   void unsubscribe(SensorClass *sensor);

@@ -19,7 +19,8 @@ void BoschParser::convertTime(uint64_t time_ticks, uint32_t *s, uint32_t *ns)
 
 void BoschParser::parseData(const struct bhy2_fifo_parse_data_info *fifoData, void *arg)
 {
-  SensorDataPacket sensorData;
+  uint8_t id = fifoData->sensor_id;
+  SensorLongDataPacket sensorData;
   sensorData.sensorId = fifoData->sensor_id;
   sensorData.size = (fifoData->data_size > sizeof(sensorData.data)) ? sizeof(sensorData.data) : fifoData->data_size;
   memcpy(&sensorData.data, fifoData->data_ptr, sensorData.size);
@@ -27,17 +28,15 @@ void BoschParser::parseData(const struct bhy2_fifo_parse_data_info *fifoData, vo
   if (_debug) {
     _debug->print("Sensor: ");
     _debug->print(sensorData.sensorId);
+    _debug->print(" size: ");
+    _debug->print(sensorData.size);
     _debug->print("  value: ");
-    for (uint8_t i = 0; i < (fifoData->data_size - 1); i++)
+    for (uint8_t i = 0; i < (sensorData.size - 1); i++)
     {
         _debug->print(sensorData.data[i], HEX);
+        _debug->print(" ");
     }
     _debug->print("  ");
-    for (uint8_t i = 0; i < (fifoData->data_size - 1); i++)
-    {
-        _debug->print(fifoData->data_ptr[i], HEX);
-    }
-    _debug->println("");
   }
 
   sensortec.addSensorData(sensorData);
