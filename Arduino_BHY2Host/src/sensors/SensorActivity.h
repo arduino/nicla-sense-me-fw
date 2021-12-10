@@ -23,6 +23,8 @@ public:
     DataParser::parseActivity(data, _value);
   }
 
+  void setData(SensorLongDataPacket &data) {}
+
   String toString()
   {
     return getActivity();

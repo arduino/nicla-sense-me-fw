@@ -75,8 +75,8 @@ public:
   static void parseEuler(SensorDataPacket& data, DataOrientation& vector);
   static void parseEuler(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
   static void parseQuaternion(SensorDataPacket& data, DataQuaternion& vector, float scaleFactor);
-  static void parseBSEC(SensorDataPacket& data, DataBSEC& vector);
-  static void parseBSECLegacy(SensorDataPacket& data, DataBSEC& vector);
+  static void parseBSEC(SensorLongDataPacket& data, DataBSEC& vector);
+  static void parseBSECLegacy(SensorLongDataPacket& data, DataBSEC& vector);
   static void parseData(SensorDataPacket& data, float& value, float scaleFactor, SensorPayload format);
   static void parseActivity(SensorDataPacket& data, uint16_t value);
 };

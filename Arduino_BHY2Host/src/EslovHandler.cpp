@@ -90,12 +90,16 @@ void EslovHandler::update()
       uint8_t availableData = requestAvailableData();
       Serial.write(availableData);
 
-      SensorDataPacket sensorData;
+      SensorLongDataPacket sensorData;
       while (availableData) {
         //delay(ESLOV_DELAY);
         requestSensorData(sensorData);
         delay(ESLOV_DELAY);
-        Serial.write((uint8_t*)&sensorData, sizeof(sensorData));
+        if (sensorData.sensorId == 115 || sensorData.sensorId == 171) {
+          Serial.write((uint8_t*)&sensorData, sizeof(SensorLongDataPacket));
+        } else {
+          Serial.write((uint8_t*)&sensorData, sizeof(SensorDataPacket));
+        }
         availableData--;
       }
 
@@ -214,7 +218,7 @@ uint8_t EslovHandler::requestAvailableData()
   delay(ESLOV_DELAY);
 }
 
-bool EslovHandler::requestSensorData(SensorDataPacket &sData)
+bool EslovHandler::requestSensorData(SensorLongDataPacket &sData)
 {
   if (_eslovState != ESLOV_READ_SENSOR_STATE) {
     writeStateChange(ESLOV_READ_SENSOR_STATE);
@@ -226,6 +230,11 @@ bool EslovHandler::requestSensorData(SensorDataPacket &sData)
   uint8_t *data = (uint8_t*)&sData;
   for (uint8_t i = 0; i < sizeof(SensorDataPacket); i++) {
     data[i] = Wire.read();
+  }
+  if (data[0] == 115 || data[0] == 171) {
+    for (uint8_t i = sizeof(SensorDataPacket); i < (sizeof(SensorLongDataPacket) - sizeof(SensorDataPacket)); i++) {
+      data[i] = Wire.read();
+    }
   }
   return true;
 }

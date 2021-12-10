@@ -6,11 +6,17 @@ SensorManager::SensorManager() :
 {
 }
 
-void SensorManager::process(SensorDataPacket &data)
+void SensorManager::process(SensorLongDataPacket &data)
 {
   for (int i = 0; i < _sensorsLen; i++) {
     if (data.sensorId == _sensors[i]->id()) {
-      _sensors[i]->setData(data);
+      if (data.sensorId == 115 || data.sensorId == 171) {
+        _sensors[i]->setData(data);
+      } else {
+        SensorDataPacket shortData;
+        memcpy(&shortData, &data, sizeof(SensorDataPacket));
+        _sensors[i]->setData(shortData);
+      }
       return; // can more sensor objects use the same sensor id?
     }
   }

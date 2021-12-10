@@ -39,6 +39,8 @@ public:
     DataParser::parseQuaternion(data, _data, _factor);
   }
 
+  void setData(SensorLongDataPacket &data) {}
+
   String toString()
   {
     return _data.toString();

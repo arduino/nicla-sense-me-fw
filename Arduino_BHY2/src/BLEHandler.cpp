@@ -12,9 +12,10 @@ BLECharacteristic dfuExternalCharacteristic(dfuExternalUuid, BLEWrite, sizeof(DF
 // Sensor Data channels
 BLEService sensorService("34c2e3bb-34aa-11eb-adc1-0242ac120002"); 
 auto sensorDataUuid = "34c2e3bc-34aa-11eb-adc1-0242ac120002";
+auto sensorLongDataUuid = "34c2e3be-34aa-11eb-adc1-0242ac120002";
 auto sensorConfigUuid = "34c2e3bd-34aa-11eb-adc1-0242ac120002";
 BLECharacteristic sensorDataCharacteristic(sensorDataUuid, (BLERead | BLENotify), sizeof(SensorDataPacket));
-BLECharacteristic sensorLongDataCharacteristic(sensorDataUuid, (BLERead | BLENotify), sizeof(SensorLongDataPacket));
+BLECharacteristic sensorLongDataCharacteristic(sensorLongDataUuid, (BLERead | BLENotify), sizeof(SensorLongDataPacket));
 BLECharacteristic sensorConfigCharacteristic(sensorConfigUuid, BLEWrite, sizeof(SensorConfigurationPacket));
 
 Stream* BLEHandler::_debug = NULL;

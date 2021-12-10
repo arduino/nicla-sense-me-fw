@@ -49,7 +49,7 @@ void Arduino_BHY2Host::update()
     } else {
       uint8_t available = availableSensorData();
       for (int i = 0; i < available; i++) {
-        SensorDataPacket data;
+        SensorLongDataPacket data;
         readSensorData(data);
         sensorManager.process(data);
       }
@@ -99,7 +99,7 @@ uint8_t Arduino_BHY2Host::availableSensorData()
   return eslovHandler.requestAvailableData();
 }
 
-bool Arduino_BHY2Host::readSensorData(SensorDataPacket &data)
+bool Arduino_BHY2Host::readSensorData(SensorLongDataPacket &data)
 {
   return eslovHandler.requestSensorData(data);
 }

@@ -48,7 +48,7 @@ public:
   void writeConfigPacket(SensorConfigurationPacket& config);
   uint8_t requestPacketAck();
   uint8_t requestAvailableData() ;
-  bool requestSensorData(SensorDataPacket &sData);
+  bool requestSensorData(SensorLongDataPacket &sData);
   void toggleEslovIntPin();
 
 protected:
