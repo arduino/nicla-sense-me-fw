@@ -108,21 +108,27 @@ void BLEHandler::update()
   BLE.poll();
 
   // This check doesn't work with more than one client at the same time
-  if (sensorDataCharacteristic.subscribed() || sensorLongDataCharacteristic.subscribed()) {
+  if (sensorDataCharacteristic.subscribed()) {
 
     // Simulate a request for reading new sensor data
     uint8_t availableData = sensortec.availableSensorData();
     while (availableData) {
-      SensorLongDataPacket data;
+      SensorDataPacket data;
       sensortec.readSensorData(data);
-      if (data.sensorId == 115 || data.sensorId == 171) {
-        sensorLongDataCharacteristic.writeValue(&data, sizeof(SensorLongDataPacket));
-      } else {
-        SensorDataPacket shortData;
-        memcpy(&shortData, &data, sizeof(SensorDataPacket));
-        sensorDataCharacteristic.writeValue(&shortData, sizeof(SensorDataPacket));
-      }
+      sensorDataCharacteristic.writeValue(&data, sizeof(SensorDataPacket));
       --availableData;
+    }
+
+  }
+
+  if (sensorLongDataCharacteristic.subscribed()) {
+
+    uint8_t availableLongData = sensortec.availableLongSensorData();
+    while (availableLongData) {
+      SensorLongDataPacket data;
+      sensortec.readLongSensorData(data);
+      sensorLongDataCharacteristic.writeValue(&data, sizeof(SensorLongDataPacket));
+      --availableLongData;
     }
 
   }

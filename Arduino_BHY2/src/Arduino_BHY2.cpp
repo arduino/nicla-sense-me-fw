@@ -184,16 +184,14 @@ void Arduino_BHY2::configureSensor(uint8_t sensorId, float sampleRate, uint32_t 
   sensortec.configureSensor(config);
 }
 
-void Arduino_BHY2::addSensorData(SensorLongDataPacket &sensorData)
+void Arduino_BHY2::addSensorData(SensorDataPacket &sensorData)
 {
   sensortec.addSensorData(sensorData);
 }
 
-void Arduino_BHY2::addSensorData(SensorDataPacket &sensorData)
+void Arduino_BHY2::addLongSensorData(SensorLongDataPacket &sensorData)
 {
-  SensorLongDataPacket data;
-  memcpy(&data, &sensorData, sizeof(SensorLongDataPacket));
-  sensortec.addSensorData(data);
+  sensortec.addLongSensorData(sensorData);
 }
 
 uint8_t Arduino_BHY2::availableSensorData()
@@ -201,17 +199,19 @@ uint8_t Arduino_BHY2::availableSensorData()
   return sensortec.availableSensorData();
 }
 
-bool Arduino_BHY2::readSensorData(SensorLongDataPacket &data)
+uint8_t Arduino_BHY2::availableLongSensorData()
 {
-  return sensortec.readSensorData(data);
+  return sensortec.availableLongSensorData();
 }
 
 bool Arduino_BHY2::readSensorData(SensorDataPacket &data)
 {
-  SensorLongDataPacket longData;
-  bool ret = sensortec.readSensorData(longData);
-  memcpy(&data, &longData, sizeof(SensorLongDataPacket));
-  return ret;
+  return sensortec.readSensorData(data);
+}
+
+bool Arduino_BHY2::readLongSensorData(SensorLongDataPacket &data)
+{
+  return sensortec.readLongSensorData(data);
 }
 
 bool Arduino_BHY2::hasSensor(uint8_t sensorId)
