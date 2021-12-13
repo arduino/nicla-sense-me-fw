@@ -47,7 +47,8 @@ void Arduino_BHY2Host::update()
     if (_passthrough){
       eslovHandler.update();
     } else {
-      while (availableSensorData() > 0) {
+      uint8_t available = availableSensorData();
+      for (int i = 0; i < available; i++) {
         SensorDataPacket data;
         readSensorData(data);
         sensorManager.process(data);
