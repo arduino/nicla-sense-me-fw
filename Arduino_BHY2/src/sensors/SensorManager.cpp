@@ -10,8 +10,17 @@ void SensorManager::process(SensorLongDataPacket &data)
 {
   for (int i = 0; i < _sensorsLen; i++) {
     if (data.sensorId == _sensors[i]->id()) {
-      if (_sensors[i]->id() == 115 || _sensors[i]->id() == 171) {
-        // BSEC sensor is the only one with long payload
+
+      bool longSensor = false;
+
+      for (int i = 0; i < NUM_LONG_SENSOR; i++) {
+        if (LongSensorList[i].id == data.sensorId) {
+          longSensor = true;
+          break;
+        }
+      }
+
+      if (longSensor) {
         _sensors[i]->setData(data);
       } else {
         // All the other sensors have short payloads
@@ -19,7 +28,8 @@ void SensorManager::process(SensorLongDataPacket &data)
         memcpy(&shortData, &data, sizeof(SensorDataPacket));
         _sensors[i]->setData(shortData);
       }
-      return; // can more sensor objects use the same sensor id?
+
+      return;
     }
   }
 }

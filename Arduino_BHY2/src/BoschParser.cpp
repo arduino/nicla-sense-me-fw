@@ -1,5 +1,6 @@
 #include "BoschParser.h"
 #include "BoschSensortec.h"
+#include "sensors/SensorID.h"
 
 Stream* BoschParser::_debug = NULL;
 
@@ -38,7 +39,16 @@ void BoschParser::parseData(const struct bhy2_fifo_parse_data_info *fifoData, vo
     _debug->print("  ");
   }
 
-  if (sensorData.sensorId == 115 || sensorData.sensorId == 171) {
+  bool longSensor = false;
+
+  for (int i = 0; i < NUM_LONG_SENSOR; i++) {
+    if (LongSensorList[i].id == sensorData.sensorId) {
+      longSensor = true;
+      break;
+    }
+  }
+
+  if (longSensor) {
     sensortec.addLongSensorData(sensorData);
   } else {
     SensorDataPacket shortData;

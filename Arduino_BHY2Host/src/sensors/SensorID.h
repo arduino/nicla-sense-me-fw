@@ -1,7 +1,8 @@
 #ifndef SENSOR_ID_H_
 #define SENSOR_ID_H_
 
-#define NUM_SUPPORTEND_SENSOR           77
+#define NUM_SUPPORTEND_SENSOR           79
+#define NUM_LONG_SENSOR                 2
 
 enum SensorID {
   SENSOR_ID_ACC_PASS                 = 1,   /* Accelerometer passthrough */
@@ -99,7 +100,8 @@ enum SensorPayload {
   P40BITUNSIGNED = 10,
   PEVENT = 11,
   ACTIVITY = 12,
-  DEBUG_DATA = 13
+  DEBUG_DATA = 13,
+  BSEC = 14
 };
 
 struct SensorStruct
@@ -107,6 +109,11 @@ struct SensorStruct
 	SensorID id;
 	SensorPayload payload;
 	float scaleFactor;
+};
+
+static SensorStruct LongSensorList[2] = {
+  {SENSOR_ID_BSEC,                BSEC,               1.0},
+  {SENSOR_ID_BSEC_LEGACY,         BSEC,               1.0}
 };
 
 static SensorStruct SensorList[NUM_SUPPORTEND_SENSOR] = {
@@ -158,6 +165,7 @@ static SensorStruct SensorList[NUM_SUPPORTEND_SENSOR] = {
   {SENSOR_ID_GYRO_BIAS_WU,        VECTOR3D,           1.0},
   {SENSOR_ID_MAG_BIAS_WU,         VECTOR3D,           1.0},
   {SENSOR_ID_STD_WU,              PEVENT,             1.0},
+  {SENSOR_ID_BSEC,                BSEC,               1.0},
   {SENSOR_ID_TEMP,                P16BITSIGNED,       0.01},
   {SENSOR_ID_BARO,                P24BITUNSIGNED,     0.0078},
   {SENSOR_ID_HUM,                 P8BITUNISIGNED,     1.0},
@@ -180,6 +188,7 @@ static SensorStruct SensorList[NUM_SUPPORTEND_SENSOR] = {
   {SENSOR_ID_PROX,                P8BITUNISIGNED,     1.0},
   {SENSOR_ID_LIGHT_WU,            P16BITUNSIGNED,     46.296},
   {SENSOR_ID_PROX_WU,             P8BITUNISIGNED,     1.0},
+  {SENSOR_ID_BSEC_LEGACY,         BSEC,               1.0},
   {DEBUG_DATA_EVENT,              DEBUG_DATA,         1.0},
   {TIMESTAMP_SMALL_DELTA,         P8BITUNISIGNED,     0.000015625},
   {TIMESTAMP_SMALL_DELTA_WU,      P8BITUNISIGNED,     0.000015625},
