@@ -14,7 +14,6 @@ Arduino_BHY2::Arduino_BHY2() :
   _debug(NULL),
   _pingTime(0),
   _timeout(120000),
-  _timeoutExpired(false),
   _eslovActive(false),
   _startTime(0),
   _eslovIntPin(PIN_ESLOV_INT),
@@ -37,25 +36,18 @@ void Arduino_BHY2::pingI2C() {
 }
 
 void Arduino_BHY2::checkEslovInt() {
-  if (millis() - _startTime < _timeout) {
-    //Timeout didn't expire yet
-    if (!digitalRead(_eslovIntPin)) {
-      //Wait for MKR to clear Eslov Int pin
-      while(!digitalRead(_eslovIntPin)) {}
-      if (_debug) _debug->println("MKR released Eslov Int pin");
+  if (!digitalRead(_eslovIntPin)) {
+    //Wait for MKR to clear Eslov Int pin
+    while(!digitalRead(_eslovIntPin)) {}
+    if (_debug) _debug->println("MKR released Eslov Int pin");
 
-      //Change mode for Eslov Int pin
-      //Eslov Int Pin will be used to synchronize Dfu via Eslov
-      pinMode(_eslovIntPin, OUTPUT);
+    //Change mode for Eslov Int pin
+    //Eslov Int Pin will be used to synchronize Dfu via Eslov
+    pinMode(_eslovIntPin, OUTPUT);
 
-      eslovHandler.begin();
-      //Eslov has been activated
-      _eslovActive = true;
-    }
-  } else {
-    //Timeout expired
-    _timeoutExpired = true;
-    nicla::disableLDO();
+    eslovHandler.begin();
+    //Eslov has been activated
+    _eslovActive = true;
   }
 }
 
@@ -122,7 +114,7 @@ void Arduino_BHY2::update()
   pingI2C();
 
   if (_niclaConfig & NICLA_I2C) {
-    if (!_timeoutExpired && !_eslovActive) {
+    if (!_eslovActive) {
       checkEslovInt();
     }
   }

@@ -75,7 +75,6 @@ private:
   int _pingTime;
   int _timeout;
   int _startTime;
-  bool _timeoutExpired;
   bool _eslovActive;
 
   PinName _eslovIntPin;
