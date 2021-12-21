@@ -1,6 +1,6 @@
 #include "EslovHandler.h"
 
-#define ESLOV_DELAY (10)
+#define ESLOV_DELAY (1)
 
 EslovHandler::EslovHandler() :
   _rxIndex(0),
@@ -70,8 +70,6 @@ void EslovHandler::update()
         dump();
 
         _rxIndex = 0;
-
-        delay(ESLOV_DELAY);
       
         Serial.write(ack);
       }
@@ -86,9 +84,15 @@ void EslovHandler::update()
 
       SensorDataPacket sensorData;
       while (availableData) {
-        //delay(ESLOV_DELAY);
         requestSensorData(sensorData);
-        delay(ESLOV_DELAY);
+        /*
+        This delay is needed because the synchronization mechanism over the Eslov Int Pin
+        may not apply for the requests from the host board to Nicla.
+        It may happen that the onRequest callback on Nicla side is serviced after a certain delay.
+        We need to add this delay of 10ms to avoid that a second request is issued before
+        the first one is handled.
+        */
+        delay(10);
         Serial.write((uint8_t*)&sensorData, sizeof(SensorDataPacket));
         availableData--;
       }
@@ -107,7 +111,7 @@ void EslovHandler::update()
       while (availableData) {
         //delay(ESLOV_DELAY);
         requestSensorLongData(sensorData);
-        delay(ESLOV_DELAY);
+        delay(10);
         Serial.write((uint8_t*)&sensorData, sizeof(SensorLongDataPacket));
         availableData--;
       }
@@ -180,31 +184,28 @@ void EslovHandler::writeDfuPacket(uint8_t *data, uint8_t length)
 
 void EslovHandler::writeStateChange(EslovState state)
 {
-  delay(ESLOV_DELAY);
   while(!digitalRead(_eslovIntPin)) {}
   uint8_t packet[2] = {ESLOV_SENSOR_STATE_OPCODE, state};
   Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
   Wire.write((uint8_t*)packet, sizeof(packet));
   Wire.endTransmission();
-  delay(ESLOV_DELAY);
   _eslovState = state;
 }
 
 void EslovHandler::writeConfigPacket(SensorConfigurationPacket& config)
 {
-  delay(ESLOV_DELAY);
+  while(!digitalRead(_eslovIntPin)) {}
   uint8_t packet[sizeof(SensorConfigurationPacket) + 1]; 
   packet[0] = ESLOV_SENSOR_CONFIG_OPCODE;
   memcpy(&packet[1], &config, sizeof(SensorConfigurationPacket));
   Wire.beginTransmission(ESLOV_DEFAULT_ADDRESS);
   Wire.write(packet, sizeof(SensorConfigurationPacket) + 1);
   Wire.endTransmission();
-  delay(ESLOV_DELAY);
 }
 
 uint8_t EslovHandler::requestPacketAck()
-{ 
-  delay(ESLOV_DELAY);
+{
+  while(!digitalRead(_eslovIntPin)) {}
   uint8_t ret = 0;
   while(!ret) {
     ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
@@ -223,7 +224,6 @@ uint8_t EslovHandler::requestAvailableData()
   uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
   if (!ret) return 0;
   return Wire.read();
-  delay(ESLOV_DELAY);
 }
 
 uint8_t EslovHandler::requestAvailableLongData() 
@@ -240,9 +240,8 @@ bool EslovHandler::requestSensorData(SensorDataPacket &sData)
 {
   if (_eslovState != ESLOV_READ_SENSOR_STATE) {
     writeStateChange(ESLOV_READ_SENSOR_STATE);
-    while(!digitalRead(_eslovIntPin)) {}
   }
-  //uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, sizeof(SensorDataPacket));
+  while(!digitalRead(_eslovIntPin)) {}
   uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, sizeof(SensorDataPacket));
   if (!ret) return false;
 
@@ -257,8 +256,8 @@ bool EslovHandler::requestSensorLongData(SensorLongDataPacket &sData)
 {
   if (_eslovState != ESLOV_READ_LONG_SENSOR_STATE) {
     writeStateChange(ESLOV_READ_LONG_SENSOR_STATE);
-    while(!digitalRead(_eslovIntPin)) {}
   }
+  while(!digitalRead(_eslovIntPin)) {}
   uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, sizeof(SensorLongDataPacket));
   if (!ret) return false;
 
