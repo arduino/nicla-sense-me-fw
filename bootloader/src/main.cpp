@@ -78,17 +78,17 @@ int mountFileSystem()
 int check_signature(FILE *file, long file_len)
 {
     void *signature = NULL;
-    char buffer[128];
-    int nChunks = ceil(file_len/128);
+    char buffer[512];
+    int nChunks = ceil(file_len/512);
 
     for (int j = 0; j < sizeof("NICLA"); j++) {
 
         for (int i = 0; i < nChunks; i++) {
-            int file_ptr = j + i*128;
+            int file_ptr = j + i*512;
             fseek(file, 0, SEEK_SET);
             fseek(file, file_ptr, SEEK_SET);
-            fread(buffer, 1, 128, file);
-            signature = memmem(buffer, 128, "NICLA", sizeof("NICLA"));
+            fread(buffer, 1, 512, file);
+            signature = memmem(buffer, 512, "NICLA", sizeof("NICLA"));
 
             if (signature != NULL) {
                 DEBUG_PRINTF("Signature check PASSED \r\n");
