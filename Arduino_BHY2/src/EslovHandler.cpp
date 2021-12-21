@@ -56,7 +56,18 @@ void EslovHandler::requestEvent()
 
   if (_debug) {
     _debug->print("Wire Request event. State: ");
-    _debug->println(_state);
+    if (_state == ESLOV_AVAILABLE_SENSOR_STATE) {
+      _debug->println("ESLOV_AVAILABLE_SENSOR_STATE");
+    }
+    else if (_state == ESLOV_READ_SENSOR_STATE) {
+      _debug->println("ESLOV_READ_SENSOR_STATE");
+    }
+    else if (_state == ESLOV_SENSOR_ACK_STATE) {
+      _debug->println("ESLOV_SENSOR_ACK_STATE");
+    }
+    else {
+      _debug->println(_state);
+    }
   }
 
   if (_state == ESLOV_AVAILABLE_SENSOR_STATE) {
@@ -126,6 +137,10 @@ void EslovHandler::receiveEvent(int length)
     // Check if packet is complete depending on its opcode
     if (_rxBuffer[0] == ESLOV_DFU_EXTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
+        if (_debug) {
+          _debug->print("Opcode: ");
+          _debug->println("ESLOV_DFU_EXTERNAL_OPCODE");
+        }
         dfuManager.processPacket(eslovDFU, DFU_EXTERNAL, &_rxBuffer[1]);
 
         dump();
@@ -142,6 +157,10 @@ void EslovHandler::receiveEvent(int length)
 
     } else if (_rxBuffer[0] == ESLOV_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
+        if (_debug) {
+          _debug->print("Opcode: ");
+          _debug->println("ESLOV_DFU_INTERNAL_OPCODE");
+        }
         dfuManager.processPacket(eslovDFU, DFU_INTERNAL, &_rxBuffer[1]);
 
         dump();
@@ -158,6 +177,10 @@ void EslovHandler::receiveEvent(int length)
 
     } else if (_rxBuffer[0] == ESLOV_SENSOR_CONFIG_OPCODE) {
       if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
+        if (_debug) {
+          _debug->print("Opcode: ");
+          _debug->println("ESLOV_SENSOR_CONFIG_OPCODE");
+        }
         SensorConfigurationPacket *config = (SensorConfigurationPacket*)&_rxBuffer[1];
         sensortec.configureSensor(*config);
 
@@ -172,6 +195,10 @@ void EslovHandler::receiveEvent(int length)
     } else if (_rxBuffer[0] == ESLOV_SENSOR_STATE_OPCODE) {
       if (_rxIndex == 2) {
         _state = (EslovState)_rxBuffer[1];
+        if (_debug) {
+          _debug->print("Opcode: ");
+          _debug->println("ESLOV_SENSOR_STATE_OPCODE");
+        }
 
         dump();
         _rxIndex = 0;
@@ -207,8 +234,10 @@ void EslovHandler::debug(Stream &stream)
 void EslovHandler::dump() 
 {
   if (_debug) {
-    _debug->print("received: ");
+    _debug->print("received:   ");
+    _debug->print("size: ");
     _debug->println(_rxIndex);
+    _debug->print("   packet: ");
     for (int i = 0; i < _rxIndex; i++) {
       _debug->print(_rxBuffer[i], HEX);
       _debug->print(", ");
