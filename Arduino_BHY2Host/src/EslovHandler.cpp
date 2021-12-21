@@ -20,9 +20,7 @@ EslovHandler::~EslovHandler()
 
 bool EslovHandler::begin(bool passthrough)
 {
-  pinMode(_eslovIntPin, OUTPUT);
-  digitalWrite(_eslovIntPin, LOW);
-
+  pinMode(_eslovIntPin, INPUT);
   Wire.begin();
   Wire.setClock(400000);
   if (passthrough) {
@@ -40,15 +38,11 @@ void EslovHandler::update()
     if (_rxBuffer[0] == HOST_DFU_EXTERNAL_OPCODE || _rxBuffer[0] == HOST_DFU_INTERNAL_OPCODE) {
       if (_rxIndex == sizeof(DFUPacket) + 1) {
 
-        toggleEslovIntPin();
-
         if (!_dfuLedOn) {
           pinMode(LED_BUILTIN, OUTPUT);
           digitalWrite(LED_BUILTIN, HIGH);
           flushWire();
         }
-
-        pinMode(_eslovIntPin, INPUT);
 
         //Wait for Nicla to set _eslovIntPin HIGH, meaning that is ready to receive
         while(!digitalRead(_eslovIntPin)) {
@@ -123,7 +117,6 @@ void EslovHandler::update()
     } else if (_rxBuffer[0] == HOST_CONFIG_SENSOR_OPCODE) {
       if (_rxIndex == sizeof(SensorConfigurationPacket) + 1) {
 
-        toggleEslovIntPin();
         SensorConfigurationPacket* config = (SensorConfigurationPacket*)&_rxBuffer[1];
         if (_debug) {
           _debug->print("received config: ");
@@ -274,28 +267,6 @@ bool EslovHandler::requestSensorLongData(SensorLongDataPacket &sData)
     data[i] = Wire.read();
   }
   return true;
-}
-
-void EslovHandler::toggleEslovIntPin()
-{
-  if (!_intPinAsserted) {
-    // Indicates eslov presence
-    pinMode(_eslovIntPin, OUTPUT);
-    digitalWrite(_eslovIntPin, LOW);
-    _intPinAsserted = true;
-    if (_debug) {
-      _debug->println("Eslov int LOW");
-    }
-    //Use 1 sec delay to let Nicla see the LOW pin and enable Eslov
-    delay(500);
-
-    digitalWrite(_eslovIntPin, HIGH);
-    _intPinCleared = true;
-    if (_debug) {
-      _debug->println("Eslov int pin cleared");
-    }
-    delay(500);
-  }
 }
 
 void EslovHandler::niclaAsShield()

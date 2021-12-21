@@ -54,7 +54,6 @@ public:
   uint8_t requestAvailableLongData();
   bool requestSensorData(SensorDataPacket &sData);
   bool requestSensorLongData(SensorLongDataPacket &sData);
-  void toggleEslovIntPin();
 
 protected:
   void niclaAsShield();

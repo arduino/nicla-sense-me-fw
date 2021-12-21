@@ -66,7 +66,6 @@ public:
   void parse(SensorDataPacket& data, DataOrientation& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
 
-  void checkEslovInt();
   void setLDOTimeout(int time);
 
   void debug(Stream &stream);
@@ -78,7 +77,6 @@ private:
   int _pingTime;
   int _timeout;
   int _startTime;
-  bool _eslovActive;
 
   PinName _eslovIntPin;
 
