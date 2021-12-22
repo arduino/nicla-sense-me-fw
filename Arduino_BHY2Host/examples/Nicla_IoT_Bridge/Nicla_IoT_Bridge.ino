@@ -60,10 +60,3 @@ void loop() {
   
   ArduinoCloud.update();
 }
-
-void onTempChange() {
-}
-
-
-void onSecondsChange() {
-}
