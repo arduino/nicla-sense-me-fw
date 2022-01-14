@@ -23,7 +23,8 @@ enum NiclaWiring {
 enum NiclaConfig {
   NICLA_I2C = 0x1,
   NICLA_BLE = 0x2,
-  NICLA_BLE_AND_I2C = NICLA_I2C | NICLA_BLE
+  NICLA_BLE_AND_I2C = NICLA_I2C | NICLA_BLE,
+  NICLA_STANDALONE = 0x4
 };
 
 class NiclaSettings {
