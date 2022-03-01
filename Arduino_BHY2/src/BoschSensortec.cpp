@@ -116,6 +116,11 @@ void BoschSensortec::configureSensor(SensorConfigurationPacket& config)
   }
 }
 
+void BoschSensortec::getSensorConfiguration(uint8_t id, SensorConfig& virt_sensor_conf)
+{
+  bhy2_get_virt_sensor_cfg(id, &virt_sensor_conf, &_bhy2);
+}
+
 uint8_t BoschSensortec::availableSensorData()
 {
   return _sensorQueue.size();

@@ -35,6 +35,7 @@ public:
   bool begin(); 
   void update();
   void configureSensor(SensorConfigurationPacket& config);
+  void getSensorConfiguration(uint8_t id, SensorConfig& virt_sensor_conf);
 
   void printSensors();
   bool hasSensor(uint8_t sensorId);

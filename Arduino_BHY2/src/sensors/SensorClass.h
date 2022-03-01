@@ -21,6 +21,7 @@ public:
    */
   bool begin(float rate = 1000, uint32_t latency = 1);
   void configure(float rate, uint32_t latency);
+  const SensorConfig getConfiguration();
   void end();
 
   virtual void setData(SensorDataPacket &data) = 0;
