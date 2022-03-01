@@ -49,6 +49,17 @@ void SensorClass::configure(float rate, uint32_t latency)
 
 }
 
+void SensorClass::readConfiguration(float *rate, uint32_t *latency)
+{
+  SensorConfigurationPacket config;
+  
+  config.sensorId = _id;
+  sensortec.readSensorConfiguration(&config);
+
+  *rate = config.sampleRate;
+  *latency = config.latency;
+}
+
 void SensorClass::end()
 {
   configure(0, 0);

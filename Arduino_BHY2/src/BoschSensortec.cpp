@@ -116,6 +116,21 @@ void BoschSensortec::configureSensor(SensorConfigurationPacket& config)
   }
 }
 
+void BoschSensortec::readSensorConfiguration(SensorConfigurationPacket* config)
+{
+  struct bhy2_virt_sensor_conf virt_sensor_conf;
+
+  auto ret = bhy2_get_virt_sensor_cfg(config->sensorId, &virt_sensor_conf, &_bhy2);
+  if (_debug) _debug->println(get_api_error(ret));
+  if (ret == BHY2_OK) {
+    _acknowledgment = SensorAck;
+  } else {
+    _acknowledgment = SensorNack;
+  }
+  config->sampleRate = virt_sensor_conf.sample_rate;
+  config->latency = virt_sensor_conf.latency;
+}
+
 uint8_t BoschSensortec::availableSensorData()
 {
   return _sensorQueue.size();
