@@ -1,14 +1,15 @@
 module arduino/bhy
 
-go 1.15
+go 1.16
 
 require (
-	github.com/cheggaaa/pb/v3 v3.0.8 // indirect
-	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4
-	github.com/schollz/progressbar/v3 v3.8.0
+	github.com/mattn/go-runewidth v0.0.13 // indirect
+	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
+	github.com/schollz/progressbar/v3 v3.8.6
 	github.com/sirupsen/logrus v1.8.1
-	go.bug.st/serial v1.1.1
-	golang.org/x/crypto v0.0.0-20210503195802-e9a32991a82e // indirect
-	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6 // indirect
-	golang.org/x/term v0.0.0-20210503060354-a79de5458b56 // indirect
+	go.bug.st/serial v1.3.5
+	golang.org/x/crypto v0.0.0-20220314234724-5d542ad81a58 // indirect
+	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect
+	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
+	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
