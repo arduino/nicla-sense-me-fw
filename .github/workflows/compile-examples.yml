@@ -47,16 +47,6 @@ jobs:
             arduinoiotcloud: false
             passthrough: false
             blebridge: false
-          - fqbn: arduino:mbed_portenta:envie_m4
-            platforms: |
-              - name: arduino:mbed_portenta
-            libraries: |
-              - name: Arduino_Portenta_OTA
-            bhy2: false
-            bhy2host: true
-            arduinoiotcloud: true
-            passthrough: false
-            blebridge: true
           - fqbn: arduino:mbed_portenta:envie_m7
             platforms: |
               - name: arduino:mbed_portenta
