@@ -2,10 +2,13 @@
 #define SENSOR_TYPES_H_
 
 #include "stdint.h"
+#include "bosch/bhy2_defs.h"
 
 #define SENSOR_DATA_FIXED_LENGTH (10)
 
 #define SENSOR_LONG_DATA_FIXED_LENGTH (18)
+
+typedef bhy2_virt_sensor_conf SensorConfig;
 
 struct __attribute__((packed)) SensorConfigurationPacket {
   uint8_t sensorId;
