@@ -41,7 +41,9 @@ public:
   void configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency);
   uint8_t requestAck();
   uint8_t availableSensorData();
+  uint8_t availableSensorLongData();
   bool readSensorData(SensorDataPacket &data);
+  bool readSensorLongData(SensorLongDataPacket &data);
 
   void parse(SensorDataPacket& data, DataXYZ& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector);

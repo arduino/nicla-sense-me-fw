@@ -26,6 +26,8 @@ public:
     DataParser::parse3DVector(data, _data);
   }
 
+  void setData(SensorLongDataPacket &data) {}
+
   String toString()
   {
     return _data.toString();

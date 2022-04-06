@@ -109,12 +109,14 @@ const deviceName = 'NICLA'
 const sensorServiceUuid = '34c2e3bb-34aa-11eb-adc1-0242ac120002';
 const sensorConfigCharacteristicUuid = '34c2e3bd-34aa-11eb-adc1-0242ac120002';
 const sensorDataCharacteristicUuid = '34c2e3bc-34aa-11eb-adc1-0242ac120002';
+const sensorLongDataCharacteristicUuid = '34c2e3be-34aa-11eb-adc1-0242ac120002';
 
 var bleDevice
 var bleServer
 var sensorService
 var sensorConfigCharacteristic
 var sensorDataCharacteristic
+var sensorLongDataCharacteristic
 
 var sensorMap = new Map();
 var parseScheme;
@@ -276,6 +278,14 @@ function getSensorCharacteristics() {
     sensorDataCharacteristic = characteristic;
     sensorDataCharacteristic.startNotifications();
     sensorDataCharacteristic.addEventListener('characteristicvaluechanged', receiveSensorData)
+  })
+  .then(_ => {
+    return sensorService.getCharacteristic(sensorLongDataCharacteristicUuid);
+  })
+  .then(characteristic => {
+    sensorLongDataCharacteristic = characteristic;
+    sensorLongDataCharacteristic.startNotifications();
+    sensorLongDataCharacteristic.addEventListener('characteristicvaluechanged', receiveSensorData)
   });
 }
 

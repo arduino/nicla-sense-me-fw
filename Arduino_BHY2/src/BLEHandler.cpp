@@ -12,8 +12,10 @@ BLECharacteristic dfuExternalCharacteristic(dfuExternalUuid, BLEWrite, sizeof(DF
 // Sensor Data channels
 BLEService sensorService("34c2e3bb-34aa-11eb-adc1-0242ac120002"); 
 auto sensorDataUuid = "34c2e3bc-34aa-11eb-adc1-0242ac120002";
+auto sensorLongDataUuid = "34c2e3be-34aa-11eb-adc1-0242ac120002";
 auto sensorConfigUuid = "34c2e3bd-34aa-11eb-adc1-0242ac120002";
 BLECharacteristic sensorDataCharacteristic(sensorDataUuid, (BLERead | BLENotify), sizeof(SensorDataPacket));
+BLECharacteristic sensorLongDataCharacteristic(sensorLongDataUuid, (BLERead | BLENotify), sizeof(SensorLongDataPacket));
 BLECharacteristic sensorConfigCharacteristic(sensorConfigUuid, BLEWrite, sizeof(SensorConfigurationPacket));
 
 Stream* BLEHandler::_debug = NULL;
@@ -92,6 +94,7 @@ bool BLEHandler::begin()
   BLE.setAdvertisedService(sensorService);
   sensorService.addCharacteristic(sensorConfigCharacteristic);
   sensorService.addCharacteristic(sensorDataCharacteristic);
+  sensorService.addCharacteristic(sensorLongDataCharacteristic);
   BLE.addService(sensorService);
   sensorConfigCharacteristic.setEventHandler(BLEWritten, receivedSensorConfig);
 
@@ -114,6 +117,18 @@ void BLEHandler::update()
       sensortec.readSensorData(data);
       sensorDataCharacteristic.writeValue(&data, sizeof(SensorDataPacket));
       --availableData;
+    }
+
+  }
+
+  if (sensorLongDataCharacteristic.subscribed()) {
+
+    uint8_t availableLongData = sensortec.availableLongSensorData();
+    while (availableLongData) {
+      SensorLongDataPacket data;
+      sensortec.readLongSensorData(data);
+      sensorLongDataCharacteristic.writeValue(&data, sizeof(SensorLongDataPacket));
+      --availableLongData;
     }
 
   }

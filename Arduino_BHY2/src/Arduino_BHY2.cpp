@@ -189,14 +189,29 @@ void Arduino_BHY2::addSensorData(SensorDataPacket &sensorData)
   sensortec.addSensorData(sensorData);
 }
 
+void Arduino_BHY2::addLongSensorData(SensorLongDataPacket &sensorData)
+{
+  sensortec.addLongSensorData(sensorData);
+}
+
 uint8_t Arduino_BHY2::availableSensorData()
 {
   return sensortec.availableSensorData();
 }
 
+uint8_t Arduino_BHY2::availableLongSensorData()
+{
+  return sensortec.availableLongSensorData();
+}
+
 bool Arduino_BHY2::readSensorData(SensorDataPacket &data)
 {
   return sensortec.readSensorData(data);
+}
+
+bool Arduino_BHY2::readLongSensorData(SensorLongDataPacket &data)
+{
+  return sensortec.readLongSensorData(data);
 }
 
 bool Arduino_BHY2::hasSensor(uint8_t sensorId)

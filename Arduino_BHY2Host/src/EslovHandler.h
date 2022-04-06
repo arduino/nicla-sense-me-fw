@@ -24,14 +24,17 @@ enum HostOpcode {
   HOST_DFU_INTERNAL_OPCODE = ESLOV_DFU_INTERNAL_OPCODE,
   HOST_DFU_EXTERNAL_OPCODE = ESLOV_DFU_EXTERNAL_OPCODE,
   HOST_READ_SENSOR_OPCODE,
-  HOST_CONFIG_SENSOR_OPCODE
+  HOST_CONFIG_SENSOR_OPCODE,
+  HOST_READ_LONG_SENSOR_OPCODE
 };
 
 enum EslovState {
   ESLOV_AVAILABLE_SENSOR_STATE = 0x00,
   ESLOV_READ_SENSOR_STATE = 0x01,
   ESLOV_DFU_ACK_STATE = 0x02,
-  ESLOV_SENSOR_ACK_STATE = 0x03
+  ESLOV_SENSOR_ACK_STATE = 0x03,
+  ESLOV_AVAILABLE_LONG_SENSOR_STATE = 0x04,
+  ESLOV_READ_LONG_SENSOR_STATE = 0x05
 
 };
 
@@ -47,8 +50,10 @@ public:
   void writeStateChange(EslovState state);
   void writeConfigPacket(SensorConfigurationPacket& config);
   uint8_t requestPacketAck();
-  uint8_t requestAvailableData() ;
+  uint8_t requestAvailableData();
+  uint8_t requestAvailableLongData();
   bool requestSensorData(SensorDataPacket &sData);
+  bool requestSensorLongData(SensorLongDataPacket &sData);
   void toggleEslovIntPin();
 
 protected:

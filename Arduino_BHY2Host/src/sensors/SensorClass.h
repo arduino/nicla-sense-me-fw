@@ -23,6 +23,7 @@ public:
   void end();
 
   virtual void setData(SensorDataPacket &data) = 0;
+  virtual void setData(SensorLongDataPacket &data) = 0;
   virtual String toString() = 0;
 
 protected:

@@ -21,6 +21,7 @@ private:
   friend class Arduino_BHY2Host;
 
   static void receivedSensorData(BLEDevice central, BLECharacteristic characteristic);
+  static void receivedLongSensorData(BLEDevice central, BLECharacteristic characteristic);
   bool connectToNicla();
 
   void debug(Stream &stream);

@@ -55,8 +55,11 @@ public:
   void configureSensor(SensorConfigurationPacket& config);
   void configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency);
   void addSensorData(SensorDataPacket &sensorData);
+  void addLongSensorData(SensorLongDataPacket &sensorData);
   uint8_t availableSensorData();
+  uint8_t availableLongSensorData();
   bool readSensorData(SensorDataPacket &data);
+  bool readLongSensorData(SensorLongDataPacket &data);
   bool hasSensor(uint8_t sensorId);
 
   void parse(SensorDataPacket& data, DataXYZ& vector);

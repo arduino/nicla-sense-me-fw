@@ -121,15 +121,35 @@ uint8_t BoschSensortec::availableSensorData()
   return _sensorQueue.size();
 }
 
+uint8_t BoschSensortec::availableLongSensorData()
+{
+  return _longSensorQueue.size();
+}
+
 bool BoschSensortec::readSensorData(SensorDataPacket &data)
 {
   return _sensorQueue.pop(data);
+}
+
+bool BoschSensortec::readLongSensorData(SensorLongDataPacket &data)
+{
+  return _longSensorQueue.pop(data);
 }
 
 void BoschSensortec::addSensorData(SensorDataPacket &sensorData)
 {
   // Overwrites oldest data when fifo is full 
   _sensorQueue.push(sensorData);
+  // Alternative: handle the full queue by storing it in flash 
+  SensorLongDataPacket longData;
+  memcpy(&longData, &sensorData, sizeof(SensorDataPacket));
+  sensorManager.process(longData);
+}
+
+void BoschSensortec::addLongSensorData(SensorLongDataPacket &sensorData)
+{
+  // Overwrites oldest data when fifo is full 
+  _longSensorQueue.push(sensorData);
   // Alternative: handle the full queue by storing it in flash 
   sensorManager.process(sensorData);
 }

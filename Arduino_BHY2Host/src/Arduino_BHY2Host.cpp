@@ -51,6 +51,14 @@ void Arduino_BHY2Host::update()
       for (int i = 0; i < available; i++) {
         SensorDataPacket data;
         readSensorData(data);
+        SensorLongDataPacket longData;
+        memcpy(&longData, &data, sizeof(SensorDataPacket));
+        sensorManager.process(longData);
+      }
+      uint8_t availableLong = availableSensorLongData();
+      for (int i = 0; i < available; i++) {
+        SensorLongDataPacket data;
+        readSensorLongData(data);
         sensorManager.process(data);
       }
     }
@@ -99,9 +107,19 @@ uint8_t Arduino_BHY2Host::availableSensorData()
   return eslovHandler.requestAvailableData();
 }
 
+uint8_t Arduino_BHY2Host::availableSensorLongData()
+{
+  return eslovHandler.requestAvailableLongData();
+}
+
 bool Arduino_BHY2Host::readSensorData(SensorDataPacket &data)
 {
   return eslovHandler.requestSensorData(data);
+}
+
+bool Arduino_BHY2Host::readSensorLongData(SensorLongDataPacket &data)
+{
+  return eslovHandler.requestSensorLongData(data);
 }
 
 void Arduino_BHY2Host::parse(SensorDataPacket& data, DataXYZ& vector)

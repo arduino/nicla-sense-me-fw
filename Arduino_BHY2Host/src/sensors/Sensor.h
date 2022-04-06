@@ -35,6 +35,8 @@ public:
     DataParser::parseData(data, _value, _factor, _format);
   }
 
+  void setData(SensorLongDataPacket &data) {}
+
   String toString()
   {
     if (_format == PEVENT && (_value > 0)) {

@@ -63,10 +63,26 @@ void EslovHandler::requestEvent()
     uint8_t availableData = sensortec.availableSensorData();
     Wire.write(availableData);
 
+  } else if (_state == ESLOV_AVAILABLE_LONG_SENSOR_STATE) {
+    uint8_t availableData = sensortec.availableLongSensorData();
+    Wire.write(availableData);
+
   } else if (_state == ESLOV_READ_SENSOR_STATE) {
     SensorDataPacket data;
     sensortec.readSensorData(data);
+
     Wire.write((uint8_t*)&data, sizeof(SensorDataPacket));
+    if (_debug) {
+      _debug->print("data: ");
+      _debug->println(data.sensorId);
+      _debug->println(data.size);
+    }
+
+  } else if (_state == ESLOV_READ_LONG_SENSOR_STATE) {
+    SensorLongDataPacket data;
+    sensortec.readLongSensorData(data);
+
+    Wire.write((uint8_t*)&data, sizeof(SensorLongDataPacket));
     if (_debug) {
       _debug->print("data: ");
       _debug->println(data.sensorId);

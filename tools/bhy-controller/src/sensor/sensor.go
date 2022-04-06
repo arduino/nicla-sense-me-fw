@@ -11,9 +11,11 @@ import (
 )
 
 const (
-	eslovReadOpcode   = 2
-	eslovConfigOpcode = 3
-	sensorDataSize    = 12
+	eslovReadOpcode       = 2
+	eslovConfigOpcode     = 3
+	eslovLongReadOpcode   = 4
+	sensorDataSize        = 12
+	sensorLongDataSize    = 20
 )
 
 const (
@@ -87,16 +89,41 @@ func readSensorData(buffer []byte, port serial.Port) {
     // Some sensors have a frame size bigger than 10 (such as Sensor id 171)
     // but the Arduino_BHY2 library only copies up to 10 bytes (SENSOR_DATA_FIXED_LENGTH in SensorTypes.h)
     // otherwise without this size check the tool would crash for such sensors
-    if data.size > 10 {
-        data.size = 10
-    }
 
-	data.data = dataPacket[2:(2 + data.size)]
-	parseData(&data)
+		if data.size > 10 {
+				data.size = 10
+		}
+
+		data.data = dataPacket[2:(2 + data.size)]
+		parseData(&data)
+
+}
+
+func readLongSensorData(buffer []byte, port serial.Port) {
+	var dataPacket [sensorLongDataSize]byte
+	for rxLen := 0; rxLen < sensorLongDataSize; {
+		n, err := port.Read(buffer)
+		errCheck(err)
+		copy(dataPacket[rxLen:sensorLongDataSize], buffer[:n])
+		rxLen = rxLen + n
+	}
+	// Print the received sensor data
+	var data SensorData
+	data.id = uint8(dataPacket[0])
+	data.size = uint8(dataPacket[1])
+    // Set max frame size to 18 for long payload sensors
+
+		if data.size > 18 {
+				data.size = 18
+		}
+
+		data.data = dataPacket[2:(2 + data.size)]
+		parseData(&data)
 }
 
 func liveRead(port serial.Port) {
 	for {
+		singleLongRead(port, false)
 		singleRead(port, false)
 		time.Sleep(300 * time.Millisecond)
 	}
@@ -134,6 +161,38 @@ func singleRead(port serial.Port, printEnable bool) {
 	}
 }
 
+func singleLongRead(port serial.Port, printEnable bool) {
+	// Send read opcode
+	packet := []byte{eslovLongReadOpcode}
+	n, err := port.Write(packet)
+	errCheck(err)
+	if printEnable {
+		fmt.Printf("Sent %v bytes\n", n)
+	}
+
+	// Read bhy available data
+	buff := make([]byte, 100)
+	n, err = port.Read(buff)
+	errCheck(err)
+
+	// If no available data, just return
+	availableData := int(buff[0])
+	if n == 0 || availableData == 0 {
+		if printEnable {
+			fmt.Println("no available data")
+		}
+		return
+	}
+	// Else query all the available data
+	if printEnable {
+		fmt.Printf("available data: %d\n", availableData)
+	}
+	for availableData > 0 {
+		readLongSensorData(buff, port)
+		availableData--
+	}
+}
+
 func Read(usbPort string, baudRate int, liveFlag bool) {
 	port := openPort(usbPort, baudRate)
 	defer port.Close()
@@ -142,7 +201,7 @@ func Read(usbPort string, baudRate int, liveFlag bool) {
 	if liveFlag {
 		liveRead(port)
 	} else {
-		singleRead(port, true)
+		singleRead(port, false)
 	}
 }
 

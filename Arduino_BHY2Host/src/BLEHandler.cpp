@@ -7,10 +7,12 @@
 
 auto sensorServiceUuid = '34c2e3bb-34aa-11eb-adc1-0242ac120002';
 auto sensorDataUuid = "34c2e3bc-34aa-11eb-adc1-0242ac120002";
+auto sensorLongDataUuid = "34c2e3be-34aa-11eb-adc1-0242ac120002";
 auto sensorConfigUuid = "34c2e3bd-34aa-11eb-adc1-0242ac120002";
 
 BLECharacteristic configCharacteristic;
 BLECharacteristic dataCharacteristic;
+BLECharacteristic longDataCharacteristic;
 BLEDevice niclaPeripheral;
 
 BLEHandler::BLEHandler() :
@@ -87,6 +89,7 @@ bool BLEHandler::connectToNicla()
       // retrieve characteristics
       configCharacteristic = peripheral.characteristic(sensorConfigUuid);
       dataCharacteristic = peripheral.characteristic(sensorDataUuid);
+      longDataCharacteristic = peripheral.characteristic(sensorLongDataUuid);
 
       if (!configCharacteristic) {
         end();
@@ -114,6 +117,21 @@ bool BLEHandler::connectToNicla()
         _debug->println("Subscribed to dataCharacteristic");
       }
 
+      if (!longDataCharacteristic) {
+        end();
+        return false;
+      } else if (!longDataCharacteristic.canSubscribe()) {
+        end();
+        return false;
+      } else if (!longDataCharacteristic.subscribe()) {
+        end();
+        return false;
+      }
+      longDataCharacteristic.setEventHandler(BLEWritten, receivedLongSensorData);
+      if (_debug) {
+        _debug->println("Subscribed to longDataCharacteristic");
+      }
+
       niclaPeripheral = peripheral;
       nicla_found = true;
     }
@@ -133,34 +151,6 @@ void BLEHandler::update()
     begin();
   }
 
-  //if (niclaPeripheral.connected()) {
-    //if (dataCharacteristic.valueUpdated()) {
-      /*
-      uint8_t data[sizeof(SensorDataPacket)];
-      dataCharacteristic.readValue(data, sizeof(SensorDataPacket));
-
-      if (_debug) {
-        _debug->print("Data packet received: ");
-        for (int i=0; i<sizeof(SensorDataPacket); i++) {
-          _debug->print(data[i], HEX);
-          _debug->print(", ");
-        }
-        _debug->println();
-      }
-
-      SensorDataPacket sensorData;
-      memcpy(&sensorData, &data, sizeof(SensorDataPacket));
-
-      sensorManager.process(sensorData);
-      */
-    //}
-    /*
-  } else {
-    if (_debug) {
-      _debug->println("Peripheral disconnected");
-    }
-  }
-  */
 }
 
 void BLEHandler::end()
@@ -188,7 +178,16 @@ void BLEHandler::receivedSensorData(BLEDevice central, BLECharacteristic charact
 {
   SensorDataPacket sensorData;
   characteristic.readValue(&sensorData, sizeof(sensorData));
-  sensorManager.process(sensorData);
+  SensorLongDataPacket sensorLongData;
+  memcpy(&sensorLongData, &sensorData, sizeof(SensorLongDataPacket));
+  sensorManager.process(sensorLongData);
+}
+
+void BLEHandler::receivedLongSensorData(BLEDevice central, BLECharacteristic characteristic)
+{
+  SensorLongDataPacket sensorLongData;
+  characteristic.readValue(&sensorLongData, sizeof(sensorLongData));
+  sensorManager.process(sensorLongData);
 }
 
 void BLEHandler::debug(Stream &stream)

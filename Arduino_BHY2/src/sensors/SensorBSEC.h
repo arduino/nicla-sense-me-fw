@@ -30,6 +30,11 @@ public:
 
   void setData(SensorDataPacket &data)
   {
+    
+  }
+
+  void setData(SensorLongDataPacket &data)
+  {
       if (_id == SENSOR_ID_BSEC ) {
           DataParser::parseBSEC(data, _data);
       } else if (_id == SENSOR_ID_BSEC_LEGACY) {

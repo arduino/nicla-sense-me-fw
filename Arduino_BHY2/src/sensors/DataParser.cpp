@@ -24,7 +24,7 @@ void DataParser::parseQuaternion(SensorDataPacket& data, DataQuaternion& vector,
   vector.accuracy = data.getUint16(8) * scaleFactor;
 }
 
-void DataParser::parseBSEC(SensorDataPacket& data, DataBSEC& vector) {
+void DataParser::parseBSEC(SensorLongDataPacket& data, DataBSEC& vector) {
   const float SCALE_BSEC_BVOC_EQ = 0.01f;
   const float SCALE_BSEC_COMP_T = 1.0f / 256;
   const float SCALE_BSEC_COMP_H = 1.0f / 500;
@@ -39,7 +39,7 @@ void DataParser::parseBSEC(SensorDataPacket& data, DataBSEC& vector) {
   vector.comp_g = (uint32_t)(data.getFloat(14));
 }
 
-void DataParser::parseBSECLegacy(SensorDataPacket& data, DataBSEC& vector) {
+void DataParser::parseBSECLegacy(SensorLongDataPacket& data, DataBSEC& vector) {
   vector.comp_t = data.getFloat(0);
   vector.comp_h = data.getFloat(4);
   //note that: SENSOR_DATA_FIXED_LENGTH is defined as 10 by default,
