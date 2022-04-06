@@ -116,6 +116,15 @@ void BoschSensortec::configureSensor(SensorConfigurationPacket& config)
   }
 }
 
+int BoschSensortec::configureSensorRange(uint8_t id, uint16_t range)
+{
+  auto ret = bhy2_set_virt_sensor_range(id, range, &_bhy2);
+  if (ret == BHY2_OK) {
+    return 1;
+  }
+  return 0;
+}
+
 void BoschSensortec::getSensorConfiguration(uint8_t id, SensorConfig& virt_sensor_conf)
 {
   bhy2_get_virt_sensor_cfg(id, &virt_sensor_conf, &_bhy2);
