@@ -355,8 +355,6 @@ int selectOperation()
 
 void loadApp()
 {
-    fwupdate_bhi260();
-
     try_update();
 }
 
