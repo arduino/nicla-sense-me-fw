@@ -17,7 +17,7 @@
 IS31FL3194::IS31FL3194(){
 }
 
-I2C i2c(I2C_SDA0, I2C_SCL0);
+extern I2C i2c0;
 
 // Read the Chip ID register, this is a good test of communication
 uint8_t IS31FL3194::getChipID() 
@@ -112,13 +112,13 @@ void IS31FL3194::writeByte(uint8_t address, uint8_t subAddress, uint8_t data)
   char command[2];
   command[0] = subAddress;
   command[1] = data;
-  i2c.write(address << 1, command, 2);
+  i2c0.write(address << 1, command, 2);
 }
 
 uint8_t IS31FL3194::readByte(uint8_t address, uint8_t subAddress)
 {
   char response = 0xFF;
-  int ret = i2c.write(address << 1, (const char*)&subAddress, 1);
-  ret = i2c.read(address << 1, &response, 1);
+  int ret = i2c0.write(address << 1, (const char*)&subAddress, 1);
+  ret = i2c0.read(address << 1, &response, 1);
   return response;
 }
