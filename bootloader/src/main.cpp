@@ -404,6 +404,12 @@ int main()
     pb_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_PUSH_BUTT_CTRL);
     DEBUG_PRINTF("Push button ctrl reg: %04x\n", pb_reg);
 
+    uint8_t highz_reg = pmic.readByte(BQ25120A_ADDRESS, BQ25120A_FAST_CHG);
+    highz_reg |= 0x01;
+    pmic.writeByte(BQ25120A_ADDRESS, BQ25120A_FAST_CHG, highz_reg);
+
+    cd = 0;
+
     DEBUG_PRINTF("Bootloader starting\r\n");
 
     if (NRF_UICR->PSELRESET[0] != 0 || NRF_UICR->PSELRESET[1] != 00) {
