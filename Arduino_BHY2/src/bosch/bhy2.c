@@ -1494,18 +1494,27 @@ static int8_t parse_fifo(enum bhy2_fifo_type source, struct bhy2_fifo_buffer *fi
                 {
                     break;
                 }
-                if (info.callback != NULL)
-                {
-                    /* Read position is incremented by 1 to exclude sensor id */
-                    data_info.data_ptr = &fifo_p->buffer[tmp_read_pos + 1];
-                    data_info.fifo_type = source;
-                    data_info.time_stamp = time_stamp;
-                    data_info.sensor_id = tmp_sensor_id;
-                    data_info.data_size = info.event_size;
-                    info.callback(&data_info, info.callback_ref);
 
+                if (info.event_size > 0)
+                {
+                    if (info.callback != NULL)
+                    {
+                        /* Read position is incremented by 1 to exclude sensor id */
+                        data_info.data_ptr = &fifo_p->buffer[tmp_read_pos + 1];
+                        data_info.fifo_type = source;
+                        data_info.time_stamp = time_stamp;
+                        data_info.sensor_id = tmp_sensor_id;
+                        data_info.data_size = info.event_size;
+                        info.callback(&data_info, info.callback_ref);
+                    }
+
+                    fifo_p->read_pos += info.event_size;
                 }
-                fifo_p->read_pos += info.event_size;
+                else
+                {
+                    //printf("error found parsing fifo, invalid frame found @:%d\n", fifo_p->read_pos);
+                    return BHY2_E_INVALID_EVENT_SIZE;
+                }
                 break;
         }
     }
