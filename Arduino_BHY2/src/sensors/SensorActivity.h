@@ -38,6 +38,7 @@ public:
         return _activityArray[i].activityMessage;
       }
     }
+    return "Waiting to detect valid activity";
   }
 
 private:
