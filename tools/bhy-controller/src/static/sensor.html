@@ -161,40 +161,44 @@ document.querySelector('#configureButton').addEventListener('click',
     var sampleRate = parseFloat(document.getElementById('rate').value);
     var latency = parseInt(document.getElementById('latency').value);
 
-    var configPacket = new Uint8Array(9);
-    configPacket[0] = sensorId;
-    configPacket.set(floatToBytes(sampleRate), 1);
-    configPacket.set(intToBytes(latency), 5);
-    console.log(configPacket);
+    if (sensorTypes[sensorId].name) {
 
-    sensorConfigCharacteristic.writeValue(configPacket)
-    .then(_ => {  
-      console.log('Configuration written');
-    });
+      var configPacket = new Uint8Array(9);
+      configPacket[0] = sensorId;
+      configPacket.set(floatToBytes(sampleRate), 1);
+      configPacket.set(intToBytes(latency), 5);
+      console.log(configPacket);
 
-    //Handle individual Enabled buttons
-    var table = document.getElementById("dataTable");
-    if (sensorMap.has(sensorId)) {
-      rowIndex = sensorMap.get(sensorId);
-      var row = table.rows[rowIndex];
-      row.cells[3].firstChild.style.backgroundColor = "limegreen";
-    } else {
-      var tableLength = table.rows.length;
-      sensorMap.set(sensorId, tableLength);
-      var row = table.insertRow(tableLength);
-      var cell = row.insertCell(0);
-      cell.innerHTML = sensorId;
-      cell = row.insertCell(1);
-      cell.innerHTML = sensorTypes[sensorId].name;
-      cell = row.insertCell(2);
-      cell.innerHTML = 0;
-      cell = row.insertCell(3);
-      cell.innerHTML = '<input id="Button" type="button" value="Enabled" onclick="updateSensorStatus(this, \'' + sensorId + '\');"/>'
-      row.cells[3].firstChild.style.backgroundColor = "limegreen";
-      cell = row.insertCell(4);
-      var chartIdx = sensorTypes[sensorId].name;
-      cell.innerHTML = '<div id=\'' + chartIdx + '\'></div>';
+      sensorConfigCharacteristic.writeValue(configPacket)
+      .then(_ => {  
+        console.log('Configuration written');
+      });
+
+      //Handle individual Enabled buttons
+      var table = document.getElementById("dataTable");
+      if (sensorMap.has(sensorId)) {
+        rowIndex = sensorMap.get(sensorId);
+        var row = table.rows[rowIndex];
+        row.cells[3].firstChild.style.backgroundColor = "limegreen";
+      } else {
+        var tableLength = table.rows.length;
+        sensorMap.set(sensorId, tableLength);
+        var row = table.insertRow(tableLength);
+        var cell = row.insertCell(0);
+        cell.innerHTML = sensorId;
+        cell = row.insertCell(1);
+        cell.innerHTML = sensorTypes[sensorId].name;
+        cell = row.insertCell(2);
+        cell.innerHTML = 0;
+        cell = row.insertCell(3);
+        cell.innerHTML = '<input id="Button" type="button" value="Enabled" onclick="updateSensorStatus(this, \'' + sensorId + '\');"/>'
+        row.cells[3].firstChild.style.backgroundColor = "limegreen";
+        cell = row.insertCell(4);
+        var chartIdx = sensorTypes[sensorId].name;
+        cell.innerHTML = '<div id=\'' + chartIdx + '\'></div>';
+      }
     }
+
 
   }
 );
