@@ -197,8 +197,7 @@
 
   "44": {
     "name": "ORI_WU",
-    "type": 6,
-    "type-name": "orientation",
+    "scheme": "orientation",
     "dashboard": 0
   },
 
