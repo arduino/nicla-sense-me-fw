@@ -57,6 +57,7 @@ void Arduino_BHY2::setLDOTimeout(int time) {
 
 bool Arduino_BHY2::begin(NiclaConfig config, NiclaWiring niclaConnection)
 {
+  bool res;
   _niclaConfig = config;
 
   if (niclaConnection == NICLA_AS_SHIELD) {
@@ -65,29 +66,30 @@ bool Arduino_BHY2::begin(NiclaConfig config, NiclaWiring niclaConnection)
   }
 
   pinMode(_eslovIntPin, INPUT);
-  nicla::begin();
+  res = nicla::begin();
   _startTime = millis();
   nicla::enable3V3LDO();
   Wire1.setClock(500000);
   _pingTime = millis();
-  if (!sensortec.begin()) {
-    return false;
-  }
+  res = sensortec.begin() & res;
+  //even if res from a single step is false, we still want to continue,
+  //e.g: The BHI260 device might have failed to boot because of an invalid FW updated via DFU.
+  //in this case, we want to start BLEHandler and DFUManager
+  //so they could come to the rescue the failed firmware for BHI260AP
+
+
   if (_niclaConfig & NICLA_BLE) {
-    if (!bleHandler.begin()) {
-      return false;
-    }
+      res = bleHandler.begin() & res;
   }
-  if (!dfuManager.begin()) {
-    return false;
-  }
+
+  res = dfuManager.begin() & res;
 
   if (_debug) {
     _debug->print("Eslov int pin: ");
     _debug->println(_eslovIntPin);
   }
 
-  return true;
+  return res;
 }
 
 bool Arduino_BHY2::begin(NiclaSettings& settings)
@@ -158,7 +160,7 @@ void Arduino_BHY2::update(unsigned long ms)
   delay(ms);
 }
 
-void Arduino_BHY2::delay(unsigned long ms) 
+void Arduino_BHY2::delay(unsigned long ms)
 {
   unsigned long start = millis();
   unsigned long elapsed = 0;
