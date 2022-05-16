@@ -16,8 +16,15 @@ public:
   }
 
   float value() 
-  { 
-    return _value; 
+  {
+    if (_format == PEVENT) {
+      if (_value > 0) {
+        _value = 0;
+        return 1;
+      }
+      return 0;
+    }
+    return _value;
   }
 
   void setFactor(float factor)
@@ -40,12 +47,10 @@ public:
   String toString()
   {
     if (_format == PEVENT) {
-      if (_value > 0) {
-        _value = 0;
+      if (value()) {
         return (String)("Event detected\n");
-      } else {
-        return (String)("");
       }
+      return (String)("");
     }
     return (String)("Data value: " + String(_value, 3)  + "\n");
   }
