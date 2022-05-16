@@ -16,7 +16,14 @@ public:
   }
 
   float value() 
-  { 
+  {
+    if (_format == PEVENT) {
+      if (_value > 0) {
+        _value = 0;
+        return 1;
+      }
+      return 0;
+    }
     return _value; 
   }
 
@@ -39,9 +46,11 @@ public:
 
   String toString()
   {
-    if (_format == PEVENT && (_value > 0)) {
-      _value = 0;
-      return (String)("Event detected\n");
+    if (_format == PEVENT) {
+      if (value()) {
+        return (String)("Event detected\n");
+      }
+      return (String)("");
     }
     return (String)("Data value: " + String(_value, 3)  + "\n");
   }
