@@ -38,7 +38,6 @@ void SensorClass::configure(float rate, uint32_t latency)
   if (BHY2Host.getNiclaConnection() == NICLA_VIA_BLE) {
     BHY2Host.configureSensor(config);
   } else {
-    eslovHandler.toggleEslovIntPin();
     uint8_t ack = 0;
     while(ack != 15) {
       BHY2Host.configureSensor(config);

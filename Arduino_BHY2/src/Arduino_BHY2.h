@@ -23,7 +23,8 @@ enum NiclaWiring {
 enum NiclaConfig {
   NICLA_I2C = 0x1,
   NICLA_BLE = 0x2,
-  NICLA_BLE_AND_I2C = NICLA_I2C | NICLA_BLE
+  NICLA_BLE_AND_I2C = NICLA_I2C | NICLA_BLE,
+  NICLA_STANDALONE = 0x4
 };
 
 class NiclaSettings {
@@ -66,7 +67,6 @@ public:
   void parse(SensorDataPacket& data, DataOrientation& vector);
   void parse(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
 
-  void checkEslovInt();
   void setLDOTimeout(int time);
 
   void debug(Stream &stream);
@@ -78,7 +78,6 @@ private:
   int _pingTime;
   int _timeout;
   int _startTime;
-  bool _eslovActive;
 
   PinName _eslovIntPin;
 

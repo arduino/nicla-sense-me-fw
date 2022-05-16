@@ -14,7 +14,6 @@ Arduino_BHY2::Arduino_BHY2() :
   _debug(NULL),
   _pingTime(0),
   _timeout(120000),
-  _eslovActive(false),
   _startTime(0),
   _eslovIntPin(PIN_ESLOV_INT),
   _niclaConfig(NICLA_BLE_AND_I2C)
@@ -35,22 +34,6 @@ void Arduino_BHY2::pingI2C() {
   }
 }
 
-void Arduino_BHY2::checkEslovInt() {
-  if (!digitalRead(_eslovIntPin)) {
-    //Wait for MKR to clear Eslov Int pin
-    while(!digitalRead(_eslovIntPin)) {}
-    if (_debug) _debug->println("MKR released Eslov Int pin");
-
-    //Change mode for Eslov Int pin
-    //Eslov Int Pin will be used to synchronize Dfu via Eslov
-    pinMode(_eslovIntPin, OUTPUT);
-
-    eslovHandler.begin();
-    //Eslov has been activated
-    _eslovActive = true;
-  }
-}
-
 void Arduino_BHY2::setLDOTimeout(int time) {
   _timeout = time;
 }
@@ -65,11 +48,9 @@ bool Arduino_BHY2::begin(NiclaConfig config, NiclaWiring niclaConnection)
     eslovHandler.niclaAsShield();
   }
 
-  pinMode(_eslovIntPin, INPUT);
   res = nicla::begin();
   _startTime = millis();
   nicla::enable3V3LDO();
-  Wire1.setClock(500000);
   _pingTime = millis();
   res = sensortec.begin() & res;
   //even if res from a single step is false, we still want to continue,
@@ -78,11 +59,18 @@ bool Arduino_BHY2::begin(NiclaConfig config, NiclaWiring niclaConnection)
   //so they could come to the rescue the failed firmware for BHI260AP
 
 
-  if (_niclaConfig & NICLA_BLE) {
+  if (!(_niclaConfig & NICLA_STANDALONE)) {
+    if (_niclaConfig & NICLA_BLE) {
       res = bleHandler.begin() & res;
+    }
+    if (_niclaConfig & NICLA_I2C) {
+      //Start Eslov Handler
+      pinMode(_eslovIntPin, OUTPUT);
+      res = eslovHandler.begin() & res;
+    }
+    //Start DFU Manager
+    res = dfuManager.begin() & res;
   }
-
-  res = dfuManager.begin() & res;
 
   if (_debug) {
     _debug->print("Eslov int pin: ");
@@ -95,7 +83,9 @@ bool Arduino_BHY2::begin(NiclaConfig config, NiclaWiring niclaConnection)
 bool Arduino_BHY2::begin(NiclaSettings& settings)
 {
   uint8_t niclaSettings = settings.getConfiguration();
-  if ((niclaSettings & NICLA_I2C) && (niclaSettings & NICLA_BLE)) {
+  if (niclaSettings & NICLA_STANDALONE) {
+     _niclaConfig = NICLA_STANDALONE;
+  } else if ((niclaSettings & NICLA_I2C) && (niclaSettings & NICLA_BLE)) {
     _niclaConfig = NICLA_BLE_AND_I2C;
   }
   else if (niclaSettings & NICLA_I2C) {
@@ -115,41 +105,40 @@ void Arduino_BHY2::update()
 {
   pingI2C();
 
-  if (_niclaConfig & NICLA_I2C) {
-    if (!_eslovActive) {
-      checkEslovInt();
-    }
-  }
-
   sensortec.update();
-  if (_niclaConfig & NICLA_BLE) {
-    bleHandler.update();
-  }
 
-  // While updating fw, detach the library from the sketch
-  if (dfuManager.isPending()) {
-    if (_debug) _debug->println("Start DFU procedure. Sketch execution is stopped.");
-    while (dfuManager.isPending()) {
-      if (_niclaConfig & NICLA_BLE) {
-        if (dfuManager.dfuSource() == bleDFU && bleHandler.bleActive) {
-          bleHandler.update();
-        }
-      }
-      pingI2C();
-    }
-    // Wait some time for acknowledgment retrieval
+  if (!(_niclaConfig & NICLA_STANDALONE)) {
+
     if (_niclaConfig & NICLA_BLE) {
-      if (dfuManager.dfuSource() == bleDFU) {
-        auto timeRef = millis();
-        while (millis() - timeRef < 1000) {
-          bleHandler.update();
-        }
-      }
+      bleHandler.update();
     }
 
-    // Reboot after fw update
-    if (_debug) _debug->println("DFU procedure terminated. Rebooting.");
-    NVIC_SystemReset();
+    // While updating fw, detach the library from the sketch
+    if (dfuManager.isPending()) {
+      if (_debug) _debug->println("Start DFU procedure. Sketch execution is stopped.");
+      while (dfuManager.isPending()) {
+        if (_niclaConfig & NICLA_BLE) {
+          if (dfuManager.dfuSource() == bleDFU && bleHandler.bleActive) {
+            bleHandler.update();
+          }
+        }
+        pingI2C();
+      }
+      // Wait some time for acknowledgment retrieval
+      if (_niclaConfig & NICLA_BLE) {
+        if (dfuManager.dfuSource() == bleDFU) {
+          auto timeRef = millis();
+          while (millis() - timeRef < 1000) {
+            bleHandler.update();
+          }
+        }
+      }
+
+      // Reboot after fw update
+      if (_debug) _debug->println("DFU procedure terminated. Rebooting.");
+      NVIC_SystemReset();
+    }
+
   }
 }
 
