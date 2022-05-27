@@ -29,8 +29,13 @@ void Arduino_BHY2::pingI2C() {
   int currTime = millis();
   if ((currTime - _pingTime) > 30000) {
     _pingTime = currTime;
+#ifdef USE_FASTCHG_TO_KICK_WATCHDOG
     //Read charger reg
     nicla::checkChgReg();
+#else
+    //Read LDO reg
+    nicla::readLDOreg();
+#endif
   }
 }
 
