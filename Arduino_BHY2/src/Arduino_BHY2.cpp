@@ -29,8 +29,8 @@ void Arduino_BHY2::pingI2C() {
   int currTime = millis();
   if ((currTime - _pingTime) > 30000) {
     _pingTime = currTime;
-    //Read status reg
-    nicla::readLDOreg();
+    //Read charger reg
+    nicla::checkChgReg();
   }
 }
 
