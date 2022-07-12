@@ -57,4 +57,4 @@ jobs:
             --path-rename "${{ matrix.library.source }}"/:
 
       - name: Update library mirror repository
-        run: git push ${{ matrix.library.repo }}
+        run: git push --set-upstream ${{ matrix.library.repo }} main
