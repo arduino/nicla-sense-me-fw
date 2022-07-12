@@ -43,6 +43,8 @@ jobs:
             platforms: |
               - name: arduino:mbed_nicla
             bhy2: true
+            libraries: |
+              - name: PacketSerial            
             bhy2host: false
             arduinoiotcloud: false
             passthrough: false
