@@ -48,7 +48,6 @@ void Arduino_BHY2Host::update()
       eslovHandler.update();
     } else {
       uint8_t available = availableSensorData();
-      delay(1);
       for (int i = 0; i < available; i++) {
         SensorDataPacket data;
         readSensorData(data);
