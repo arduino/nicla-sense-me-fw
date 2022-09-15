@@ -2,7 +2,7 @@
     This sketch shows how to use Nicla in standalone mode and how to save data
     the on-board 2MB SPI Flash using the LitteFS filesystem.
 
-    Please, take care both ot RAM and Flash usage at run-time.
+    Please, take care both of RAM and Flash usage at run-time.
 
     This example shows how to use MbedOS-native Storage APIs
     - https://os.mbed.com/docs/mbed-os/v6.15/apis/data-storage.html
