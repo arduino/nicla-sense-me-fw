@@ -1,8 +1,5 @@
 /* 
- * This sketch shows how nicla can be used in standalone mode.
- * Without the need for an host, nicla can run sketches that 
- * are able to configure the bhi sensors and are able to read all 
- * the bhi sensors data.
+ * This sketch shows how to get and set the range settings for the built-in IMU of the BHI260 sensor on Nicla Sense ME
 */
 
 #include "Arduino.h"
@@ -10,9 +7,7 @@
 
 SensorXYZ accel(SENSOR_ID_ACC);
 SensorXYZ gyro(SENSOR_ID_GYRO);
-Sensor temp(SENSOR_ID_TEMP);
-Sensor gas(SENSOR_ID_GAS);
-SensorQuaternion rotation(SENSOR_ID_RV);
+SensorXYZ gravity(SENSOR_ID_GRA);
 
 void setup()
 {
@@ -23,19 +18,23 @@ void setup()
 
   accel.begin();
   gyro.begin();
-  temp.begin();
-  gas.begin();
-  rotation.begin();
+
 
   SensorConfig cfg = accel.getConfiguration();
   Serial.println(String("range of accel: +/-") + cfg.range + String("g"));
-  accel.setRange(2);    //this sets the range of accel to +/-4g, 
+  cfg = gravity.getConfiguration();
+  Serial.println(String("range of gravity: +/-") + cfg.range + String("g"));
+
+  accel.setRange(4);    //this sets the range of accel to +/-4g, 
   cfg = accel.getConfiguration();
   Serial.println(String("range of accel: +/-") + cfg.range + String("g"));
 
+  cfg = gravity.getConfiguration();
+  Serial.println(String("range of gravity: +/-") + cfg.range + String("g"));
+
   cfg = gyro.getConfiguration();
   Serial.println(String("range of gyro: +/-") + cfg.range + String("dps"));  
-  gyro.setRange(1000);    
+  gyro.setRange(1000);  //this sets the range of gyro to +/-1000dps, 
   cfg = gyro.getConfiguration();
   Serial.println(String("range of gyro: +/-") + cfg.range + String("dps"));
 }
@@ -49,11 +48,7 @@ void loop()
 
   if (millis() - printTime >= 1000) {
     printTime = millis();
-
     Serial.println(String("acceleration: ") + accel.toString());
     Serial.println(String("gyroscope: ") + gyro.toString());
-    Serial.println(String("temperature: ") + String(temp.value(),3));
-    Serial.println(String("gas: ") + String(gas.value(),3));
-    Serial.println(String("rotation: ") + rotation.toString());
   }
 }
