@@ -4,6 +4,9 @@
 #include "Arduino.h"
 #include "mbed.h"
 
+#include "BLEHandler.h"
+
+
 #include "bosch/common/common.h"
 #include "sensors/SensorTypes.h"
 
@@ -16,8 +19,13 @@ extern "C"
 }
 #endif
 
+#if BHY2_ENABLE_BLE_BATCH
+#define SENSOR_QUEUE_SIZE   (BLE_SENSOR_EVT_BATCH_CNT_MAX + 20)
+#define WORK_BUFFER_SIZE    1024
+#else
 #define SENSOR_QUEUE_SIZE   10
 #define WORK_BUFFER_SIZE    2048
+#endif
 
 #define MAX_READ_WRITE_LEN 256
 
