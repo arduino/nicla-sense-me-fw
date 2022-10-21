@@ -5,6 +5,10 @@
 #include "ArduinoBLE.h"
 
 #include "DFUManager.h"
+#include "sensors/SensorTypes.h"
+
+#define BHY2_ENABLE_BLE_BATCH 1
+const uint8_t BLE_SENSOR_EVT_BATCH_CNT_MAX = (244 / (SENSOR_DATA_FIXED_LENGTH + 2))/10*10;
 
 class BLEHandler {
 public:
@@ -22,6 +26,11 @@ public:
 
 private:
   static Stream *_debug;
+
+#if BHY2_ENABLE_BLE_BATCH
+  static SensorDataPacket *_dataBatch;
+  static uint8_t           _idxBatch;
+#endif
 
   bool _lastDfuPack;
 
