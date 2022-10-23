@@ -25,7 +25,6 @@ Arduino_BHY2::~Arduino_BHY2()
 }
 
 void Arduino_BHY2::pingI2C() {
-  char response = 0xFF;
   int currTime = millis();
   if ((currTime - _pingTime) > 30000) {
     _pingTime = currTime;

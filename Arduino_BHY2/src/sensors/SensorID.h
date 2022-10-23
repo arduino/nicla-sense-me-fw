@@ -111,11 +111,13 @@ struct SensorStruct
 	float scaleFactor;
 };
 
+const
 static SensorStruct LongSensorList[2] = {
   {SENSOR_ID_BSEC,                BSEC,               1.0},
   {SENSOR_ID_BSEC_LEGACY,         BSEC,               1.0}
 };
 
+const
 static SensorStruct SensorList[NUM_SUPPORTEND_SENSOR] = {
   {SENSOR_ID_ACC_PASS,            VECTOR3D,           1.0},
   {SENSOR_ID_ACC_RAW,             VECTOR3D,           1.0},

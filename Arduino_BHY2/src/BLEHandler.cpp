@@ -104,7 +104,7 @@ void BLEHandler::receivedSensorConfig(BLEDevice central, BLECharacteristic chara
                       _debug->print("batch buffer allocated:");
                       _debug->println((long)_dataBatch, HEX);
                   }
-                  printf("batch buffer:0x%x\n", _dataBatch);
+                  printf("batch buffer:%p\n", _dataBatch);
               }
           }
       }
