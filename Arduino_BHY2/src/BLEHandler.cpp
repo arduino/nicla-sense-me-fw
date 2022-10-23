@@ -21,10 +21,10 @@ const uint8_t CHARACTERISTIC_SIZE_SENSOR_DATA_MAX = BLE_SENSOR_EVT_BATCH_CNT_MAX
 uint8_t BLEHandler::_idxBatch = 0;
 SensorDataPacket * BLEHandler::_dataBatch = NULL;
 BLECharacteristic sensorDataCharacteristic(sensorDataUuid, (BLERead | BLENotify), CHARACTERISTIC_SIZE_SENSOR_DATA_MAX);
-BLECharacteristic sensorLongDataCharacteristic(sensorLongDataUuid, (BLERead | BLENotify), sizeof(SensorLongDataPacket));
 #else
 BLECharacteristic sensorDataCharacteristic(sensorDataUuid, (BLERead | BLENotify), sizeof(SensorDataPacket));
 #endif
+BLECharacteristic sensorLongDataCharacteristic(sensorLongDataUuid, (BLERead | BLENotify), sizeof(SensorLongDataPacket));
 BLECharacteristic sensorConfigCharacteristic(sensorConfigUuid, BLEWrite, sizeof(SensorConfigurationPacket));
 
 Stream* BLEHandler::_debug = NULL;
