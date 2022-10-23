@@ -50,8 +50,8 @@ public:
   }
 
 private:
-  float _factor;
   DataOrientation _data;
+  float _factor;
 };
 
 #endif

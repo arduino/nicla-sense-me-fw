@@ -56,8 +56,8 @@ public:
   }
 
 private:
-  float _factor;
   float _value;
+  float _factor;
   SensorPayload _format;
 };
 

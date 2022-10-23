@@ -47,8 +47,8 @@ public:
   }
 
 private:
-  float _factor;
   DataQuaternion _data;
+  float _factor;
 };
 
 #endif
