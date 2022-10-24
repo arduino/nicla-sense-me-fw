@@ -58,9 +58,9 @@ bool get_interrupt_status(void)
     return BHY260_INT_PIN;
 }
 
-char* get_api_error(int8_t error_code)
+const char* get_api_error(int8_t error_code)
 {
-    char *ret = " ";
+    const char *ret = " ";
 
     switch (error_code)
     {
@@ -138,6 +138,7 @@ int8_t bhy2_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void 
 {
     (void)intf_ptr;
 
+    return BHY2_E_IO;//I2C is not connected, so we return an error
     //return i2c.write(0x28, reg_addr, reg_data, (uint16_t)length);
 }
 
@@ -145,6 +146,7 @@ int8_t bhy2_i2c_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length
 {
     (void)intf_ptr;
 
+    return BHY2_E_IO;//I2C is not connected, so we return an error
     //return i2c.write(0x28, reg_addr, (uint8_t*)reg_data, (uint16_t)length);
 }
 
@@ -154,9 +156,9 @@ void bhy2_delay_us(uint32_t us, void *private_data)
     wait_us(us);
 }
 
-char* get_sensor_error_text(uint8_t sensor_error)
+const char* get_sensor_error_text(uint8_t sensor_error)
 {
-    char *ret;
+    const char *ret;
 
     switch (sensor_error)
     {
@@ -397,9 +399,9 @@ char* get_sensor_error_text(uint8_t sensor_error)
     return ret;
 }
 
-char* get_sensor_name(uint8_t sensor_id)
+const char* get_sensor_name(uint8_t sensor_id)
 {
-    char *ret;
+    const char *ret;
 
     switch (sensor_id)
     {

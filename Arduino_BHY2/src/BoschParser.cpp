@@ -63,7 +63,7 @@ void BoschParser::parseMetaEvent(const struct bhy2_fifo_parse_data_info *callbac
   uint8_t byte1 = callback_info->data_ptr[1];
   uint8_t byte2 = callback_info->data_ptr[2];
   uint32_t s, ns;
-  char *event_text;
+  const char *event_text;
 
   if (callback_info->sensor_id == BHY2_SYS_ID_META_EVENT)
   {
@@ -81,6 +81,7 @@ void BoschParser::parseMetaEvent(const struct bhy2_fifo_parse_data_info *callbac
   convertTime(*callback_info->time_stamp, &s, &ns);
 
   struct parse_ref *parse_table = (struct parse_ref*)callback_ref;
+  (void)parse_table;
 
   if (_debug) {
 
@@ -197,7 +198,7 @@ void BoschParser::parseGeneric(const struct bhy2_fifo_parse_data_info *callback_
   uint32_t s, ns;
   convertTime(*callback_info->time_stamp, &s, &ns);
 
-  printf("SID: %u; T: %u.%09u; ", callback_info->sensor_id, s, ns);
+  printf("SID: %u; T: %u.%09u; ", callback_info->sensor_id, (unsigned int)s, (unsigned int)ns);
   for (uint8_t i = 0; i < (callback_info->data_size - 1); i++)
   {
       printf("%X ", callback_info->data_ptr[i]);

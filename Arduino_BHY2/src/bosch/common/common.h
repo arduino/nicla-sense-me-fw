@@ -44,10 +44,10 @@
 
 #include "bosch/bhy2.h"
 
-char *get_coines_error(int16_t rslt);
-char *get_api_error(int8_t error_code);
-char *get_sensor_error_text(uint8_t sensor_error);
-char *get_sensor_name(uint8_t sensor_id);
+const char *get_coines_error(int16_t rslt);
+const char *get_api_error(int8_t error_code);
+const char *get_sensor_error_text(uint8_t sensor_error);
+const char *get_sensor_name(uint8_t sensor_id);
 
 void setup_interfaces(bool reset_power, enum bhy2_intf intf);
 void close_interfaces(void);
