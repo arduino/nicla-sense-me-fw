@@ -1,23 +1,33 @@
-# process_nicla_bhy2_log_base64.py
+# Usage of the scripts
+## process_nicla_bhy2_log_base64.py
 This script is used to convert the log encoded in base64 to ascii
-## Usage
+### Usage
 ```
-./process_nicla_bhy2_log_base64.py [log_file_name]
+./process_nicla_bhy2_log_base64.py [log_file_name] [options]
 ```
-## Example
-./process_nicla_bhy2_log_base64.py log_nicla_bhy2.txt
+The [log_file_name] is the log captured on the host side from the USB serial port.
+[options] tells what kind of data is embedded in the base64-encoded data.
+possible options are:
+    - "accel"
+    - "gyro"
+    - "meta"
+    - "accel+meta"
+    - "gyro+meta"
+    - "accel+gyro+meta"
+### Example
+./process_nicla_bhy2_log_base64.py log_nicla_bhy2.txt "accel+gyro+meta"
 
 
-# check_for_data_loss.sh
+## check_for_data_loss.sh
 This script is used to check for any potential data loss during the transfer,
 and it reports some errors if it does find any data loss
 
-## Usage
+### Usage
 ```
 ./check_for_data_loss.sh [OPTION] [log_file_name]
 ```
 
-## Example
+### Example
 - Example 1
     ```
     ./check_for_data_loss.sh -b ./minicom.log
