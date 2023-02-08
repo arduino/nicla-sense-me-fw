@@ -27,6 +27,9 @@ extern "C"
 #define WORK_BUFFER_SIZE    2048
 #endif
 
+//the long sensors are usually of much lower rate, hence smaller demand on buffer size
+#define LONG_SENSOR_QUEUE_SIZE 5
+
 #define MAX_READ_WRITE_LEN 256
 
 enum SensorAckCode {
@@ -62,11 +65,11 @@ public:
 
 private:
   mbed::CircularBuffer<SensorDataPacket, SENSOR_QUEUE_SIZE, uint8_t> _sensorQueue;
-  mbed::CircularBuffer<SensorLongDataPacket, SENSOR_QUEUE_SIZE, uint8_t> _longSensorQueue;
+  mbed::CircularBuffer<SensorLongDataPacket, LONG_SENSOR_QUEUE_SIZE, uint8_t> _longSensorQueue;
 
   uint8_t _workBuffer[WORK_BUFFER_SIZE];
   uint8_t _acknowledgment;
-  
+
   struct bhy2_dev _bhy2;
   uint8_t _sensorsPresent[32];
 
