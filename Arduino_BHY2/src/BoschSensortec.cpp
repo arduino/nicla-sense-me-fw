@@ -131,6 +131,14 @@ void BoschSensortec::getSensorConfiguration(uint8_t id, SensorConfig& virt_senso
   bhy2_get_virt_sensor_cfg(id, &virt_sensor_conf, &_bhy2);
 }
 
+int8_t BoschSensortec::bhy2_setParameter(uint16_t param, const uint8_t *buffer, uint32_t length) {
+  return bhy2_set_parameter(param, buffer, length, &_bhy2);
+}
+
+int8_t BoschSensortec::bhy2_getParameter(uint16_t param, uint8_t *buffer, uint32_t length, uint32_t *actual_len) {
+  return bhy2_get_parameter(param, buffer, length, actual_len, &_bhy2);
+}
+
 uint8_t BoschSensortec::availableSensorData()
 {
   return _sensorQueue.size();

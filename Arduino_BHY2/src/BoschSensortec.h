@@ -89,6 +89,9 @@ public:
    * 
    */
   void printSensors();
+  int8_t bhy2_setParameter(uint16_t param, const uint8_t *buffer, uint32_t length);
+  int8_t bhy2_getParameter(uint16_t param, uint8_t *buffer, uint32_t length, uint32_t *actual_len);
+
   /**
    * @brief Check to see if sensor corresponding to SensorID is present.
    * 
