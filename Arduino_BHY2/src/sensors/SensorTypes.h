@@ -6,7 +6,10 @@
 
 #define SENSOR_DATA_FIXED_LENGTH (10)
 
-#define SENSOR_LONG_DATA_FIXED_LENGTH (18)
+#define SENSOR_LONG_DATA_FIXED_LENGTH (21)
+
+#define PARAM_SIZE_LENGTH (20)
+
 
 typedef bhy2_virt_sensor_conf SensorConfig;
 
@@ -96,6 +99,12 @@ struct __attribute__((packed)) SensorDataPacket {
     return result;
   }
 
+  int32_t getInt24(uint8_t index) {
+    int32_t result = 0;
+    result = (int32_t)(getUint24(index) << 8) >> 8;
+    return result;
+  }
+
   int32_t getInt32(uint8_t index) {
     int32_t result = 0;
     uint8_t length = sizeof(result);
@@ -165,6 +174,17 @@ struct __attribute__((packed)) SensorLongDataPacket {
     return result;
   }
 
+  uint64_t getUint64(uint8_t index) {
+    uint64_t result = 0;
+    uint8_t length = sizeof(result);
+    if (index + length > SENSOR_LONG_DATA_FIXED_LENGTH) {
+      length = SENSOR_LONG_DATA_FIXED_LENGTH > index ? SENSOR_LONG_DATA_FIXED_LENGTH - index : 0;
+    }
+    if (length > 0)
+        memcpy(&result, &data[index], length);
+    return result;
+  }
+
   int8_t getInt8(uint8_t index) {
     if (index >= SENSOR_LONG_DATA_FIXED_LENGTH) {
       return 0;
@@ -183,8 +203,25 @@ struct __attribute__((packed)) SensorLongDataPacket {
     return result;
   }
 
+  int32_t getInt24(uint8_t index) {
+    int32_t result = 0;
+    result = (int32_t)(getUint24(index) << 8) >> 8;
+    return result;
+  }
+
   int32_t getInt32(uint8_t index) {
     int32_t result = 0;
+    uint8_t length = sizeof(result);
+    if (index + length > SENSOR_LONG_DATA_FIXED_LENGTH) {
+      length = SENSOR_LONG_DATA_FIXED_LENGTH > index ? SENSOR_LONG_DATA_FIXED_LENGTH - index : 0;
+    }
+    if (length > 0)
+        memcpy(&result, &data[index], length);
+    return result;
+  }
+
+    int64_t getInt64(uint8_t index) {
+    int64_t result = 0;
     uint8_t length = sizeof(result);
     if (index + length > SENSOR_LONG_DATA_FIXED_LENGTH) {
       length = SENSOR_LONG_DATA_FIXED_LENGTH > index ? SENSOR_LONG_DATA_FIXED_LENGTH - index : 0;

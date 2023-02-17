@@ -139,6 +139,47 @@ int8_t BoschSensortec::bhy2_getParameter(uint16_t param, uint8_t *buffer, uint32
   return bhy2_get_parameter(param, buffer, length, actual_len, &_bhy2);
 }
 
+void BoschSensortec::bhy2_bsec2_setConfigString(const uint8_t * buffer, uint32_t length) {
+    const uint8_t BSEC2_CMD_ENA_WR[] = {0x01,0x00,0x00,0x00};
+    const uint8_t BSEC2_CMD_WR_CFG[] = {0x00,0x00,0x00,0x00};
+    const uint16_t BSEC2_CFG_PARAM_ID_1 = 0X0802;
+    const uint16_t BSEC2_CFG_PARAM_ID_2 = 0X0801;
+
+    const uint16_t BLOCK_SIZE = 4;
+    uint16_t wr_cnt = length / BLOCK_SIZE;
+    uint8_t remain[BLOCK_SIZE] = {0};
+    uint16_t i=0;
+
+    bhy2_setParameter(BSEC2_CFG_PARAM_ID_1, BSEC2_CMD_ENA_WR, sizeof(BSEC2_CMD_ENA_WR)/sizeof(BSEC2_CMD_ENA_WR[0]));
+
+    for (i=0; i<wr_cnt; i++){
+        bhy2_setParameter(BSEC2_CFG_PARAM_ID_2, &buffer[i*BLOCK_SIZE], BLOCK_SIZE);
+    }
+
+    if (length % BLOCK_SIZE != 0){
+        memcpy(remain, &buffer[i*BLOCK_SIZE], length % BLOCK_SIZE);
+        bhy2_setParameter(BSEC2_CFG_PARAM_ID_2, remain, BLOCK_SIZE);
+    }
+
+    bhy2_setParameter(BSEC2_CFG_PARAM_ID_1, BSEC2_CMD_WR_CFG, sizeof(BSEC2_CMD_ENA_WR)/sizeof(BSEC2_CMD_ENA_WR[0]));
+}
+
+void BoschSensortec::bhy2_bsec2_setHP(const uint8_t * hp_temp, uint8_t hp_temp_len, const uint8_t * hp_dur, uint8_t hp_dur_len) {
+    const uint16_t BSEC2_CFG_PARAM_ID_1 = 0X0803;
+    const uint16_t BSEC2_CFG_PARAM_ID_2 = 0X0804;
+
+    bhy2_setParameter(BSEC2_CFG_PARAM_ID_1, hp_temp, hp_temp_len);
+    bhy2_setParameter(BSEC2_CFG_PARAM_ID_2, hp_dur, hp_dur_len);
+}
+
+void BoschSensortec::bsecSetBoardTempOffset(float temp_offset)
+{
+    const uint16_t BSEC2_CFG_PARAM_ID_1 = 0X0805;
+    uint8_t temp_buf[4];
+    memcpy(temp_buf, (uint8_t*)&temp_offset, sizeof(temp_buf));
+    bhy2_setParameter(BSEC2_CFG_PARAM_ID_1, temp_buf, sizeof(temp_buf));
+}
+
 uint8_t BoschSensortec::availableSensorData()
 {
   return _sensorQueue.size();

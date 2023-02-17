@@ -39,6 +39,26 @@ void DataParser::parseBSEC(SensorLongDataPacket& data, DataBSEC& vector) {
   vector.comp_g = (uint32_t)(data.getFloat(14));
 }
 
+void DataParser::parseBSEC2(SensorDataPacket& data, DataBSEC2& vector) {
+  vector.gas_estimates[0] = data.getUint8(0);
+  vector.gas_estimates[1] = data.getUint8(1);
+  vector.gas_estimates[2] = data.getUint8(2);
+  vector.gas_estimates[3] = data.getUint8(3);
+  vector.accuracy = data.getUint8(4);
+}
+
+void DataParser::parseBSEC2Collector(SensorLongDataPacket& data, DataBSEC2Collector& vector) {
+  const float SCALE_BSEC_COMP_T = 1.0f / 256;
+  const float SCALE_BSEC_COMP_H = 1.0f / 500;
+
+  vector.timestamp = data.getUint64(0);
+  vector.raw_temp = data.getInt16(8) * SCALE_BSEC_COMP_T;
+  vector.raw_pressure = data.getFloat(10);
+  vector.raw_hum = data.getUint16(14) * SCALE_BSEC_COMP_H;
+  vector.raw_gas = data.getFloat(16);
+  vector.gas_index = data.getUint8(20);
+}
+
 void DataParser::parseBSECLegacy(SensorLongDataPacket& data, DataBSEC& vector) {
   vector.comp_t = data.getFloat(0);
   vector.comp_h = data.getFloat(4);
@@ -52,9 +72,9 @@ void DataParser::parseBSECLegacy(SensorLongDataPacket& data, DataBSEC& vector) {
   vector.accuracy = data.getUint8(28);
 }
 
-
 void DataParser::parseData(SensorDataPacket& data, float& value, float scaleFactor, SensorPayload format) {
   uint8_t id = data.sensorId;
+  (void)id;
   switch (format) {
     case P8BITSIGNED:
       value = data.getInt8(0) * scaleFactor;
