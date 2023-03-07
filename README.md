@@ -9,7 +9,6 @@ Nicla Sense ME belongs to Arduino Mbed OS boards and its core is available [here
 The packaged core can also be downloaded from Arduino IDE as 'Arduino Mbed OS Nicla Boards'
 
 Table of Contents:
-- [Nicla](#nicla)
   - [Repo structure](#repo-structure)
   - [Main use cases](#main-use-cases)
     - [Nicla standalone mode](#nicla-standalone-mode)
