@@ -13,6 +13,7 @@ SensorXYZ gyro(SENSOR_ID_GYRO);
 Sensor temp(SENSOR_ID_TEMP);
 Sensor gas(SENSOR_ID_GAS);
 SensorQuaternion rotation(SENSOR_ID_RV);
+SensorBSEC bsec(SENSOR_ID_BSEC);
 
 void setup()
 {
@@ -25,6 +26,7 @@ void setup()
   gyro.begin();
   temp.begin();
   gas.begin();
+  bsec.begin();
   rotation.begin();
 }
 
@@ -42,6 +44,8 @@ void loop()
     Serial.println(String("gyroscope: ") + gyro.toString());
     Serial.println(String("temperature: ") + String(temp.value(),3));
     Serial.println(String("gas: ") + String(gas.value(),3));
+    Serial.println(String("co2: ") + String(bsec.co2_eq(),3));
+    Serial.println(String("iaq: ") + String(bsec.iaq(),3));
     Serial.println(String("rotation: ") + rotation.toString());
   }
 }
