@@ -353,6 +353,20 @@
     "dashboard": 1
   },
 
+  "116": {
+      "name": "BSEC2 Data Collector Output",
+      "scheme": "BSEC2DataCollectorOutput",
+      "value": 0,
+      "dashboard": 1
+  },
+
+  "117": {
+      "name": "BSEC2 Gas Classifier Output",
+      "scheme": "BSEC2GasClassifierOutput",
+      "value": 0,
+      "dashboard": 1
+  },
+
   "128": {
     "name": "TEMPERATURE",
     "scheme": "singleRead",
