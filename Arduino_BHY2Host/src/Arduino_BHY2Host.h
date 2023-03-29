@@ -20,11 +20,19 @@
 #include "BLEHandler.h"
 #endif
 
+
+/** 
+ *  @brief Enumeration for defining the I2C or BLE configuration.
+ * 
+ *  @details
+ *  For NICLA_AS_SHIELD configuration, see https://docs.arduino.cc/tutorials/nicla-sense-me/use-as-mkr-shield
+ */
 enum NiclaWiring {
   NICLA_VIA_ESLOV = 0,
   NICLA_AS_SHIELD,
   NICLA_VIA_BLE
 };
+
 
 class Arduino_BHY2Host {
 public:
