@@ -15,11 +15,23 @@
 
 #include "sensors/SensorID.h"
 
+/** 
+ *  @brief Enumeration for defining wiring configuration over ESLOV or Shield.
+ * 
+ *  For NICLA_AS_SHIELD configuration, see https://docs.arduino.cc/tutorials/nicla-sense-me/use-as-mkr-shield
+ *  
+ */
 enum NiclaWiring {
   NICLA_VIA_ESLOV = 0x10,
   NICLA_AS_SHIELD = 0x20
 };
 
+/** 
+ *  @brief Enumeration for defining I2C or BLE communication configuration.
+ * 
+ *  
+ *  @see Arduino_BHY2::begin()
+ */
 enum NiclaConfig {
   NICLA_I2C = 0x1,
   NICLA_BLE = 0x2,
@@ -46,7 +58,13 @@ public:
   virtual ~Arduino_BHY2();
 
   // Necessary API. Update function should be continuously polled 
+  /**
+   * @param config Configuration for set @ref NiclaConfig state
+   * @param niclaConnection Configuration for set @ref NiclaWiring state
+   * 
+  */
   bool begin(NiclaConfig config = NICLA_BLE_AND_I2C, NiclaWiring niclaConnection = NICLA_VIA_ESLOV);
+  
   bool begin(NiclaSettings& settings);
   void update(); // remove this to enforce a sleep
   void update(unsigned long ms); // Update and then sleep
