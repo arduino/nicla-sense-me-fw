@@ -154,7 +154,7 @@ public:
    */
   bool hasSensor(uint8_t sensorId);
   /**
-   * @brief Parse XYZ cartesian data
+   * @brief Parse XYZ Cartesian data
    * 
    * @param data Data packet including SensorID
    * @param vector vector with XYZ
