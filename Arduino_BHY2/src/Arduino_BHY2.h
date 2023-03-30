@@ -1,3 +1,4 @@
+#ifndef ARDUINO_BHY2_H_
 #define ARDUINO_BHY2_H_
 
 #include "Arduino.h"
