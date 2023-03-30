@@ -146,7 +146,7 @@ public:
    */
   bool readLongSensorData(SensorLongDataPacket &data);
   /**
-   * @brief Check existance of sensor
+   * @brief Check existence of sensor
    * 
    * @param sensorId Selected virtual sensor
    * @return true - Sensor is present
