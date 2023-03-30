@@ -27,7 +27,7 @@ public:
    */
   bool begin();
   /**
-   * @brief Poll data over bluetooth and read data to FIFO buffer.
+   * @brief Poll data over Bluetooth and read data to FIFO buffer.
    * 
    */
   void update();
