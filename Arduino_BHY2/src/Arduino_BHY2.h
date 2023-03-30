@@ -118,13 +118,13 @@ public:
    */
   void addLongSensorData(SensorLongDataPacket &sensorData);
   /**
-   * @brief Return availible sensor data
+   * @brief Return available sensor data
    * 
    * @return uint8_t 
    */
   uint8_t availableSensorData();
   /**
-   * @brief Return availible long sensor data
+   * @brief Return available long sensor data
    * 
    * @return uint8_t 
    */
