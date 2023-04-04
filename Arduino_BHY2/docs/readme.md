@@ -13,12 +13,25 @@ The Bosch BHY2 Sensor Library provides an interface with the [Bosch BHY2-Sensor-
 
 The ArduinoBLE library needs to be installed, for the BLE features to function.
 
-For additional information on the Arduino_BHY2 library and how you can use it with the Nicla Sense ME, see the [Arduino Nicla Sense ME Cheat Sheet](https://docs.arduino.cc/tutorials/nicla-sense-me/cheat-sheet) page.
-
-To use this library
+To use this library, use this code at the top of your sketch
 ```
 #include <Arduino_BHY2.h>
 ```
+
+> **Note**
+> If no wired connection is used, we can set the state of `NiclaWiring` to `false`. Also, a modified delay using the millis() function similar to the [BlinkWithoutDelay.ino](https://docs.arduino.cc/built-in-examples/digital/BlinkWithoutDelay) sketch is used.
+
+Methods interacting with the sensor, such as `configureSensor()` and `readSensorData()`, calls methods defined by the `sensortec` class which are defined in `BoschSensortec.h`. The `sensortec` class itself calls methods developed by the [Bosch BHY2-Sensor-API](https://github.com/boschsensortec/BHY2-Sensor-API) library and mirrored in the `bosch` folder. Motion data is parsed from the `DataParser` class (defined in `sensors/DataParser.h`). The `debug()` method checks the state of `NiclaConfig` and then calls the related method to start `.debug(stream)` using `eslovHandler` or `BLEHandler` class, together with `sensortec`, `dfuManager` and `BoschParser`.
+
+IMU sensor objects are defined as objects of `SensorXYZ`. IMU readings in quaternion format are defined in `SensorQuaternion.h`. Activity recognition (obtained from the on-chip AI processor) in `SensorActivity.h`. Pressure, temperature and gas values are defined in `Sensor.h`. The relevant IDs are defined in `SensorID.h`. 
+
+A UML diagram of the main library classes are provided in the diagram below, provided as an editable SVG file.
+
+![Arduino_BHY2 Library UML Diagram](./Arduino_BHY2.UML.drawio.svg)
+
+For additional information on the Arduino_BHY2 library (including a list of Sensor IDs) and how you can use it with the Nicla Sense ME, see the [Arduino Nicla Sense ME Cheat Sheet](https://docs.arduino.cc/tutorials/nicla-sense-me/cheat-sheet) page.
+
+
 
 ## Examples
 
