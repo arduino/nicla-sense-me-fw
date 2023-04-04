@@ -20,40 +20,39 @@ void BoschParser::convertTime(uint64_t time_ticks, uint32_t *s, uint32_t *ns)
 
 void BoschParser::parseData(const struct bhy2_fifo_parse_data_info *fifoData, void *arg)
 {
-  SensorLongDataPacket sensorData;
-  sensorData.sensorId = fifoData->sensor_id;
-  sensorData.size = (fifoData->data_size > sizeof(sensorData.data)) ? sizeof(sensorData.data) : fifoData->data_size;
-  memcpy(&sensorData.data, fifoData->data_ptr, sensorData.size);
+  int8_t sz;
+
+  sz = fifoData->data_size - 1;
+  if (sz <= SENSOR_DATA_FIXED_LENGTH) {
+      SensorDataPacket sensorData;
+      sensorData.sensorId = fifoData->sensor_id;
+      sensorData.size = sz + 1;
+      if (sz > 0)
+          memcpy(&sensorData.data, fifoData->data_ptr, sz);
+
+      sensortec.addSensorData(sensorData);
+  } else {
+      SensorLongDataPacket sensorDataLong;
+      sensorDataLong.sensorId = fifoData->sensor_id;
+      sz = (sz <= SENSOR_LONG_DATA_FIXED_LENGTH) ? sz : SENSOR_LONG_DATA_FIXED_LENGTH;
+      sensorDataLong.size = sz + 1;
+
+      memcpy(&sensorDataLong.data, fifoData->data_ptr, sz);
+      sensortec.addLongSensorData(sensorDataLong);
+  }
 
   if (_debug) {
     _debug->print("Sensor: ");
-    _debug->print(sensorData.sensorId);
+    _debug->print(fifoData->sensor_id);
     _debug->print(" size: ");
-    _debug->print(sensorData.size);
+    _debug->print(fifoData->data_size);
     _debug->print("  value: ");
-    for (uint8_t i = 0; i < (sensorData.size - 1); i++)
+    for (uint8_t i = 0; i < (fifoData->data_size - 1); i++)
     {
-        _debug->print(sensorData.data[i], HEX);
+        _debug->print(fifoData->data_ptr[i], HEX);
         _debug->print(" ");
     }
     _debug->print("  ");
-  }
-
-  bool longSensor = false;
-
-  for (int i = 0; i < NUM_LONG_SENSOR; i++) {
-    if (LongSensorList[i].id == sensorData.sensorId) {
-      longSensor = true;
-      break;
-    }
-  }
-
-  if (longSensor) {
-    sensortec.addLongSensorData(sensorData);
-  } else {
-    SensorDataPacket shortData;
-    memcpy(&shortData, &sensorData, sizeof(SensorDataPacket));
-    sensortec.addSensorData(shortData);
   }
 }
 
@@ -89,30 +88,30 @@ void BoschParser::parseMetaEvent(const struct bhy2_fifo_parse_data_info *callbac
     {
       case BHY2_META_EVENT_FLUSH_COMPLETE:
         //printf("%s; T: %u.%09u; Flush complete for sensor id %u\r\n", event_text, s, ns, byte1);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->print(" Flush complete for sensor id ");
         _debug->println(byte1);
         break;
       case BHY2_META_EVENT_SAMPLE_RATE_CHANGED:
         //printf("%s; T: %u.%09u; Sample rate changed for sensor id %u\r\n", event_text, s, ns, byte1);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->print(" Sample rate changed for sensor id ");
         _debug->println(byte1);
         break;
       case BHY2_META_EVENT_POWER_MODE_CHANGED:
         //printf("%s; T: %u.%09u; Power mode changed for sensor id %u\r\n", event_text, s, ns, byte1);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->print(" Power mode changed for sensor id ");
         _debug->println(byte1);
         break;
       case BHY2_META_EVENT_ALGORITHM_EVENTS:
         //printf("%s; T: %u.%09u; Algorithm event\r\n", event_text, s, ns);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->println(" Algorithm event");
         break;
       case BHY2_META_EVENT_SENSOR_STATUS:
         //printf("%s; T: %u.%09u; Accuracy for sensor id %u changed to %u\r\n", event_text, s, ns, byte1, byte2);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->print(" Accuracy for sensor id ");
         _debug->print(byte1);
         _debug->print(" changed to ");
@@ -120,22 +119,22 @@ void BoschParser::parseMetaEvent(const struct bhy2_fifo_parse_data_info *callbac
         break;
       case BHY2_META_EVENT_BSX_DO_STEPS_MAIN:
         //printf("%s; T: %u.%09u; BSX event (do steps main)\r\n", event_text, s, ns);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->println(" Algorithm event");
         break;
       case BHY2_META_EVENT_BSX_DO_STEPS_CALIB:
         //printf("%s; T: %u.%09u; BSX event (do steps calib)\r\n", event_text, s, ns);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->println(" BSX event (do steps calib)");
         break;
       case BHY2_META_EVENT_BSX_GET_OUTPUT_SIGNAL:
         //printf("%s; T: %u.%09u; BSX event (get output signal)\r\n", event_text, s, ns);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->println(" BSX event (get output signal)");
         break;
       case BHY2_META_EVENT_SENSOR_ERROR:
         //printf("%s; T: %u.%09u; Sensor id %u reported error 0x%02X\r\n", event_text, s, ns, byte1, byte2);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->print(" Sensor id ");
         _debug->print(byte1);
         _debug->print(" reported error 0x ");
@@ -143,51 +142,51 @@ void BoschParser::parseMetaEvent(const struct bhy2_fifo_parse_data_info *callbac
         break;
       case BHY2_META_EVENT_FIFO_OVERFLOW:
         //printf("%s; T: %u.%09u; FIFO overflow\r\n", event_text, s, ns);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->println(" FIFO overflow");
         break;
       case BHY2_META_EVENT_DYNAMIC_RANGE_CHANGED:
         //printf("%s; T: %u.%09u; Dynamic range changed for sensor id %u\r\n", event_text, s, ns, byte1);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->print(" Dynamic range changed for sensor id ");
         _debug->println(byte1);
         break;
       case BHY2_META_EVENT_FIFO_WATERMARK:
         //printf("%s; T: %u.%09u; FIFO watermark reached\r\n", event_text, s, ns);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->println(" FIFO watermark reached");
         break;
       case BHY2_META_EVENT_INITIALIZED:
         //printf("%s; T: %u.%09u; Firmware initialized. Firmware version %u\r\n", event_text, s, ns,
               //((uint16_t )byte2 << 8) | byte1);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->print(" Firmware initialized. Firmware version ");
         _debug->println(((uint16_t )byte2 << 8) | byte1);
         break;
       case BHY2_META_TRANSFER_CAUSE:
         //printf("%s; T: %u.%09u; Transfer cause for sensor id %u\r\n", event_text, s, ns, byte1);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->print(" Transfer cause for sensor id ");
         _debug->println(byte1);
         break;
       case BHY2_META_EVENT_SENSOR_FRAMEWORK:
         //printf("%s; T: %u.%09u; Sensor framework event for sensor id %u\r\n", event_text, s, ns, byte1);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->print(" Sensor framework event for sensor id ");
         _debug->println(byte1);
         break;
       case BHY2_META_EVENT_RESET:
         //printf("%s; T: %u.%09u; Reset event\r\n", event_text, s, ns);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->println(" Reset event");
         break;
       case BHY2_META_EVENT_SPACER:
         break;
       default:
         //printf("%s; T: %u.%09u; Unknown meta event with id: %u\r\n", event_text, s, ns, meta_event_type);
-        _debug->print(event_text); 
+        _debug->print(event_text);
         _debug->print(" Unknown meta event with id: ");
-        _debug->println(meta_event_type); 
+        _debug->println(meta_event_type);
         break;
     }
   }

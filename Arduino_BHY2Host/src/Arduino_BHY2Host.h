@@ -20,11 +20,14 @@
 #include "BLEHandler.h"
 #endif
 
+
+
 enum NiclaWiring {
   NICLA_VIA_ESLOV = 0,
   NICLA_AS_SHIELD,
   NICLA_VIA_BLE
 };
+
 
 class Arduino_BHY2Host {
 public:

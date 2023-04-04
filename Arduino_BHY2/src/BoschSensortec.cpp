@@ -2,13 +2,13 @@
 #include "BoschParser.h"
 #include "sensors/SensorManager.h"
 
-BoschSensortec::BoschSensortec() : 
+BoschSensortec::BoschSensortec() :
   _acknowledgment(SensorNack),
   _debug(NULL)
 {
 }
 
-BoschSensortec::~BoschSensortec() 
+BoschSensortec::~BoschSensortec()
 {
 }
 
@@ -17,11 +17,11 @@ bool BoschSensortec::begin()
   setup_interfaces(false, BHY2_SPI_INTERFACE);
   auto ret = bhy2_init(BHY2_SPI_INTERFACE, bhy2_spi_read, bhy2_spi_write, bhy2_delay_us, MAX_READ_WRITE_LEN, NULL, &_bhy2);
   if (_debug) _debug->println(get_api_error(ret));
-  if (ret != BHY2_OK) return false; 
+  if (ret != BHY2_OK) return false;
 
   bhy2_soft_reset(&_bhy2);
 
-  // Print bhi status 
+  // Print bhi status
   uint8_t stat = 0;
   //delay(1000);
   ret = bhy2_get_boot_status(&stat, &_bhy2);
@@ -33,7 +33,7 @@ bool BoschSensortec::begin()
 
   ret = bhy2_boot_from_flash(&_bhy2);
   if (_debug) _debug->println(get_api_error(ret));
-  if (ret != BHY2_OK) return false; 
+  if (ret != BHY2_OK) return false;
 
   ret = bhy2_get_boot_status(&stat, &_bhy2);
   if (_debug) {
@@ -89,7 +89,7 @@ void BoschSensortec::printSensors() {
 
   if (_debug) {
     _debug->println("Present sensors: ");
-    for (int i = 0; i < sizeof(presentBuff); i++) {
+    for (int i = 0; i < (int)sizeof(presentBuff); i++) {
       if (presentBuff[i]) {
         _debug->print(i);
         _debug->print(" - ");
@@ -153,19 +153,17 @@ bool BoschSensortec::readLongSensorData(SensorLongDataPacket &data)
 
 void BoschSensortec::addSensorData(SensorDataPacket &sensorData)
 {
-  // Overwrites oldest data when fifo is full 
+  // Overwrites oldest data when fifo is full
   _sensorQueue.push(sensorData);
-  // Alternative: handle the full queue by storing it in flash 
-  SensorLongDataPacket longData;
-  memcpy(&longData, &sensorData, sizeof(SensorDataPacket));
-  sensorManager.process(longData);
+  // Alternative: handle the full queue by storing it in flash
+  sensorManager.process(sensorData);
 }
 
 void BoschSensortec::addLongSensorData(SensorLongDataPacket &sensorData)
 {
-  // Overwrites oldest data when fifo is full 
+  // Overwrites oldest data when fifo is full
   _longSensorQueue.push(sensorData);
-  // Alternative: handle the full queue by storing it in flash 
+  // Alternative: handle the full queue by storing it in flash
   sensorManager.process(sensorData);
 }
 
