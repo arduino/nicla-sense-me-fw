@@ -12,6 +12,9 @@
 # The main thread will always wait for user input while a second one is created
 # to exchange both control and data with the Arduino board.
 # The two threads coordinate via a simple Queue.
+#
+# Install the required module using this command in Windows
+# pip -m install pyreadline3 pyserial cobs
 
 # Thread and Queue
 from threading import Thread
@@ -22,7 +25,8 @@ from datetime import date, datetime
 import struct
 
 # User input
-import readline
+from pyreadline3 import Readline # import readline
+readline = Readline()
 import argparse
 
 # Communication with the Arduino board
