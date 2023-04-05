@@ -3,7 +3,6 @@
    - sample rate and latency – from sensors.
 */
 
-#include "Arduino.h"
 #include "Arduino_BHY2.h"
 
 SensorXYZ accel(SENSOR_ID_ACC);
