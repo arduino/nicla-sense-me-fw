@@ -1,13 +1,13 @@
 # Bosch BHY2 Host Sensor Library for Arduino
 
-This library provides capabilities for the Portenta and MKR boards to interact with the Nicla Sense ME and poll the BHI260AP and and BME688 sensors. This library is included on sketches from the host board (not the Nicla Sense ME board).
+This library provides capabilities for the Portenta and MKR boards to interact with the Nicla Sense ME and poll the BHI260AP and BME688 sensors. This library is included on sketches from the host board (not the Nicla Sense ME board).
 
 ## Features
 
 - Easy access to data from Nicla Sense ME sensors from the Portenta and MKR boards
 - Wrapper for [Bosch BHY2-Sensor-API](https://github.com/BoschSensortec/BHY2-Sensor-API)
 - Bridge for data to the Arduino IoT Cloud
-- All functionality avaliable over both I2C/ESLOV and BLE
+- All functionality available over both I2C/ESLOV and BLE
 
 ## Usage
 
