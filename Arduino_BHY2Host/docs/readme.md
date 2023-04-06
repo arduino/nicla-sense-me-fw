@@ -18,7 +18,7 @@ To use this library, use this code at the top of your sketch
 #include <Arduino_BHY2host.h>
 ```
 
-A UML diagram of the main library classes are provided in the diagram below, provided as an editable SVG file.
+A UML diagram of the main library classes is provided in the diagram below, provided as an editable SVG file.
 
 ![Arduino_BHY2 Library UML Diagram](./Arduino_BHY2Host.UML.drawio.svg)
 
