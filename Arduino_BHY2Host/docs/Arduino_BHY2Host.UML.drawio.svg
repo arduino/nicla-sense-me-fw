@@ -234,7 +234,7 @@
                     <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe flex-start; width: 930px; height: 1px; padding-top: 908px; margin-left: 6px;">
                         <div data-drawio-colors="color: #000000; " style="box-sizing: border-box; font-size: 0px; text-align: left; max-height: 361px; overflow: hidden;">
                             <div style="display: inline-block; font-size: 18px; font-family: &quot;Roboto Mono&quot;; color: rgb(0, 0, 0); line-height: 1.2; pointer-events: none; white-space: nowrap;">
-                                + begin(bassthrough:bool, niclaConnection: NiclaWiring): bool
+                                + begin(passthrough:bool, niclaConnection: NiclaWiring): bool
                                 <br style="font-size: 18px;"/>
                                 + update()
                                 <br style="font-size: 18px;"/>
@@ -270,7 +270,7 @@
                     </div>
                 </foreignObject>
                 <text x="6" y="913" fill="#000000" font-family="Roboto Mono" font-size="18px">
-                    + begin(bassthrough:bool, niclaConnection: NiclaWiring): bool...
+                    + begin(passthrough:bool, niclaConnection: NiclaWiring): bool...
                 </text>
             </switch>
         </g>
