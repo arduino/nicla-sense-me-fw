@@ -11,7 +11,6 @@
  *
 */
 
-#include "Arduino.h"
 #include "Arduino_BHY2.h"
 
 // Set DEBUG to true in order to enable debug print
