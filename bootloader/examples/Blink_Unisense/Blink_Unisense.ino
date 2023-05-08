@@ -48,21 +48,31 @@ void setup() {
 }
 
 void loop() {
-  ledBlink(green, 1000);    //blue
+  //cycle through LED colour configurations
+  ledBlink(green, 1000);    
   delay(1000);
-  ledBlink(blue, 1000);     //green
+  ledBlink(blue, 1000);     
   delay(1000);
   ledBlink(red, 1000);
   delay(1000);
   ledBlink(cyan, 1000);
   delay(1000);
-  ledBlink(magenta, 1000);    //yellow
+  ledBlink(magenta, 1000);    
   delay(1000);
-  ledBlink(yellow, 1000);     //magenta
+  ledBlink(yellow, 1000);     
   delay(1000);
 }
 
+/**
+ * Blink a given color for a set duration in milliseconds. 
+*/
 void ledBlink(uint8_t color, uint32_t duration)
+/**
+ * Intensity is defined in 256 levels according to table 7 of the IS31FL3194 datasheet:
+ * 0x00 -> 0
+ * 0x20 -> I_max * (2^7) / 256 = I_max  * 1/2
+ * 0xFF -> I_max * (2^7 + 2^6 + 2^5 + 2^4 + 2^3 + 2^2 + 2^1 + 2^0) / 255 ~= I_max
+*/
 {
   if(color == green) {
   _out1 = 0x00;
