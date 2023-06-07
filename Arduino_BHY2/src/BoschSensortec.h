@@ -55,7 +55,6 @@ public:
    * @brief Setup SPI interface
    * 
    * @return true successful initialisation of SPI interface 
-   * @return false error setting up SPI interface
    */
   bool begin();
   /**

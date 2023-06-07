@@ -32,14 +32,14 @@ enum NiclaWiring {
  *  @see Arduino_BHY2::begin()
  */
 enum NiclaConfig {
-  NICLA_I2C = 0x1,                          /*!< I2C */
+  NICLA_I2C = 0x1,                          /*!< I2C and ESLOV */
   NICLA_BLE = 0x2,                          /*!< Bluetooth via ANNA-B112 module */
   NICLA_BLE_AND_I2C = NICLA_I2C | NICLA_BLE, /*!< Enable I2C and BLE simultaneously */
   NICLA_STANDALONE = 0x4                    /*!< Operate in standalone, without external data transfer */
 };
 
 /**
- * @brief Class for storing Nicla state
+ * @brief Class for storing Nicla configuration state
  * 
  */
 class NiclaSettings {
@@ -90,7 +90,7 @@ public:
 
   // API for using the bosch sensortec from sketch
   /**
-   * @brief Poll Bosch method 
+   * @brief Poll Bosch method for configuring sensor
    * 
    * @param config Sensor configuration
    */
@@ -102,17 +102,17 @@ public:
    * @param sampleRate Polling rate for sensor
    * @param latency   Latency in milliseconds
    * 
-   * @note For list of SensorID, see src/SensorID.h
+   * @note For list of SensorID, see src/SensorID.h. Alternatively, see Table  79 in the BHI260 datasheet https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bhi260ab-ds000.pdf
    */
   void configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency);
   /**
-   * @brief Handlo FIFO of data queue
+   * @brief Handle FIFO of data queue
    * 
    * @param sensorData Data packet from sensor
    */
   void addSensorData(SensorDataPacket &sensorData);
   /**
-   * @brief Handlo FIFO of data queue for long sensor data
+   * @brief Handle FIFO of data queue for long sensor data
    * 
    * @param sensorData Data packet from sensor
    */

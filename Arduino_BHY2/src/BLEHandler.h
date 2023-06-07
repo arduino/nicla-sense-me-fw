@@ -23,7 +23,6 @@ public:
    * @brief Set advertised local name and initialise BLE advertising for DFU and sensor data transfer
    * 
    * @return true   Successful initialisation of BLE device
-   * @return false  Failure in initialisation of BLE device
    */
   bool begin();
   /**
@@ -66,14 +65,14 @@ private:
   void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic);
 
   /**
-   * @brief Method for recieving BLE packet to ANNA-B112 module
+   * @brief Method for receiving and forwarding BLE packet to ANNA-B112 module
    * 
    * @param central         Instance of BLEDevice
    * @param characteristic  Selected BLE characteristic
    */
   static void receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic);
   /**
-   * @brief Method for recieving BLE packet to BHI260AP sensor
+   * @brief Method for receiving and forwarding BLE packet to BHI260AP sensor
    * 
    * @param central         Instance of BLEDevice
    * @param characteristic  Selected BLE characteristic

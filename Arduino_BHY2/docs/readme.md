@@ -37,12 +37,12 @@ For additional information on the Arduino_BHY2 library (including a list of Sens
 
 - [App](https://github.com/arduino-libraries/Arduino_BHY2/blob/main/examples/App/App.ino) : Control Nicla Sense ME from an external device acting as a host via I2C or ESLOV
 - [AppLowDelay](https://github.com/arduino-libraries/Arduino_BHY2/blob/main/examples/AppLowDelay/AppLowDelay.ino) : Control Nicla Sense ME from an external device acting as a host via I2C or ESLOV with a lower delay
-- [BHYFirmwareUpdate](https://github.com/arduino-libraries/Arduino_BHY2/tree/main/examples/BHYFirmwareUpdate) : Update ANNA-B112 and BHI260 firmware
-- [Fail_Safe_flasher](https://github.com/arduino-libraries/Arduino_BHY2/blob/main/examples/Fail_Safe_flasher/Fail_Safe_flasher.ino) : Fail Safe flashing of a RGB blink sketch
-- [ReadSensorConfiguration](https://github.com/arduino-libraries/Arduino_BHY2/blob/main/examples/ReadSensorConfiguration/ReadSensorConfiguration.ino) : Read motion, temperature and gas data and send over Serial
+- [BHYFirmwareUpdate](https://github.com/arduino-libraries/Arduino_BHY2/tree/main/examples/BHYFirmwareUpdate) : Update ANNA-B112 and BHI260 firmware to latest version
+- [Fail_Safe_flasher](https://github.com/arduino-libraries/Arduino_BHY2/blob/main/examples/Fail_Safe_flasher/Fail_Safe_flasher.ino) : Fail Safe flashing of a RGB blink sketch, via uploading a custom binary
+- [ReadSensorConfiguration](https://github.com/arduino-libraries/Arduino_BHY2/blob/main/examples/ReadSensorConfiguration/ReadSensorConfiguration.ino) : Read motion, temperature and gas configuration and send over Serial
 - [ShowSensorList](https://github.com/arduino-libraries/Arduino_BHY2/blob/main/examples/ShowSensorList/ShowSensorList.ino) : List sensors of the Nicla Sense ME board
 - [Standalone](https://github.com/arduino-libraries/Arduino_BHY2/blob/main/examples/Standalone/Standalone.ino) : Read motion, temperature and gas data and send over Serial
-- [StandaloneFlashStorage](https://github.com/arduino-libraries/Arduino_BHY2/blob/main/examples/StandaloneFlashStorage/StandaloneFlashStorage.ino) : Read motion, temperature and gas data and send over and save on Flash storage  
+- [StandaloneFlashStorage](https://github.com/arduino-libraries/Arduino_BHY2/blob/main/examples/StandaloneFlashStorage/StandaloneFlashStorage.ino) : Read motion, temperature and gas data. Simultaneously send over serial and save on Flash storage  
 
 ## License
 
