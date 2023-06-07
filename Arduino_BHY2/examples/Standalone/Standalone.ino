@@ -44,8 +44,8 @@ void loop()
     Serial.println(String("gyroscope: ") + gyro.toString());
     Serial.println(String("temperature: ") + String(temp.value(),3));
     Serial.println(String("gas: ") + String(gas.value(),3));
-    Serial.println(String("co2: ") + String(bsec.co2_eq(),3));
-    Serial.println(String("iaq: ") + String(bsec.iaq(),3));
+    Serial.println(String("co2: ") + String(bsec.co2_eq()));
+    Serial.println(String("iaq: ") + String(bsec.iaq()));
     Serial.println(String("rotation: ") + rotation.toString());
   }
 }
