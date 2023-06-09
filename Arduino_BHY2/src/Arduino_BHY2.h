@@ -16,30 +16,36 @@
 #include "sensors/SensorID.h"
 
 /** 
- *  @brief Enumeration for defining wiring configuration over ESLOV or Shield.
+ *  @brief Enumeration for defining wiring configuration between host board and Nicla client. We can select between an I2C connection over ESLOV (NICLA_VIA_ESLOV) or as a Shield for the MKR boards (NICAL_AS_SHIELD). 
  * 
  *  For NICLA_AS_SHIELD configuration, see https://docs.arduino.cc/tutorials/nicla-sense-me/use-as-mkr-shield
  *  
  */
 enum NiclaWiring {
-  NICLA_VIA_ESLOV = 0x10,
-  NICLA_AS_SHIELD = 0x20
+  NICLA_VIA_ESLOV = 0x10,                 /*!< Host connects to Nicla board via ESLOV */
+  NICLA_AS_SHIELD = 0x20                  /*!< Host connects to Nicla board as a Shield */
 };
 
 /** 
- *  @brief Enumeration for defining I2C or BLE communication configuration.
+ *  @brief Enumeration for defining I2C (wired) or BLE communication configuration between host board and Nicla client. Alternatively, the Nicla Sense ME can also run in a standalone configuration.  
  * 
- *  @see Arduino_BHY2::begin()
+ *  @note Both ESLOV and Shield should be considered as implementations of I2C communication (NICLA_I2C)
+ * 
  */
 enum NiclaConfig {
-  NICLA_I2C = 0x1,                          /*!< I2C and ESLOV */
-  NICLA_BLE = 0x2,                          /*!< Bluetooth via ANNA-B112 module */
-  NICLA_BLE_AND_I2C = NICLA_I2C | NICLA_BLE, /*!< Enable I2C and BLE simultaneously */
+  NICLA_I2C = 0x1,                          /*!< I2C Configuration, relavent for both ESLOV and Shield configurations  */
+  NICLA_BLE = 0x2,                          /*!< Bluetooth via the onboard ANNA-B112 module */
+  NICLA_BLE_AND_I2C = NICLA_I2C | NICLA_BLE,/*!< Enable I2C (ESLOV/Shield) and BLE simultaneously */
   NICLA_STANDALONE = 0x4                    /*!< Operate in standalone, without external data transfer */
 };
 
 /**
- * @brief Class for storing Nicla configuration state
+ * @brief Class for configuring the host-client communication, based on the @ref NiclaConfig enumeration.
+ * 
+ * Example:
+ * @code
+ * NiclaSettings niclaSettings(NICLA_I2C);
+ * @endcode
  * 
  */
 class NiclaSettings {
@@ -56,7 +62,8 @@ private:
 };
 
 /**
- * @brief Main class for initialising communication with sensors
+ * @brief Class to interface with the Bosch BHI260 sensor hub on the Nicla Sense ME.
+ * Provides functionality for reading/configuring sensors based on sensor ID and accessing debug features. 
 */
 class Arduino_BHY2 {
 public:
@@ -65,45 +72,64 @@ public:
 
   // Necessary API. Update function should be continuously polled 
   /**
-   * @param config Configuration for set @ref NiclaConfig state
-   * @param niclaConnection Configuration for set @ref NiclaWiring state
+   * @brief Initialise the BHY2 functionality for the Nicla Sense ME, for a given @ref NiclaSettings configuration.
    * 
-  */
+   * @note When called without input parameters, I2C and BLE are enabled by default. I2C communication is over ESLOV.
+   * 
+   * @param NiclaConfig Define communication configuration (NICLA_I2C, NICLA_BLE, NICLA_BLE_AND_I2C or NICLA_STANDALONE). @see NiclaConfig
+   * @param NiclaWiring Defining I2C configuration (NICLA_VIA_ESLOV or NICLA_AS_SHIELD). @see NiclaWiring 
+   * 
+   * Configuring for operation as a Shield:
+   * @code 
+   * BHY2.begin(NICLA_I2C, NICLA_AS_SHIELD);
+   * @endcode
+   */
   bool begin(NiclaConfig config = NICLA_BLE_AND_I2C, NiclaWiring niclaConnection = NICLA_VIA_ESLOV);
   bool begin(NiclaSettings& settings);
   /**
-   *  @brief  Pings sensor
+   *  @brief Update sensor data by reading the FIFO buffer on the BHI260 and then pass it to a suitable parser. 
    * 
-   *  @note Sensor must be continuously polled to prevent sleep
+   *  @param ms (optional) Time (in milliseconds) to wait before returning data. 
    */
   void update(); // remove this to enforce a sleep
-  /**
-   *  @brief  Pings sensor and then sleep
-   * 
-   *  @note Delay does not stall microcontroller to sleep. See https://docs.arduino.cc/built-in-examples/digital/BlinkWithoutDelay
-   */
   void update(unsigned long ms); // Update and then sleep
   /**
-  *   @brief delay method to be used instead of Arduino delay().
+  *   @brief Delay method to be used instead of Arduino delay().
+  * 
+  *   @note Unlike the standard Arduino delay, this modified delay method uses a function to check if the elapsed time has passed.
+  * This does not stall the microprocessor. 
+  * 
+  *   @param ms Time (in milliseconds) to enforce delay.
+  * 
+  *   @code 
+  *   BHY2.delay(100);
+  *   @endcode
   */
   void delay(unsigned long ms); // to be used instead of arduino delay()
 
   // API for using the bosch sensortec from sketch
   /**
-   * @brief Poll Bosch method for configuring sensor
+   * @brief Configure a virtual sensor on the BHI260 to have a set sample rate (Hz) and latency (milliseconds)
+   * This can be achieved 
    * 
-   * @param config Sensor configuration
+   * @param config Instance of @see SensorConfigurationPacket class, with sensorID, sampleRate and latency
+   * 
+   * @code
+   * #set virtual sensor SENSOR_ID_DEVICE_ORI_WU to have sample rate of 1 Hz and latency of 500 milliseconds
+   * SensorConfigurationPacket config(70, 1, 500);
+   * BHY2.configureSensor(config)
+   * @endcode
+   * 
+   * @note Alternatively, we can directly configure the virtual sensor without creating a SensorConfigurationPacket class
+   * 
+   * @param sensorId  SensorID for virtual sensor
+   * @param sampleRate Polling rate for sensor in Hz
+   * @param latency   Latency in milliseconds 
+   * 
+   * @note For list of SensorID, see src/SensorID.h. Or see Table 79 in the <a href="https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bhi260ab-ds000.pdf">BHI260 datasheet</a>
+   * 
    */
   void configureSensor(SensorConfigurationPacket& config);
-  /**
-   * @brief Setup virtual sensors on the BHI260
-   * 
-   * @param sensorId  Sensor ID for sensor
-   * @param sampleRate Polling rate for sensor
-   * @param latency   Latency in milliseconds
-   * 
-   * @note For list of SensorID, see src/SensorID.h. Alternatively, see Table  79 in the BHI260 datasheet https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bhi260ab-ds000.pdf
-   */
   void configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency);
   /**
    * @brief Handle FIFO of data queue
