@@ -14,7 +14,7 @@
 #define I2C_INT_PIN (0)
 
 /**
- * @brief Enumerator for ESLOV operational state
+ * @brief Enumerator for ESLOV operational state. Defines what state the I2C protocol of the ESLOV device should be in. Used to set DFU (Device Firmware Update) mode in the ANNA-B112 and BHY260 of the Nicla Sense ME.
  * 
  */
 enum EslovOpcode {
@@ -24,6 +24,10 @@ enum EslovOpcode {
   ESLOV_SENSOR_STATE_OPCODE   /*!< ESLOV Sensor State */
 };
 
+/**
+ * @brief Enumeration for the host device operational status. 
+ * 
+ */
 enum HostOpcode {
   HOST_DFU_INTERNAL_OPCODE = ESLOV_DFU_INTERNAL_OPCODE,
   HOST_DFU_EXTERNAL_OPCODE = ESLOV_DFU_EXTERNAL_OPCODE,
@@ -66,16 +70,16 @@ public:
    */
   void update();
   /**
-   * @brief Write a DFU (Device Firmware Update) packet to the Nicla Board over ESLOV
+   * @brief Write a DFU (Device Firmware Update) packet to the Nicla Board over ESLOV. On the last packet, the built-in LED is pulled down.
    * 
-   * @param data pointer to data to be uploaded to Nicla board (uint8_t)
-   * @param length length of the data to be written to the Nicla in bytes (int)
+   * @param data pointer to data to be uploaded to Nicla board as a byte array
+   * @param length amount of data to be written to the Nicla in bytes (int)
    */
   void writeDfuPacket(uint8_t *data, uint8_t length);
   /**
    * @brief Waits for the ESLOV interrupt pin to be pulled high, then sends a packet with the @see ESLOV_SENSOR_STATE_OPCODE to over I2C
    * 
-   * @param state enumeration of EslovState to be written over ESLOV to the Nicla
+   * @param state State value sent to Nicla Sense ME based on @ref EslovState enumerator.
    */
   void writeStateChange(EslovState state);
   /**
