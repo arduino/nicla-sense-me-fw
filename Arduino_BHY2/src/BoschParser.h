@@ -41,7 +41,7 @@ public:
    * @brief Parse Meta Events from the Bosch BHI260 Sensor
    * 
    * @param callback_info Pointer containing information to be parsed
-   * @param callback_ref 
+   * @param callback_ref Reserved for future use
    */
   static void parseMetaEvent(const struct bhy2_fifo_parse_data_info *callback_info, void *callback_ref);
   /**
@@ -52,7 +52,7 @@ public:
    */
   static void parseGeneric(const struct bhy2_fifo_parse_data_info *callback_info, void *callback_ref);
   /**
-   * @brief Print out debug message
+   * @brief Parse debug message
    * 
    * @param callback_info Pointer containing information to be parsed
    * @param callback_ref  Reserved for future use
