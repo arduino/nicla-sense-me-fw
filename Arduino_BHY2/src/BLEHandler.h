@@ -22,14 +22,15 @@ public:
   /**
    * @brief Set advertised local name and initialise BLE advertising for DFU and sensor data transfer
    * 
-   * @return true   Successful initialisation of BLE device
+   * @return true Successful initialisation of BLE device
    */
   bool begin();
   /**
-   * @brief Poll data over Bluetooth and read data to FIFO buffer.
-   * 
+   *  @brief Update sensor data by reading the FIFO buffer on the BHI260 and then pass it to a suitable parser. 
+   *  
    */
   void update();
+  
   /**
    * @brief Poll BLE data
    * 
@@ -60,7 +61,7 @@ private:
    * @brief Method for reading and processing DFU packet. Prints size of DFU packet to debug output
    * 
    * @param dfuType         Selects device to update firmware. DFU_INTERNAL for the ANNA-B112 and DFU_EXTERNAL for the BHY2 sensor.
-   * @param characteristic  Selected BLE characteristic
+   * @param characteristic  Selected BLE characteristic. See https://reference.arduino.cc/reference/en/libraries/arduinoble/blecharacteristic/
    */
   void processDFUPacket(DFUType dfuType, BLECharacteristic characteristic);
 
@@ -68,21 +69,21 @@ private:
    * @brief Method for receiving and forwarding BLE packet to ANNA-B112 module
    * 
    * @param central         Instance of BLEDevice
-   * @param characteristic  Selected BLE characteristic
+   * @param characteristic  Selected BLE characteristic. See https://reference.arduino.cc/reference/en/libraries/arduinoble/blecharacteristic/
    */
   static void receivedInternalDFU(BLEDevice central, BLECharacteristic characteristic);
   /**
    * @brief Method for receiving and forwarding BLE packet to BHI260AP sensor
    * 
    * @param central         Instance of BLEDevice
-   * @param characteristic  Selected BLE characteristic
+   * @param characteristic  Selected BLE characteristic. See https://reference.arduino.cc/reference/en/libraries/arduinoble/blecharacteristic/
    */
   static void receivedExternalDFU(BLEDevice central, BLECharacteristic characteristic);
   /**
    * @brief Read sensor configuration data and output to debug
    * 
    * @param central         Instance of BLEDevice
-   * @param characteristic  Selected BLE characteristic
+   * @param characteristic  Selected BLE characteristic. See https://reference.arduino.cc/reference/en/libraries/arduinoble/blecharacteristic/
    */
   static void receivedSensorConfig(BLEDevice central, BLECharacteristic characteristic);
 };

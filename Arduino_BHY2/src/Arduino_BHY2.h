@@ -139,15 +139,15 @@ public:
   void configureSensor(SensorConfigurationPacket& config);
   void configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency);
   /**
-   * @brief Handle FIFO of data queue. Eliminate oldest data when sensor queue is full.
+   * @brief Extract data from the FIFO buffer for a specific SensorID and save into an instance of the SensorDataPacket struct. Eliminate oldest data when sensor queue is full.
    * 
-   * @param sensorData Data packet from sensor
+   * @param sensorData Struct containing SensorID (uint8_t), data payload size (uint8_t) and data corresponding to SensorID (uint8_t).
    */
   void addSensorData(SensorDataPacket &sensorData);
   /**
-   * @brief Handle FIFO of data queue. Eliminate oldest data when sensor queue is full.
+   * @brief Extract data from the FIFO buffer for a specific SensorID and save into an instance of the SensorLongDataPacket struct. Eliminate oldest data when sensor queue is full.
    *
-   * @param sensorData Data packet from sensor
+   * @param sensorData Struct containing SensorID (uint8_t), long data payload size (uint8_t) and data corresponding to SensorID (uint8_t).
    */
   void addLongSensorData(SensorLongDataPacket &sensorData);
   /**
@@ -169,7 +169,7 @@ public:
    */
   bool readSensorData(SensorDataPacket &data);
   /**
-   * @brief Read long sensor data
+   * @brief Read long sensor data from the top element of the queue
    *
    * @param data Structure including sensorID, sampleRate and latency
    */
@@ -177,20 +177,19 @@ public:
   /**
    * @brief Check existence of a given sensorID
    *
-   * @param sensorId Selected virtual sensor
-   * @return true - Sensor is present
-   * @return false - Sensor is not present
+   * @param sensorID Selected virtual sensor
+   * @return True Sensor is present
    */
   bool hasSensor(uint8_t sensorId);
   /**
-   * @brief Parse XYZ Cartesian data
+   * @brief Parse XYZ Cartesian data from a given data packet
    *
-   * @param data Data packet including SensorID
+   * @param data data packet including SensorID
    * @param vector vector with XYZ
    */
   void parse(SensorDataPacket &data, DataXYZ &vector);
   /**
-   * @brief Parse orientation
+   * @brief Parse orientation from a given data packet
    *
    * @param data Data packet including SensorID
    * @param vector Vector with heading, pitch and roll
@@ -211,9 +210,9 @@ public:
    */
   void setLDOTimeout(int time);
   /**
-   * @brief Stream
+   * @brief Prints debug stream of multiple library components to the specified stream object. 
    *
-   * @param stream
+   * @param Stream object that implements the Print() function. 
    */
   void debug(Stream &stream);
 
