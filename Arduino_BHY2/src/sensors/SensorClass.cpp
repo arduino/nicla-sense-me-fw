@@ -1,14 +1,16 @@
 #include "SensorClass.h"
 #include "SensorManager.h"
 
-SensorClass::SensorClass() : 
+SensorClass::SensorClass() :
   _id(0),
+  _dataAvail(false),
   _subscribed(false)
 {
 }
 
-SensorClass::SensorClass(uint8_t id) : 
+SensorClass::SensorClass(uint8_t id) :
   _id(id),
+  _dataAvail(false),
   _subscribed(false)
 {
 }
