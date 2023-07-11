@@ -46,7 +46,6 @@ public:
    * @brief Start I2C communication over ESLOV
    * 
    * @return true   I2C communication initialised successfully. 
-   * @return false  Failure in starting communication over ESLOV protocol.
    */
   bool begin();
   /**

@@ -52,33 +52,32 @@ public:
 
   // sketch-side API
   /**
-   * @brief Setup SPI interface
+   * @brief Setup SPI interface between BHI260 and ANNA-B112
    * 
    * @return true successful initialisation of SPI interface 
-   * @return false error setting up SPI interface
    */
   bool begin();
   /**
-   * @brief Update FIFO buffer for BME688 sensor
+   * @brief Update data on FIFO buffer
    * 
    */
   void update();
   /**
-   * @brief Configure sensor 
+   * @brief Configure sensor. @see Arduino_BHY2::configureSensor() 
    * 
    * @param config Contains SensorID, SampleRate and latency
    */
   void configureSensor(SensorConfigurationPacket& config);
   /**
-   * @brief Set range of the sensor
+   * @brief Set range of the sensor @see Arduino_BHY2::configureSensor()
    * 
-   * @param id    SensorID
-   * @param range Range
+   * @param id    SensorID of selected virtual sensor
+   * @param range Range for selected SensorID. See Table 79 in BHY260 datasheet 
    * @return int 1-> Success 0-> failure
    */
   int configureSensorRange(uint8_t id, uint16_t range);
   /**
-   * @brief Get the Sensor Configuration object
+   * @brief Read the configuration for a given virtual sensor
    * 
    * @param id                SensorID
    * @param virt_sensor_conf  Define sensitivity, range, latency and sample rate
@@ -86,7 +85,7 @@ public:
   void getSensorConfiguration(uint8_t id, SensorConfig& virt_sensor_conf);
 
   /**
-   * @brief Print sensors to debug
+   * @brief Print sensors to debug output
    * 
    */
   void printSensors();
@@ -95,48 +94,45 @@ public:
    * 
    * @param sensorId SensorID
    * @return true Sensor is present
-   * @return false Sensor is not present
    */
   bool hasSensor(uint8_t sensorId);
 
   /**
-   * @brief Return available sensor data
+   * @brief Return available size of avaliable sensor data
    * 
-   * @return uint8_t 
+   * @return uint8_t size of avaliable sensor data
    */
   uint8_t availableSensorData();
   /**
-   * @brief Return available long sensor data
+   * @brief Return available size of avaliable long sensor data
    * 
-   * @return uint8_t 
+   * @return uint8_t size of avaliable sensor long data
    */
   uint8_t availableLongSensorData();
   /**
    * @brief Read sensor data
    * 
-   * @param data 
-   * @return true 
-   * @return false 
+   * @param data instance of SensorDataPacket containing sensorID (uint8_t), payload size (uint8_t) and data (uint8_t)
+   * @return true data read from sensor successfully
    */
   bool readSensorData(SensorDataPacket &data);
   /**
    * @brief Read long sensor data
    * 
-   * @param data 
-   * @return true 
-   * @return false 
+   * @param data instance of SensorDataPacket containing sensorID (uint8_t), payload size (uint8_t) and data (uint8_t)
+   * @return true data read from sensor successfully
    */
   bool readLongSensorData(SensorLongDataPacket &data);
 
   // ANNA <-> BOSCH interface
   /**
-   * @brief Handlo FIFO of data queue
+   * @brief Handle FIFO of data queue. @see Arduino_BHY2::addSensorData()
    * 
    * @param sensorData Data packet from sensor
    */
   void addSensorData(SensorDataPacket &sensorData);
   /**
-   * @brief Handlo FIFO of data queue for long sensor data
+   * @brief Handle FIFO of data queue for long sensor data @see Arduino_BHY2::addSensorData()
    * 
    * @param sensorData Data packet from sensor
    */

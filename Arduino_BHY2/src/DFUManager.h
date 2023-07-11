@@ -48,7 +48,7 @@ struct __attribute__((packed)) DFUPacket {
 };
 
 /**
- * @brief Class for handling DFU of both the ANNA-B112 and the BHY2 chip
+ * @brief Class for handling Device Firmware Upgrade (DFU) of both the ANNA-B112 and the BHY2 chip
  * 
  */
 class DFUManager {
