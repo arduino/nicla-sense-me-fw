@@ -38,10 +38,29 @@ void loop()
   if (millis() - printTime >= 1000) {
     printTime = millis();
 
-    Serial.println(String("acceleration: ") + accel.toString());
-    Serial.println(String("gyroscope: ") + gyro.toString());
-    Serial.println(String("temperature: ") + String(temp.value(),3));
-    Serial.println(String("gas: ") + String(gas.value(),3));
-    Serial.println(String("rotation: ") + rotation.toString());
+    if(accel.dataAvailable()) {
+      Serial.println(String("acceleration: ") + accel.toString());
+      accel.clearDataAvailFlag();
+    }
+
+    if(gyro.dataAvailable()) {
+      Serial.println(String("gyroscope: ") + gyro.toString());
+      gyro.clearDataAvailFlag();
+    }
+
+    if (temp.dataAvailable()) {
+      Serial.println(String("temperature: ") + String(temp.value(),3));
+      temp.clearDataAvailFlag();
+    }
+
+    if (gas.dataAvailable()) {
+      Serial.println(String("gas: ") + String(gas.value(),3));
+      gas.clearDataAvailFlag();
+    }
+
+    if (rotation.dataAvailable()) {
+      Serial.println(String("rotation: ") + rotation.toString());
+      rotation.clearDataAvailFlag();
+    }
   }
 }

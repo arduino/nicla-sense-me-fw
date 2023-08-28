@@ -12,7 +12,7 @@ public:
   virtual ~SensorClass();
 
   uint8_t id();
-  /* 
+  /*
    * Sample rate: it indicates the frequency at which a sensor is sampled.
    *              It is expressed in Hz.
    * Latency: it indicates how much ms time a new value is retained in its fifo
@@ -25,6 +25,10 @@ public:
   const SensorConfig getConfiguration();
   void end();
 
+  bool dataAvailable() {return _dataAvail;}
+  bool clearDataAvailFlag(){_dataAvail = false;}
+
+
   virtual void setData(SensorDataPacket &data) = 0;
   virtual void setData(SensorLongDataPacket &data) = 0;
   virtual String toString() = 0;
@@ -32,6 +36,12 @@ public:
 protected:
   uint8_t _id;
   bool _subscribed;
+
+  bool _dataAvail;
+
+  void setDataAvailFlag() {_dataAvail = true;}
+
+  friend class SensorManager;
 };
 
 #endif

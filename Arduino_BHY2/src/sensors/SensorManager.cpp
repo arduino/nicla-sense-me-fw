@@ -11,6 +11,7 @@ void SensorManager::process(SensorDataPacket &data)
     for (int i = 0; i < _sensorsLen; i++) {
         if (data.sensorId == _sensors[i]->id()) {
             _sensors[i]->setData(data);
+            _sensors[i]->setDataAvailFlag();
             return;
         }
     }
@@ -21,6 +22,7 @@ void SensorManager::process(SensorLongDataPacket &data)
     for (int i = 0; i < _sensorsLen; i++) {
         if (data.sensorId == _sensors[i]->id()) {
             _sensors[i]->setData(data);
+            _sensors[i]->setDataAvailFlag();
             return;
         }
     }
