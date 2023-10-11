@@ -22,7 +22,7 @@ Table of Contents:
 ## Repo structure
 
 ------------
-[Arduino_BHY2](Arduino_BHY2) - is the library to be included when making sketches for Nicla. It can be used for configuring bhi's sensors and for retrieving bhi's sensors data either from a sketch running on Nicla (standalone mode)  or from an external device (thorugh ESLOV or BLE). 
+[Arduino_BHY2](Arduino_BHY2) - is the library to be included when making sketches for Nicla. It can be used for configuring bhi's sensors and for retrieving bhi's sensors data either from a sketch running on Nicla (standalone mode)  or from an external device (through ESLOV or BLE). 
 
 In [examples](Arduino_BHY2/examples) there are already working examples for both scenarios:
 - Standalone mode - [Standalone](Arduino_BHY2/examples/Standalone/Standalone.ino) exploits bhi's sensors directly from Nicla.
