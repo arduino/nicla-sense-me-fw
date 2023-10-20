@@ -487,6 +487,44 @@ function receiveSensorData(event) {
           });
         }
 
+    } else if (sensorTypes[sensor].scheme == "BSEC2GasClassifierOutput") {
+        //Parse BSEC values
+        const BSECValues = parsedStringValue.split(" ");
+        console.log("Split: ", BSECValues);
+
+        var val0 = BSECValues[1];   //gas 0 probability (%)
+        var val1 = BSECValues[5];   //gas 1 probability (%)
+        var val2 = BSECValues[9];   //gas 2 probability (%)
+        var val3 = BSECValues[13];  //gas 3 probability (%)
+        //var status = BSECValues[17];  //status
+        //var total = (val0+val1+val2+val3);
+
+        if (sensorTypes[sensor].value == 0) {   //Plot doesn't exist yet because no valid data have been received
+            Plotly.newPlot(chartIdx,
+                [
+                    {y:[val0],name:'Gas0 probability(%)',type:'line'}, {y:[val1],name:'Gas1 probability(%)',type:'line'},
+                    {y:[val2],name:'Gas2 probability(%)',type:'line'}, {y:[val3],name:'Gas3 probability(%)',type:'line'}
+                ]);
+            //Update json to signal that the reception started
+            cnt = sensorTypes[sensor].value + 1;
+            sensorTypes[sensor].value = cnt;
+        } else {    //Plot already exists
+            Plotly.extendTraces(chartIdx,{y:[[val0]]}, [0]);
+            Plotly.extendTraces(chartIdx,{y:[[val1]]}, [1]);
+            Plotly.extendTraces(chartIdx,{y:[[val2]]}, [2]);
+            Plotly.extendTraces(chartIdx,{y:[[val3]]}, [3]);
+            cnt = sensorTypes[sensor].value;
+            sensorTypes[sensor].value = cnt + 1;
+        }
+
+        if (cnt > 150) {
+            Plotly.relayout(chartIdx,{
+                xaxis: {
+                    range: [cnt-150,cnt]
+                }
+            });
+        }
+
     }
   }
 }
@@ -524,6 +562,10 @@ function parseData(sensor, data) {
       } else {
          parse_scheme = parseScheme["types"][7]["parse-scheme"];
       }
+  } else if (scheme == "BSEC2DataCollectorOutput") {
+    parse_scheme = parseScheme["types"][8]["parse-scheme"];
+  } else if (scheme == "BSEC2GasClassifierOutput") {
+    parse_scheme = parseScheme["types"][9]["parse-scheme"];
   }
 
   parse_scheme.forEach(element => {
@@ -547,13 +589,22 @@ function parseData(sensor, data) {
       size = 2;
     } else if (valueType == "uint24") {
       value = data.getUint16(dataIndex, true) + (data.getUint8(dataIndex+2, true) << 16);
+      value = value * scale;
       size = 3;
     } else if (valueType == "uint32") {
       value = data.getUint16(dataIndex, true) + (data.getUint16(dataIndex+2, true) << 16);
+      value = value * scale;
       size = 4;
     } else if (valueType == "float") {
       value = data.getFloat32(dataIndex, true) * scale; 
       size = 4;
+    } else if (valueType == "uint64") {
+      valLow = data.getUint32(dataIndex, true)
+      valHigh = data.getUint32(dataIndex + 4, true)
+      value = (valLow + (valHigh * 2**32)) * scale
+      //value = (valLow) * scale
+      //console.log('value:' + value + 'scale:' + scale)
+      size = 8;
     } else if (valueType == "none") {
       value = eventcount + 1;
       sensorTypes[sensor].eventcount = value;

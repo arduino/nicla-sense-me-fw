@@ -1,8 +1,8 @@
 #ifndef SENSOR_ID_H_
 #define SENSOR_ID_H_
 
-#define NUM_SUPPORTEND_SENSOR           79
-#define NUM_LONG_SENSOR                 2
+#define NUM_SUPPORTEND_SENSOR           82
+#define NUM_LONG_SENSOR                 4
 
 enum SensorID {
   SENSOR_ID_ACC_PASS                 = 1,   /* Accelerometer passthrough */
@@ -53,7 +53,17 @@ enum SensorID {
   SENSOR_ID_GYRO_BIAS_WU             = 92,  /* Gyroscope offset wake up */
   SENSOR_ID_MAG_BIAS_WU              = 93,  /* Magnetometer offset wake up */
   SENSOR_ID_STD_WU                   = 94,  /* Step detector wake up */
+  SENSOR_ID_KLIO                     = 112,  /* KLIO output */
+  SENSOR_ID_PDR                      = 113,  /* PDR output */
+  SENSOR_ID_SWIM                     = 114, /* SWIM output */
   SENSOR_ID_BSEC                     = 115,  /* BSEC 1.x output */
+  SENSOR_ID_BSEC2_COLLECTOR          = 116,  /* BSEC 2.x raw data collector for AI training */
+  SENSOR_ID_BSEC2                    = 117,  /* BSEC 2.x gas classifier output */
+  SENSOR_ID_HMC                      = 120, /* HMC output */
+  SENSOR_ID_OC                       = 121, /* OC output */
+  SENSOR_ID_NOC                      = 122, /* NOC output */
+  SENSOR_ID_OCE                      = 123, /* OCE output */
+  SENSOR_ID_NOCE                     = 124, /* NOCE output */
   SENSOR_ID_TEMP                     = 128, /* Temperature */
   SENSOR_ID_BARO                     = 129, /* Barometer */
   SENSOR_ID_HUM                      = 130, /* Humidity */
@@ -101,7 +111,10 @@ enum SensorPayload {
   PEVENT = 11,
   ACTIVITY = 12,
   DEBUG_DATA = 13,
-  BSEC = 14
+  BSEC = 14,
+  BSEC2 = 15,
+  BSEC2_COLLECTOR = 16,
+  KLIO = 17
 };
 
 struct SensorStruct
@@ -112,9 +125,11 @@ struct SensorStruct
 };
 
 const
-static SensorStruct LongSensorList[2] = {
+static SensorStruct LongSensorList[NUM_LONG_SENSOR] = {
   {SENSOR_ID_BSEC,                BSEC,               1.0},
-  {SENSOR_ID_BSEC_LEGACY,         BSEC,               1.0}
+  {SENSOR_ID_BSEC2_COLLECTOR,     BSEC2_COLLECTOR,    1.0},
+  {SENSOR_ID_BSEC_LEGACY,         BSEC,               1.0},
+  {SENSOR_ID_KLIO,                KLIO,               1.0}
 };
 
 const
@@ -167,7 +182,10 @@ static SensorStruct SensorList[NUM_SUPPORTEND_SENSOR] = {
   {SENSOR_ID_GYRO_BIAS_WU,        VECTOR3D,           1.0},
   {SENSOR_ID_MAG_BIAS_WU,         VECTOR3D,           1.0},
   {SENSOR_ID_STD_WU,              PEVENT,             1.0},
+  {SENSOR_ID_KLIO,                KLIO,               1.0},
   {SENSOR_ID_BSEC,                BSEC,               1.0},
+  {SENSOR_ID_BSEC2,               BSEC2,              1.0},
+  {SENSOR_ID_BSEC2_COLLECTOR,     BSEC2_COLLECTOR,    1.0},
   {SENSOR_ID_TEMP,                P16BITSIGNED,       0.01},
   {SENSOR_ID_BARO,                P24BITUNSIGNED,     0.0078},
   {SENSOR_ID_HUM,                 P8BITUNISIGNED,     1.0},

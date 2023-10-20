@@ -28,7 +28,7 @@ extern "C"
 #endif
 
 //the long sensors are usually of much lower rate, hence smaller demand on buffer size
-#define LONG_SENSOR_QUEUE_SIZE 5
+#define LONG_SENSOR_QUEUE_SIZE 4
 
 #define MAX_READ_WRITE_LEN 256
 
@@ -89,6 +89,14 @@ public:
    * 
    */
   void printSensors();
+  int8_t bhy2_setParameter(uint16_t param, const uint8_t *buffer, uint32_t length);
+  int8_t bhy2_getParameter(uint16_t param, uint8_t *buffer, uint32_t length, uint32_t *actual_len);
+  void bhy2_bsec2_setConfigString(const uint8_t * buffer, uint32_t length);
+  void bhy2_bsec2_setHP(const uint8_t * hp_temp, uint8_t hp_temp_len, const uint8_t * hp_dur, uint8_t hp_dur_len);
+  //this sets the temperature offset caused by board's self heat,
+  //the BSEC output will subtract the offset and also use it for relative humidity compensation
+  void bsecSetBoardTempOffset(float temp_offset);
+
   /**
    * @brief Check to see if sensor corresponding to SensorID is present.
    * 

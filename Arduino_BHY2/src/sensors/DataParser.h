@@ -69,6 +69,41 @@ struct DataBSEC {
   }
 };
 
+struct DataBSEC2 {
+    uint8_t gas_estimates[4];
+    uint8_t accuracy; /* gas estimator accuracy (0-3) */
+
+  String toString() {
+    return (String)("BSEC2 output values (%) - gas[0]: " + String(gas_estimates[0])
+                    + "   gas[1]: " + String(gas_estimates[1])
+                    + "   gas[2]: " + String(gas_estimates[2])
+                    + "   gas[3]: " + String(gas_estimates[3])
+                    + "   accuracy: " + String(accuracy)
+                    + "\n");
+  }
+};
+
+struct DataBSEC2Collector {
+  uint64_t timestamp; /* Time since poweron (Milliseconds) */
+  float raw_temp; /* Raw temperature (deg C) */
+  float raw_pressure; /* Raw pressure (Hectopascals) */
+  float raw_hum; /* Raw humidity (%rH) */
+  float raw_gas; /* Raw gas resistance (ohms) */
+  uint8_t gas_index; /* gas index (0-9) */
+
+  String toString() {
+    return (String)("timestamp: "
+                    + String((uint32_t)(timestamp>>32))
+                    + String((uint32_t)(timestamp & 0xFFFFFFFF))
+                    + "   temp: " + String(raw_temp, 2)
+                    + "   pressure: " + String(raw_pressure, 2)
+                    + "   hum: " + String(raw_hum, 2)
+                    + "   gas: " + String(raw_gas, 2)
+                    + "   gas_index: " + String(gas_index)
+                    + "\n");
+  }
+};
+
 
 class DataParser {
 public:
@@ -77,6 +112,8 @@ public:
   static void parseEuler(SensorDataPacket& data, DataOrientation& vector, float scaleFactor);
   static void parseQuaternion(SensorDataPacket& data, DataQuaternion& vector, float scaleFactor);
   static void parseBSEC(SensorLongDataPacket& data, DataBSEC& vector);
+  static void parseBSEC2(SensorDataPacket& data, DataBSEC2& vector);
+  static void parseBSEC2Collector(SensorLongDataPacket& data, DataBSEC2Collector& vector);
   static void parseBSECLegacy(SensorLongDataPacket& data, DataBSEC& vector);
   static void parseData(SensorDataPacket& data, float& value, float scaleFactor, SensorPayload format);
   static void parseActivity(SensorDataPacket& data, uint16_t& value);

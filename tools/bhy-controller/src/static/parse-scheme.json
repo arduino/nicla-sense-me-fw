@@ -90,9 +90,35 @@
         {"name": "Accuracy", "type": "uint8", "scale-factor": 1},
         {"name": "Compensated-Temperature(°C)", "type": "int16", "scale-factor": 0.003906},
         {"name": "Compensated-Humidity(%)", "type": "uint16", "scale-factor": 0.002},
-        {"name": "Compensated-Gas Resistance(Ohms)", "type": "float", "scale-factor": 1}
+        {"name": "Compensated-Gas Resistance(Ω)", "type": "uint32", "scale-factor": 1}
+      ]
+    },
+
+    {
+      "id": 8,
+      "type": "BSEC2DataCollectorOutput",
+      "parse-scheme":
+      [
+        {"name": "Timestamp(ms)", "type": "uint64", "scale-factor": 1},
+        {"name": "Temperature(°C)", "type": "int16", "scale-factor": 0.003906},
+        {"name": "Pressure(Pa)", "type": "float", "scale-factor": 1},
+        {"name": "Humidity(%)", "type": "uint16", "scale-factor": 0.002},
+        {"name": "Gas(Ω)", "type": "float", "scale-factor": 1},
+        {"name": "Index", "type": "uint8", "scale-factor": 1}
+      ]
+    },
+
+    {
+      "id": 9,
+      "type": "BSEC2GasClassifierOutput",
+      "parse-scheme":
+      [
+        {"name": "Gas0(%)", "type": "uint8", "scale-factor": 1},
+        {"name": "Gas1(%)", "type": "uint8", "scale-factor": 1},
+        {"name": "Gas2(%)", "type": "uint8", "scale-factor": 1},
+        {"name": "Gas3(%)", "type": "uint8", "scale-factor": 1},
+        {"name": "Accuracy", "type": "uint8", "scale-factor": 1}
       ]
     }
-
   ]
 }

@@ -10,6 +10,8 @@
 #include "sensors/SensorXYZ.h"
 #include "sensors/SensorQuaternion.h"
 #include "sensors/SensorBSEC.h"
+#include "sensors/SensorBSEC2.h"
+#include "sensors/SensorBSEC2Collector.h"
 #include "sensors/SensorActivity.h"
 #include "sensors/Sensor.h"
 
