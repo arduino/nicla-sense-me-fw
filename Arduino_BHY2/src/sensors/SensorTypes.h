@@ -6,6 +6,7 @@
 
 #define SENSOR_DATA_FIXED_LENGTH (10)
 
+// With the introduction of the new sensor 116 ( SENSOR_ID_BSEC2_COLLECTOR), the max sensor packet size is now 21.
 #define SENSOR_LONG_DATA_FIXED_LENGTH (21)
 
 #define PARAM_SIZE_LENGTH (20)

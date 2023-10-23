@@ -27,7 +27,8 @@ extern "C"
 #define WORK_BUFFER_SIZE    2048
 #endif
 
-//the long sensors are usually of much lower rate, hence smaller demand on buffer size
+// The long sensors are usually of much lower rate, hence smaller demand on buffer size
+// The queue size can be as low as 2, but 4 turns to be a good balance between size and stability.
 #define LONG_SENSOR_QUEUE_SIZE 4
 
 #define MAX_READ_WRITE_LEN 256
