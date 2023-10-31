@@ -1,10 +1,19 @@
 /* 
- * This sketch shows how to get and set the range settings for the built-in IMU of the BHI260 sensor on Nicla Sense ME
+ * IMURangeSettings
+ * 
+ * This sketch demonstrates how to configure the acceleration (SENSOR_ID_ACC) and gyroscope (SENSOR_ID_GYRO) range values.
+ * In the setup function, the default ranges are printed to the serial for the acceleration and gravity (+/-8g).
+ * Then, the range is modified to +/-4g, and is confirmed by printing the value of .range method to the Serial monitor. Finally,
+ * the setup function prints the default range value for the gyroscope (+/-2000 dps) and then modifies this to +/-1000 dps.
+ * 
+ * Every second, the loop function prints out acceleration and gyroscope values to the Serial port.
+ * 
+ * 
 */
 
-#include "Arduino.h"
 #include "Arduino_BHY2.h"
 
+// declare 3D sensor instances
 SensorXYZ accel(SENSOR_ID_ACC);
 SensorXYZ gyro(SENSOR_ID_GYRO);
 SensorXYZ gravity(SENSOR_ID_GRA);
@@ -19,16 +28,19 @@ void setup()
   accel.begin();
   gyro.begin();
 
+  delay(1000);
 
   SensorConfig cfg = accel.getConfiguration();
+
+  Serial.println("Default Range values:")
   Serial.println(String("range of accel: +/-") + cfg.range + String("g"));
   cfg = gravity.getConfiguration();
   Serial.println(String("range of gravity: +/-") + cfg.range + String("g"));
 
   accel.setRange(4);    //this sets the range of accel to +/-4g, 
+  Serial.println("Modified Range values:")
   cfg = accel.getConfiguration();
   Serial.println(String("range of accel: +/-") + cfg.range + String("g"));
-
   cfg = gravity.getConfiguration();
   Serial.println(String("range of gravity: +/-") + cfg.range + String("g"));
 
@@ -46,9 +58,10 @@ void loop()
   // Update function should be continuously polled
   BHY2.update();
 
+  // print gyroscope/acceleration data once every second
   if (millis() - printTime >= 1000) {
     printTime = millis();
-    Serial.println(String("acceleration: ") + accel.toString());
+    Serial.print(String("acceleration: ") + accel.toString());
     Serial.println(String("gyroscope: ") + gyro.toString());
   }
 }
