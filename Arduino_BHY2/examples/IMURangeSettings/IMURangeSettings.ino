@@ -11,7 +11,7 @@ SensorXYZ gravity(SENSOR_ID_GRA);
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   while(!Serial);
 
   BHY2.begin();
