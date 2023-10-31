@@ -32,13 +32,13 @@ void setup()
 
   SensorConfig cfg = accel.getConfiguration();
 
-  Serial.println("Default Range values:")
+  Serial.println("Default Range values:");
   Serial.println(String("range of accel: +/-") + cfg.range + String("g"));
   cfg = gravity.getConfiguration();
   Serial.println(String("range of gravity: +/-") + cfg.range + String("g"));
 
   accel.setRange(4);    //this sets the range of accel to +/-4g, 
-  Serial.println("Modified Range values:")
+  Serial.println("Modified Range values:");
   cfg = accel.getConfiguration();
   Serial.println(String("range of accel: +/-") + cfg.range + String("g"));
   cfg = gravity.getConfiguration();
