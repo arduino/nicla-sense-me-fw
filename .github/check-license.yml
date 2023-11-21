@@ -78,12 +78,13 @@ jobs:
       - name: Install licensee
         run: gem install licensee
 
-      - name: Check license file
+      - name: Check license file for root repo
         run: |
           EXIT_STATUS=0
           # See: https://github.com/licensee/licensee
           LICENSEE_OUTPUT="$(licensee detect --json --confidence=100)"
 
+          # Check license file in repo root folder
           DETECTED_LICENSE_FILE="$(echo "$LICENSEE_OUTPUT" | jq .matched_files[0].filename | tr --delete '\r')"
           echo "Detected license file: $DETECTED_LICENSE_FILE"
           if [ "$DETECTED_LICENSE_FILE" != "\"${EXPECTED_LICENSE_FILENAME}\"" ]; then
@@ -95,6 +96,48 @@ jobs:
           echo "Detected license type: $DETECTED_LICENSE_TYPE"
           if [ "$DETECTED_LICENSE_TYPE" != "\"${EXPECTED_LICENSE_TYPE}\"" ]; then
             echo "::error file=${DETECTED_LICENSE_FILE}::detected license type $DETECTED_LICENSE_TYPE doesn't match expected \"${EXPECTED_LICENSE_TYPE}\""
+            EXIT_STATUS=1
+          fi
+
+      - name: Check license file for Arduino_BHY2 library
+        run: |
+          EXIT_STATUS=0
+          # See: https://github.com/licensee/licensee
+          LICENSEE_OUTPUT="$(licensee detect --json --confidence=100)"
+
+          # Check license file in Arduino_BHY2 folder
+          DETECTED_LICENSE_FILE_ARDUINO_BHY2="$(echo "$LICENSEE_OUTPUT" | jq '.matched_files[] | select(.filename == "Arduino_BHY2/LICENSE.txt") | .filename' | tr --delete '\r')"
+          echo "Detected license file in Arduino_BHY2: $DETECTED_LICENSE_FILE_ARDUINO_BHY2"
+          if [ "$DETECTED_LICENSE_FILE_ARDUINO_BHY2" != "\"Arduino_BHY2/${EXPECTED_LICENSE_FILENAME}\"" ]; then
+            echo "::error file=${DETECTED_LICENSE_FILE_ARDUINO_BHY2}::detected license file $DETECTED_LICENSE_FILE_ARDUINO_BHY2 doesn't match expected: Arduino_BHY2/LICENSE.txt"
+            EXIT_STATUS=1
+          fi
+
+          DETECTED_LICENSE_TYPE_ARDUINO_BHY2="$(echo "$LICENSEE_OUTPUT" | jq '.matched_files[] | select(.filename == "Arduino_BHY2/LICENSE.txt") | .matched_license' | tr --delete '\r')"
+          echo "Detected license type in Arduino_BHY2: $DETECTED_LICENSE_TYPE_ARDUINO_BHY2"
+          if [ "$DETECTED_LICENSE_TYPE_ARDUINO_BHY2" != "\"${EXPECTED_LICENSE_TYPE}\"" ]; then
+            echo "::error file=${DETECTED_LICENSE_FILE_ARDUINO_BHY2}::detected license type $DETECTED_LICENSE_TYPE_ARDUINO_BHY2 doesn't match expected \"${EXPECTED_LICENSE_TYPE}\""
+            EXIT_STATUS=1
+          fi
+
+      - name: Check license file for Arduino_BHY2Host library
+        run: |
+          EXIT_STATUS=0
+          # See: https://github.com/licensee/licensee
+          LICENSEE_OUTPUT="$(licensee detect --json --confidence=100)"
+
+          # Check license file in Arduino_BHY2Host folder
+          DETECTED_LICENSE_FILE_ARDUINO_BHY2HOST="$(echo "$LICENSEE_OUTPUT" | jq '.matched_files[] | select(.filename == "Arduino_BHY2Host/LICENSE.txt") | .filename' | tr --delete '\r')"
+          echo "Detected license file in Arduino_BHY2Host: $DETECTED_LICENSE_FILE_ARDUINO_BHY2HOST"
+          if [ "$DETECTED_LICENSE_FILE_ARDUINO_BHY2HOST" != "\"Arduino_BHY2Host/${EXPECTED_LICENSE_FILENAME}\"" ]; then
+            echo "::error file=${DETECTED_LICENSE_FILE_ARDUINO_BHY2HOST}::detected license file $DETECTED_LICENSE_FILE_ARDUINO_BHY2HOST doesn't match expected: Arduino_BHY2Host/LICENSE.txt"
+            EXIT_STATUS=1
+          fi
+
+          DETECTED_LICENSE_TYPE_ARDUINO_BHY2HOST="$(echo "$LICENSEE_OUTPUT" | jq '.matched_files[] | select(.filename == "Arduino_BHY2Host/LICENSE.txt") | .matched_license' | tr --delete '\r')"
+          echo "Detected license type in Arduino_BHY2Host: $DETECTED_LICENSE_TYPE_ARDUINO_BHY2HOST"
+          if [ "$DETECTED_LICENSE_TYPE_ARDUINO_BHY2HOST" != "\"${EXPECTED_LICENSE_TYPE}\"" ]; then
+            echo "::error file=${DETECTED_LICENSE_FILE_ARDUINO_BHY2HOST}::detected license type $DETECTED_LICENSE_TYPE_ARDUINO_BHY2HOST doesn't match expected \"${EXPECTED_LICENSE_TYPE}\""
             EXIT_STATUS=1
           fi
 
