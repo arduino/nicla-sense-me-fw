@@ -93,6 +93,8 @@ jobs:
           
           cd ./${{ matrix.module.path }}
 
+          LICENSEE_OUTPUT="$(licensee detect --json --confidence=100)"
+
           DETECTED_LICENSE_FILE="$(echo "$LICENSEE_OUTPUT" | jq .matched_files[0].filename | tr --delete '\r')"
           echo "Detected license file: $DETECTED_LICENSE_FILE"
           if [ "$DETECTED_LICENSE_FILE" != "\"${EXPECTED_LICENSE_FILENAME}\"" ]; then
