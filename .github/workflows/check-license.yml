@@ -91,6 +91,7 @@ jobs:
         run: |
           EXIT_STATUS=0
           
+          # Go into folder path
           cd ./${{ matrix.module.path }}
 
           LICENSEE_OUTPUT="$(licensee detect --json --confidence=100)"
@@ -109,6 +110,4 @@ jobs:
             EXIT_STATUS=1
           fi
           
-          echo "${LICENSEE_OUTPUT}"
-
           exit $EXIT_STATUS
