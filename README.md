@@ -2,6 +2,7 @@
 
 [![Check Arduino status](https://github.com/arduino/nicla-sense-me-fw/actions/workflows/check-arduino.yml/badge.svg)](https://github.com/arduino/nicla-sense-me-fw/actions/workflows/check-arduino.yml)
 [![Compile Examples status](https://github.com/arduino/nicla-sense-me-fw/actions/workflows/compile-examples.yml/badge.svg)](https://github.com/arduino/nicla-sense-me-fw/actions/workflows/compile-examples.yml)
+[![Check License status](https://github.com/arduino/nicla-sense-me-fw/actions/workflows/check-license.yml/badge.svg)](https://github.com/arduino/nicla-sense-me-fw/actions/workflows/check-license.yml)
 
 This repo contains everything needed to program Nicla Sense ME and to control it from another device. Further documentation can be found on the [Arduino Docs website](https://docs.arduino.cc/hardware/nicla-sense-me).
 
@@ -9,6 +10,7 @@ Nicla Sense ME belongs to Arduino Mbed OS boards and its core is available [here
 The packaged core can also be downloaded from Arduino IDE as 'Arduino Mbed OS Nicla Boards'
 
 Table of Contents:
+- [Nicla](#nicla)
   - [Repo structure](#repo-structure)
   - [Main use cases](#main-use-cases)
     - [Nicla standalone mode](#nicla-standalone-mode)
