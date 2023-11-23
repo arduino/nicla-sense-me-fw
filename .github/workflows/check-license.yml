@@ -1,4 +1,5 @@
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-license.md
+
 name: Check License
 
 env:
@@ -86,7 +87,6 @@ jobs:
             expected-filename: LICENSE.txt
             expected-type: AGPL-3.0
 
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -114,11 +114,13 @@ jobs:
           echo "Detected license file: $DETECTED_LICENSE_FILE"
           if [ "$DETECTED_LICENSE_FILE" != "\"${{ matrix.check-license.expected-filename }}\"" ]; then
             echo "::error file=${DETECTED_LICENSE_FILE}::detected license file $DETECTED_LICENSE_FILE doesn't match expected: ${{ matrix.check-license.expected-filename }}"
+
             EXIT_STATUS=1
           fi
 
           DETECTED_LICENSE_TYPE="$(echo "$LICENSEE_OUTPUT" | jq .matched_files[0].matched_license | tr --delete '\r')"
           echo "Detected license type: $DETECTED_LICENSE_TYPE"
+
           if [ "$DETECTED_LICENSE_TYPE" != "\"${{ matrix.check-license.expected-type }}\"" ]; then
             echo "::error file=${DETECTED_LICENSE_FILE}::detected license type $DETECTED_LICENSE_TYPE doesn't match expected \"${{ matrix.check-license.expected-type }}\""
             EXIT_STATUS=1
