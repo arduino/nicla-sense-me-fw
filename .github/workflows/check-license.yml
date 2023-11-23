@@ -1,4 +1,5 @@
-# Modified from : https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-license.md
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-license.md
+
 name: Check License
 
 env:
@@ -60,6 +61,7 @@ jobs:
           echo "result=$RESULT" >> $GITHUB_OUTPUT
 
   check-license:
+    name: ${{ matrix.check-license.path }}
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
@@ -70,10 +72,20 @@ jobs:
       fail-fast: false
 
       matrix:
-        module:
-          - path: 
+        check-license:
+          # TODO: Add additional paths where license files should be
+          - path: ./
+             # TODO: Define the project's license file name here:
+            expected-filename: LICENSE.txt
+            # SPDX identifier: https://spdx.org/licenses/
+            # TODO: Define the project's license type here
+            expected-type: AGPL-3.0
           - path: Arduino_BHY2
+            expected-filename: LICENSE.txt
+            expected-type: AGPL-3.0
           - path: Arduino_BHY2Host
+            expected-filename: LICENSE.txt
+            expected-type: AGPL-3.0
 
     steps:
       - name: Checkout repository
@@ -87,27 +99,31 @@ jobs:
       - name: Install licensee
         run: gem install licensee
 
-      - name: Check license file for ${{ matrix.module.path }}
+      - name: Check license file for ${{ matrix.check-license.path }}
         run: |
           EXIT_STATUS=0
-          
-          # Go into folder path
-          cd ./${{ matrix.module.path }}
 
+          # Go into folder path
+          cd ./${{ matrix.check-license.path }}
+
+          # See: https://github.com/licensee/licensee
           LICENSEE_OUTPUT="$(licensee detect --json --confidence=100)"
+
 
           DETECTED_LICENSE_FILE="$(echo "$LICENSEE_OUTPUT" | jq .matched_files[0].filename | tr --delete '\r')"
           echo "Detected license file: $DETECTED_LICENSE_FILE"
-          if [ "$DETECTED_LICENSE_FILE" != "\"${EXPECTED_LICENSE_FILENAME}\"" ]; then
-            echo "::error file=${DETECTED_LICENSE_FILE}::detected license file $DETECTED_LICENSE_FILE doesn't match expected: $EXPECTED_LICENSE_FILENAME"
+          if [ "$DETECTED_LICENSE_FILE" != "\"${{ matrix.check-license.expected-filename }}\"" ]; then
+            echo "::error file=${DETECTED_LICENSE_FILE}::detected license file $DETECTED_LICENSE_FILE doesn't match expected: ${{ matrix.check-license.expected-filename }}"
+
             EXIT_STATUS=1
           fi
 
           DETECTED_LICENSE_TYPE="$(echo "$LICENSEE_OUTPUT" | jq .matched_files[0].matched_license | tr --delete '\r')"
           echo "Detected license type: $DETECTED_LICENSE_TYPE"
-          if [ "$DETECTED_LICENSE_TYPE" != "\"${EXPECTED_LICENSE_TYPE}\"" ]; then
-            echo "::error file=${DETECTED_LICENSE_FILE}::detected license type $DETECTED_LICENSE_TYPE doesn't match expected \"${EXPECTED_LICENSE_TYPE}\""
+
+          if [ "$DETECTED_LICENSE_TYPE" != "\"${{ matrix.check-license.expected-type }}\"" ]; then
+            echo "::error file=${DETECTED_LICENSE_FILE}::detected license type $DETECTED_LICENSE_TYPE doesn't match expected \"${{ matrix.check-license.expected-type }}\""
             EXIT_STATUS=1
           fi
-          
+
           exit $EXIT_STATUS
