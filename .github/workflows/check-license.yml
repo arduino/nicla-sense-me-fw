@@ -74,12 +74,17 @@ jobs:
         check-license:
           # TODO: Add additional paths where license files should be
           - path: ./
+             # TODO: Define the project's license file name here:
             expected-filename: LICENSE.txt
+            # SPDX identifier: https://spdx.org/licenses/
+            # TODO: Define the project's license type here
             expected-type: AGPL-3.0
           - path: Arduino_BHY2
-            expected-filename: LICENSE.md
-            expected-type: GPL-3.0
-
+            expected-filename: LICENSE.txt
+            expected-type: AGPL-3.0
+          - path: Arduino_BHY2Host
+            expected-filename: LICENSE.txt
+            expected-type: AGPL-3.0
 
 
     steps:
