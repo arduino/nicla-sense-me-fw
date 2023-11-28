@@ -38,8 +38,8 @@ extern "C"
  * 
  */
 enum SensorAckCode {
-  SensorAck = 0x0F,    /*!< Acknowledgement */
-  SensorNack = 0x00    /*!< Negative Acknowledgement */
+  SensorAck = 0x0F,    /*!< Acknowledgment */
+  SensorNack = 0x00    /*!< Negative Acknowledgment */
 };
 
 /**
@@ -55,7 +55,7 @@ public:
   /**
    * @brief Setup SPI interface between BHI260 and ANNA-B112
    * 
-   * @return true successful initialisation of SPI interface 
+   * @return true successful initialization of SPI interface 
    */
   bool begin();
   /**

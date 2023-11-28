@@ -35,7 +35,7 @@ from cobs import cobs
 
 
 # The main serial object
-# Initialise later
+# initialize later
 ser = serial.Serial()
 
 # The function to be run in the Arduino-facing thread

@@ -81,7 +81,7 @@ public:
 
   // Necessary API. Update function should be continuously polled
   /**
-   * @brief Initialise the BHY2 functionality for the Nicla Sense ME, for a given @ref NiclaSettings configuration.
+   * @brief initialize the BHY2 functionality for the Nicla Sense ME, for a given @ref NiclaSettings configuration.
    * 
    * @note When called without input parameters, I2C and BLE are enabled by default. I2C communication is over ESLOV.
    * 

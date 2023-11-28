@@ -17,12 +17,12 @@ enum DFUType {
 };
 
 /**
- * @brief Acknowledgement handler for the DFU
+ * @brief Acknowledgment handler for the DFU
  * 
  */
 enum DFUAckCode {
-  DFUAck = 0x0F,   /*!< Acknowledgement */
-  DFUNack = 0x00   /*!< Negative Acknowledgement */
+  DFUAck = 0x0F,   /*!< Acknowledgment */
+  DFUNack = 0x00   /*!< Negative Acknowledgment */
 };
 
 /**

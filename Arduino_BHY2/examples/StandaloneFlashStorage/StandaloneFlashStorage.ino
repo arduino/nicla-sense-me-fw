@@ -58,7 +58,7 @@ void setup()
     }
     Serial.println(" done.");
 
-    Serial.print("Initialising the sensors... ");
+    Serial.print("Initializing the sensors... ");
     BHY2.begin();
 
     accel.begin();

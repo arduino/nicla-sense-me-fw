@@ -45,7 +45,7 @@ public:
   /**
    * @brief Start I2C communication over ESLOV
    * 
-   * @return true   I2C communication initialised successfully. 
+   * @return true   I2C communication initialized successfully. 
    */
   bool begin();
   /**
