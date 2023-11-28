@@ -48,7 +48,7 @@ void setup() {
 }
 
 void loop() {
-  //cycle through LED colour configurations
+  //cycle through LED color configurations
   ledBlink(green, 1000);    
   delay(1000);
   ledBlink(blue, 1000);     
