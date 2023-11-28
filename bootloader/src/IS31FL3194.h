@@ -1,7 +1,7 @@
 #ifndef IS31FL3194_h
 #define IS31FL3194_h
 
-// Regsiter Map
+// Register Map
 // http://www.issi.com/WW/pdf/IS31FL3194.pdf
 #define IS31FL3194_PRODUCT_ID           0x00  // should return 0xCE
 #define IS31FL3194_OP_CONFIG            0x01

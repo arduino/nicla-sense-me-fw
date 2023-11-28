@@ -1,5 +1,5 @@
 /* 
- * This sketch shows how the Nicla board could be used to scan / classify certian gases of interest 
+ * This sketch shows how the Nicla board could be used to scan / classify certain gases of interest 
  * using the on-board BME688 4-in-1 evnironmental sensor cluster
  *
 */

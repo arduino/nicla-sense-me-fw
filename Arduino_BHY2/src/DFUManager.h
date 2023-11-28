@@ -104,7 +104,7 @@ private:
 
 private:
   /**
-   * @brief The Arduino_BHY2 class can accces both private and public methods of DFUManager
+   * @brief The Arduino_BHY2 class can access both private and public methods of DFUManager
    * 
    */
   friend class Arduino_BHY2;

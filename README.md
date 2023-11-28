@@ -108,5 +108,5 @@ Then, Nicla will reset and the firmware will be updated.
 - Execute the command `./bhy dfu -p YOUR_PORT -t TARGET -bin BIN_FILE`
     * Replace `YOUR_PORT` with the serial port used by the arduino board
     * Replace `TARGET` with `nicla` or `bhi`
-    * Replace `BIN_FILE` with the path of the binary file to bu uploaded
+    * Replace `BIN_FILE` with the path of the binary file to be uploaded
 - Nicla will reset and the firmware will be updated

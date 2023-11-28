@@ -96,7 +96,7 @@ def receiver(cmd_q, uart, name, tag):
 # The main thread
 if __name__ == '__main__':
 
-    # Parse arugments
+    # Parse arguments
     # - port == Arduino Serial Port
     # - name == Filename
     # - tag == Custom tag to append to filename

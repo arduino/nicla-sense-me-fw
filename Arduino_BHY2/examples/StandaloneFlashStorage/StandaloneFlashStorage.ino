@@ -7,7 +7,7 @@
     This example shows how to use MbedOS-native Storage APIs
     - https://os.mbed.com/docs/mbed-os/v6.15/apis/data-storage.html
 
-    C/C++ storage APIs are supporte too
+    C/C++ storage APIs are supported too
     - C-based STDIO: https://en.cppreference.com/w/cpp/header/cstdio
     - Stream-based: https://en.cppreference.com/w/cpp/io
 */

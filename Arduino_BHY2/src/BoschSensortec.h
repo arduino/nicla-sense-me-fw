@@ -107,15 +107,15 @@ public:
   bool hasSensor(uint8_t sensorId);
 
   /**
-   * @brief Return available size of avaliable sensor data
+   * @brief Return available size of available sensor data
    * 
-   * @return uint8_t size of avaliable sensor data
+   * @return uint8_t size of available sensor data
    */
   uint8_t availableSensorData();
   /**
-   * @brief Return available size of avaliable long sensor data
+   * @brief Return available size of available long sensor data
    * 
-   * @return uint8_t size of avaliable sensor long data
+   * @return uint8_t size of available sensor long data
    */
   uint8_t availableLongSensorData();
   /**
@@ -165,7 +165,7 @@ private:
 
 private:
   /**
-   * @brief The Arduino_BHY2 class can accces both private and public methods of BoschSensortec
+   * @brief The Arduino_BHY2 class can access both private and public methods of BoschSensortec
    * 
    */
   friend class Arduino_BHY2;
