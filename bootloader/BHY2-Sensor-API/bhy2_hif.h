@@ -410,7 +410,7 @@ int8_t bhy2_hif_set_sensor_ctrl(uint8_t sensor_id,
 /**
  * @brief Function to get the BSX state of a BSX parameter
  * @param[in] param_id      : Parameter ID of the BSX parameter
- * @param[out] bsx_state    : Reference to teh data buffer to store the BSX state
+ * @param[out] bsx_state    : Reference to the data buffer to store the BSX state
  * @param[in] state_len     : Length of the buffer
  * @param[out] actual_len   : Actual length of the BSX state
  * @param[in] hif           : HIF device reference
