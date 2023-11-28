@@ -631,7 +631,7 @@ struct bhy2_spt_bits
     uint8_t cpol : 1; /**< spi clock polarity. */
     uint8_t cpha : 1; /**< spi clock phase. */
     /*! byte 2 */
-    uint8_t delay_val : 6; /**< mutiples of 50us. */
+    uint8_t delay_val : 6; /**< multiples of 50us. */
     uint8_t cs_level : 1; /**< chip select level. */
     uint8_t lsb_first : 1; /**< least significant byte first. */
     /*! byte 3~4 */
