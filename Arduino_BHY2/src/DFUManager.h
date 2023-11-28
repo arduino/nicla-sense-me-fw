@@ -17,12 +17,12 @@ enum DFUType {
 };
 
 /**
- * @brief Acknowledgement handler for the DFU
+ * @brief Acknowledgment handler for the DFU
  * 
  */
 enum DFUAckCode {
-  DFUAck = 0x0F,   /*!< Acknowledgement */
-  DFUNack = 0x00   /*!< Negative Acknowledgement */
+  DFUAck = 0x0F,   /*!< Acknowledgment */
+  DFUNack = 0x00   /*!< Negative Acknowledgment */
 };
 
 /**
@@ -104,7 +104,7 @@ private:
 
 private:
   /**
-   * @brief The Arduino_BHY2 class can accces both private and public methods of DFUManager
+   * @brief The Arduino_BHY2 class can access both private and public methods of DFUManager
    * 
    */
   friend class Arduino_BHY2;

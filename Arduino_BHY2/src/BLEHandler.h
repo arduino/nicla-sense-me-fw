@@ -20,9 +20,9 @@ public:
   virtual ~BLEHandler();
 
   /**
-   * @brief Set advertised local name and initialise BLE advertising for DFU and sensor data transfer
+   * @brief Set advertised local name and initialize BLE advertising for DFU and sensor data transfer
    * 
-   * @return true Successful initialisation of BLE device
+   * @return true Successful initialization of BLE device
    */
   bool begin();
   /**

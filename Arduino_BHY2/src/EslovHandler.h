@@ -45,7 +45,7 @@ public:
   /**
    * @brief Start I2C communication over ESLOV
    * 
-   * @return true   I2C communication initialised successfully. 
+   * @return true   I2C communication initialized successfully. 
    */
   bool begin();
   /**
@@ -89,7 +89,7 @@ private:
 
 private:
   /**
-   * @brief The Arduino_BHY2 class can accces both private and public methods of EslovHandler
+   * @brief The Arduino_BHY2 class can access both private and public methods of EslovHandler
    * 
    */
   friend class Arduino_BHY2;

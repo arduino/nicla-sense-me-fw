@@ -12,7 +12,7 @@ import json
 
 class BSEC2DataLogConverter():
     # sometimes you may want to add an offset to the converted data in situations such as reset of the board, this way
-    # the converted data contains timestamp that will succeed eariler log files,
+    # the converted data contains timestamp that will succeed earlier log files,
     # otherwise, there will be overlap of timestamp ranges among the converted data which might confuse the AI studio software
     def __init__(self, log_file_name, gas_label, bmeconfig_file, timestamp_offset_ms = 0, dbg=False):
         self.log_file_name = log_file_name

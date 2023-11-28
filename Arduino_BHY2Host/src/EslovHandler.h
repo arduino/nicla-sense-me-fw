@@ -61,7 +61,7 @@ public:
   /**
    * @brief Start I2C communication over ESLOV between host board and Nicla
    * 
-   * @return true I2C communication initialised successfully. 
+   * @return true I2C communication initialized successfully. 
    */
   bool begin(bool passthrough);
   /**
@@ -91,30 +91,30 @@ public:
   /**
    * @brief Requests an acknowledgment packet from the Nicla over ESLOV.
    * 
-   * @return uint8_t acknowledge packet recieved from the Nicla over ESLOV
+   * @return uint8_t acknowledge packet Received from the Nicla over ESLOV
    */
   uint8_t requestPacketAck();
   /**
-   * @brief Change `EslovState` of Nicla to `ESLOV_AVAILABLE_SENSOR_STATE` and wait for the interrupt pin to go high. Then read the avaliable sensor data over I2C.
+   * @brief Change `EslovState` of Nicla to `ESLOV_AVAILABLE_SENSOR_STATE` and wait for the interrupt pin to go high. Then read the available sensor data over I2C.
    * 
    * @return uint8_t Number of available sensor data packets.
    */
   uint8_t requestAvailableData();
   /**
-   * @brief Change `EslovState` of Nicla to `ESLOV_AVAILABLE_SENSOR_STATE` and wait for the interrupt pin to go high. Then read the avaliable long sensor data over I2C.
+   * @brief Change `EslovState` of Nicla to `ESLOV_AVAILABLE_SENSOR_STATE` and wait for the interrupt pin to go high. Then read the available long sensor data over I2C.
    * 
    * @return uint8_t Number of available long sensor data packets.
    */
   uint8_t requestAvailableLongData();
   /**
-   * @brief Change `EslovState` of Nicla to `ESLOV_READ_SENSOR_STATE` and wait for the interrupt pin to go high. Then read the avaliable sensor data over I2C.
+   * @brief Change `EslovState` of Nicla to `ESLOV_READ_SENSOR_STATE` and wait for the interrupt pin to go high. Then read the available sensor data over I2C.
    * 
    * @param sData data packet containing sensorID, payload size and data payload
    * @return true Successful request of sensor data
    */
   bool requestSensorData(SensorDataPacket &sData);
   /**
-   * @brief Change `EslovState` of Nicla to `ESLOV_READ_SENSOR_STATE` and wait for the interrupt pin to go high. Then read the avaliable long sensor data over I2C.
+   * @brief Change `EslovState` of Nicla to `ESLOV_READ_SENSOR_STATE` and wait for the interrupt pin to go high. Then read the available long sensor data over I2C.
    * 
    * @param sData data packet containing sensorID, payload size and data payload
    * @return true Successful request of sensor data

@@ -37,7 +37,7 @@ void setup() {
 
   // init
   writeByte(IS31FL3194_ADDRESS, IS31FL3194_OP_CONFIG, 0x01);     // normal operation in current mode
-  writeByte(IS31FL3194_ADDRESS, IS31FL3194_OUT_CONFIG, 0x07);    // enable all three ouputs
+  writeByte(IS31FL3194_ADDRESS, IS31FL3194_OUT_CONFIG, 0x07);    // enable all three outputs
   writeByte(IS31FL3194_ADDRESS, IS31FL3194_CURRENT_BAND, 0x00);  // 10 mA max current
   writeByte(IS31FL3194_ADDRESS, IS31FL3194_HOLD_FUNCTION, 0x00); // hold function disable
 
@@ -48,7 +48,7 @@ void setup() {
 }
 
 void loop() {
-  //cycle through LED colour configurations
+  //cycle through LED color configurations
   ledBlink(green, 1000);    
   delay(1000);
   ledBlink(blue, 1000);     

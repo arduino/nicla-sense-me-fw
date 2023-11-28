@@ -95,7 +95,7 @@ public:
   void configureSensor(SensorConfigurationPacket& config);
   void configureSensor(uint8_t sensorId, float sampleRate, uint32_t latency);
   /**
-   * @brief Recieve acknowledgement from Nicla board over ESLOV
+   * @brief Receive Acknowledgment from Nicla board over ESLOV
    * 
    * @return uint8_t One byte of data read from the I2C bus.
    */

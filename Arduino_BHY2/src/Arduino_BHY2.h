@@ -35,7 +35,7 @@ enum NiclaWiring {
  * 
  */
 enum NiclaConfig {
-  NICLA_I2C = 0x1,                          /*!< I2C Configuration, relavent for both ESLOV and Shield configurations  */
+  NICLA_I2C = 0x1,                          /*!< I2C Configuration, relevant for both ESLOV and Shield configurations  */
   NICLA_BLE = 0x2,                          /*!< Bluetooth via the onboard ANNA-B112 module */
   NICLA_BLE_AND_I2C = NICLA_I2C | NICLA_BLE,/*!< Enable I2C (ESLOV/Shield) and BLE simultaneously */
   NICLA_STANDALONE = 0x4                    /*!< Operate in standalone, without external data transfer */
@@ -81,7 +81,7 @@ public:
 
   // Necessary API. Update function should be continuously polled
   /**
-   * @brief Initialise the BHY2 functionality for the Nicla Sense ME, for a given @ref NiclaSettings configuration.
+   * @brief initialize the BHY2 functionality for the Nicla Sense ME, for a given @ref NiclaSettings configuration.
    * 
    * @note When called without input parameters, I2C and BLE are enabled by default. I2C communication is over ESLOV.
    * 

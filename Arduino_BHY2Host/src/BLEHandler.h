@@ -11,7 +11,7 @@ public:
   BLEHandler();
   virtual ~BLEHandler();
   /**
-   * @brief Initialise BLE for DFU and sensor data transfer and connect to Nicla device
+   * @brief initialize BLE for DFU and sensor data transfer and connect to Nicla device
    * 
    * @return true successful connection to Nicla over BLE
    * 
