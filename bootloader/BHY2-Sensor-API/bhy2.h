@@ -285,7 +285,7 @@ int8_t bhy2_erase_flash(uint32_t start_address, uint32_t end_addr, struct bhy2_d
 /**
  * @brief Function to upload firmware to Flash
  * @param[in] firmware  : Reference to the data buffer containing the firmware
- * @param[in] length    : Size of the firwmare
+ * @param[in] length    : Size of the firmware
  * @param[in] dev       : Device reference
  * @return API error codes
  */
@@ -484,8 +484,8 @@ int8_t bhy2_set_calibration_profile(uint8_t sensor_id,
 int8_t bhy2_get_post_mortem_data(uint8_t *post_mortem, uint32_t buffer_len, uint32_t *actual_len, struct bhy2_dev *dev);
 
 /**
- * @brief Function to link a callback and relevant reference when the sensor event is available in teh FIFO
- * @param[in] sensor_id     : Sensor ID of the virtal sensor
+ * @brief Function to link a callback and relevant reference when the sensor event is available in the FIFO
+ * @param[in] sensor_id     : Sensor ID of the virtual sensor
  * @param[in] callback      : Reference of the callback function
  * @param[in] callback_ref  : Reference needed inside the callback function. Can be NULL
  * @param[in] dev           : Device reference
