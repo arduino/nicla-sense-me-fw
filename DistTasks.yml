@@ -20,18 +20,8 @@ version: "3"
 vars:
   CONTAINER: "docker.elastic.co/beats-dev/golang-crossbuild"
   GO_VERSION: "1.16.4"
-  CHECKSUM_FILE: "{{.VERSION}}-checksums.txt"
 
 tasks:
-  all:
-    desc: Build for distribution for all platforms
-    cmds:
-      - task: Windows_32bit
-      - task: Windows_64bit
-      - task: Linux_32bit
-      - task: Linux_64bit
-      - task: macOS_64bit
-
   Windows_32bit:
     desc: Builds Windows 32 bit binaries
     dir: "{{.TOOL_DIR}}/{{.DIST_DIR}}"
@@ -44,7 +34,6 @@ tasks:
         -p "{{.BUILD_PLATFORM}}"
 
         zip {{.PACKAGE_NAME}} {{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe ../LICENSE.txt -j
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_windows_386"
@@ -66,7 +55,6 @@ tasks:
         -p "{{.BUILD_PLATFORM}}"
 
         zip {{.PACKAGE_NAME}} {{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe ../LICENSE.txt -j
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_windows_amd64"
@@ -88,7 +76,6 @@ tasks:
         -p "{{.BUILD_PLATFORM}}"
 
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_amd32"
@@ -110,7 +97,6 @@ tasks:
         -p "{{.BUILD_PLATFORM}}"
 
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_amd64"
@@ -132,7 +118,6 @@ tasks:
         -p "{{.BUILD_PLATFORM}}"
 
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
 
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_osx_darwin_amd64"
