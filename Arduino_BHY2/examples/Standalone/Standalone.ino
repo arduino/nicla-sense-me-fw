@@ -26,6 +26,18 @@ void setup()
   temp.begin();
   gas.begin();
   rotation.begin();
+
+  SensorConfig cfg = accel.getConfiguration();
+  Serial.println(String("range of accel: +/-") + cfg.range + String("g"));
+  accel.setRange(2);    //this sets the range of accel to +/-4g, 
+  cfg = accel.getConfiguration();
+  Serial.println(String("range of accel: +/-") + cfg.range + String("g"));
+
+  cfg = gyro.getConfiguration();
+  Serial.println(String("range of gyro: +/-") + cfg.range + String("dps"));  
+  gyro.setRange(1000);    
+  cfg = gyro.getConfiguration();
+  Serial.println(String("range of gyro: +/-") + cfg.range + String("dps"));
 }
 
 void loop()
