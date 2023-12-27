@@ -14,12 +14,12 @@
 #include "Arduino_BHY2.h"
 
 // declare 3D sensor instances
+// default ADC range is -32768 to 32767 (16 bit)
 SensorXYZ accel(SENSOR_ID_ACC);
 SensorXYZ gyro(SENSOR_ID_GYRO);
 SensorXYZ gravity(SENSOR_ID_GRA);
 
-void setup()
-{
+void setup() {
   Serial.begin(9600);
   while(!Serial);
 
@@ -51,8 +51,7 @@ void setup()
   Serial.println(String("range of gyro: +/-") + cfg.range + String("dps"));
 }
 
-void loop()
-{
+void loop() {
   static auto printTime = millis();
 
   // Update function should be continuously polled
@@ -61,7 +60,14 @@ void loop()
   // print gyroscope/acceleration data once every second
   if (millis() - printTime >= 1000) {
     printTime = millis();
-    Serial.print(String("acceleration: ") + accel.toString());
+    Serial.print(String("acceleration (raw): ") + accel.toString());
+
+    float accelX = ((float)accel.x() / 32768.0) *4;
+    float accelY = ((float)accel.y() / 32768.0) *4;
+    float accelZ = ((float)accel.z() / 32768.0) *4;
+    String accelInG = String("X: ") + String(accelX) + String(" Y: ") + String(accelY) + String(" Z: ") + String(accelZ);
+
+    Serial.println(String("acceleration (g): ") + accelInG);
     Serial.println(String("gyroscope: ") + gyro.toString());
   }
 }
