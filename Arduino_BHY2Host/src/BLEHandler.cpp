@@ -178,9 +178,7 @@ void BLEHandler::receivedSensorData(BLEDevice central, BLECharacteristic charact
 {
   SensorDataPacket sensorData;
   characteristic.readValue(&sensorData, sizeof(sensorData));
-  SensorLongDataPacket sensorLongData;
-  memcpy(&sensorLongData, &sensorData, sizeof(SensorLongDataPacket));
-  sensorManager.process(sensorLongData);
+  sensorManager.process(sensorData);
 }
 
 void BLEHandler::receivedLongSensorData(BLEDevice central, BLECharacteristic characteristic)

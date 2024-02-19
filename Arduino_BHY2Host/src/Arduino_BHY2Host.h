@@ -117,13 +117,13 @@ public:
    *
    * @param data SensorDataPacket object including SensorID, size, and data payload
    */
-  bool readSensorData(SensorDataPacket &data);
+  bool readSensorData(SensorDataPacket &data, bool last = false);
    /**
    * @brief Read long sensor data from the top element of the queue
    *
    * @param data SensorDataPacket object including SensorID, size , and data payload
    */
-  bool readSensorLongData(SensorLongDataPacket &data);
+  bool readSensorLongData(SensorLongDataPacket &data, bool last = false);
   /**
    * @brief Parse XYZ Cartesian data from `SensorDataPacket` and store within `DataXYZ` vector
    *

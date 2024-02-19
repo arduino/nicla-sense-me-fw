@@ -112,14 +112,14 @@ public:
    * @param sData data packet containing sensorID, payload size and data payload
    * @return true Successful request of sensor data
    */
-  bool requestSensorData(SensorDataPacket &sData);
+  bool requestSensorData(SensorDataPacket &sData, bool last = false);
   /**
    * @brief Change `EslovState` of Nicla to `ESLOV_READ_SENSOR_STATE` and wait for the interrupt pin to go high. Then read the available long sensor data over I2C.
    * 
    * @param sData data packet containing sensorID, payload size and data payload
    * @return true Successful request of sensor data
    */
-  bool requestSensorLongData(SensorLongDataPacket &sData);
+  bool requestSensorLongData(SensorLongDataPacket &sData, bool last = false);
 
 protected:
   void niclaAsShield();

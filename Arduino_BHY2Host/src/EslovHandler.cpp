@@ -207,20 +207,26 @@ uint8_t EslovHandler::requestPacketAck()
   delay(ESLOV_DELAY);
   uint8_t ret = 0;
   while(!ret) {
-    ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
+    ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1, false);
     if (_debug){
       _debug->print("Request returned: ");
       _debug->println(ret);
     }
+    delay(100);
   }
-  return Wire.read();
+  uint8_t c = Wire.read();
+  if (_debug){
+    _debug->print("Read byte: ");
+    _debug->println(c);
+  }
+  return c;
 }
 
 uint8_t EslovHandler::requestAvailableData() 
 {
   writeStateChange(ESLOV_AVAILABLE_SENSOR_STATE);
   while(!digitalRead(_eslovIntPin)) {}
-  uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
+  uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1, false);
   if (!ret) return 0;
   return Wire.read();
   delay(ESLOV_DELAY);
@@ -230,20 +236,20 @@ uint8_t EslovHandler::requestAvailableLongData()
 {
   writeStateChange(ESLOV_AVAILABLE_LONG_SENSOR_STATE);
   while(!digitalRead(_eslovIntPin)) {}
-  uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1);
+  uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, 1, false);
   if (!ret) return 0;
   return Wire.read();
   delay(ESLOV_DELAY);
 }
 
-bool EslovHandler::requestSensorData(SensorDataPacket &sData)
+bool EslovHandler::requestSensorData(SensorDataPacket &sData, bool last)
 {
   if (_eslovState != ESLOV_READ_SENSOR_STATE) {
     writeStateChange(ESLOV_READ_SENSOR_STATE);
     while(!digitalRead(_eslovIntPin)) {}
   }
   //uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, sizeof(SensorDataPacket));
-  uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, sizeof(SensorDataPacket));
+  uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, sizeof(SensorDataPacket), last);
   if (!ret) return false;
 
   uint8_t *data = (uint8_t*)&sData;
@@ -253,13 +259,13 @@ bool EslovHandler::requestSensorData(SensorDataPacket &sData)
   return true;
 }
 
-bool EslovHandler::requestSensorLongData(SensorLongDataPacket &sData)
+bool EslovHandler::requestSensorLongData(SensorLongDataPacket &sData, bool last)
 {
   if (_eslovState != ESLOV_READ_LONG_SENSOR_STATE) {
     writeStateChange(ESLOV_READ_LONG_SENSOR_STATE);
     while(!digitalRead(_eslovIntPin)) {}
   }
-  uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, sizeof(SensorLongDataPacket));
+  uint8_t ret = Wire.requestFrom(ESLOV_DEFAULT_ADDRESS, sizeof(SensorLongDataPacket), last);
   if (!ret) return false;
 
   uint8_t *data = (uint8_t*)&sData;
