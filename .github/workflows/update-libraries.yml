@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout filter-repo tool repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: newren/git-filter-repo
           ref: v2.33.0  # See: https://github.com/newren/git-filter-repo/releases
@@ -40,7 +40,7 @@ jobs:
           echo "$INSTALL_PATH" >> "$GITHUB_PATH"
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.LIBRARY_REPO_TOKEN }}
           fetch-depth: 0
