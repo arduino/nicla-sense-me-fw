@@ -49,6 +49,7 @@ jobs:
             arduinoiotcloud: false
             passthrough: false
             blebridge: false
+            artifact-name-suffix: arduino-mbed_nicla-nicla_sense
           - fqbn: arduino:mbed_portenta:envie_m7
             platforms: |
               - name: arduino:mbed_portenta
@@ -59,6 +60,7 @@ jobs:
             arduinoiotcloud: true
             passthrough: true
             blebridge: true
+            artifact-name-suffix: arduino-mbed_portenta-envie_m7
           - fqbn: arduino:samd:mkrzero
             platforms: |
               - name: arduino:samd
@@ -67,6 +69,7 @@ jobs:
             arduinoiotcloud: false
             passthrough: true
             blebridge: false
+            artifact-name-suffix: arduino-samd-mkrzero
           - fqbn: arduino:samd:mkrwifi1010
             platforms: |
               - name: arduino:samd
@@ -75,6 +78,7 @@ jobs:
             arduinoiotcloud: true
             passthrough: true
             blebridge: false
+            artifact-name-suffix: arduino-samd-mkrwifi1010
           - fqbn: arduino:samd:mkrwan1310
             platforms: |
               - name: arduino:samd
@@ -83,6 +87,7 @@ jobs:
             arduinoiotcloud: false
             passthrough: true
             blebridge: false
+            artifact-name-suffix: arduino-samd-mkrwan1310
           - fqbn: arduino:samd:mkrgsm1400
             platforms: |
               - name: arduino:samd
@@ -91,6 +96,7 @@ jobs:
             arduinoiotcloud: false
             passthrough: true
             blebridge: false
+            artifact-name-suffix: arduino-samd-mkrgsm1400
           - fqbn: arduino:samd:mkrnb1500
             platforms: |
               - name: arduino:samd
@@ -99,6 +105,7 @@ jobs:
             arduinoiotcloud: false
             passthrough: true
             blebridge: false
+            artifact-name-suffix: arduino-samd-mkrnb1500
 
         # Make board type-specific customizations to the matrix jobs
         include:
@@ -200,4 +207,4 @@ jobs:
         with:
           if-no-files-found: error
           path: ${{ env.SKETCHES_REPORTS_PATH }}
-          name: ${{ env.SKETCHES_REPORTS_PATH }}
+          name: sketches-report-${{ matrix.board.artifact-name-suffix }}
