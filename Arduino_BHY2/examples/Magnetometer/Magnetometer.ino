@@ -2,7 +2,6 @@
  * This example shows how to use the access the magnetometer data and send it over serial.
  * 
  * Every 1 second, this sketch will send the heading of the magnetometer over serial.
- * SensorID 22 (SENSOR_ID_MAG) is read with the SensorXYS class. The heading is calculated
  * by calculating the arctangent between the x and y axis and multiplied in a convertion
  * factor to convert the headings from radians to degrees.
  * 
@@ -27,7 +26,6 @@ void setup() {
   Serial.begin(115200);
   BHY2.begin();
   magnetometer.begin();
-
 }
 
 void loop() {
