@@ -9,7 +9,7 @@
  * 1. Upload this sketch to your Nicla Sense ME board.
  * 2. Open the Serial Plotter at a baud rate of 115200.
  * 3. The three axis values for both the accelerometer and gyroscope will be printed to the Serial Plotter.
- * 4. Optionally, you can change the visability of each data by clicking on the legend.
+ * 4. Optionally, you can change the visibility of each data by clicking on the legend.
  * 
  * Initial author: @mcmchris
  */

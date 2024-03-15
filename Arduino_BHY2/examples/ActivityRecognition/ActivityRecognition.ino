@@ -3,7 +3,7 @@
  * 
  * Every 1 second, this sketch will send the latest activity detected via the BHI260AP sensor to the serial port.
  * Without any additional training, it is possible to detect Still, Walking, Running and Tilting activities
- * A full description of supported activities is avaliable in Table 93 of the BHI260AP datasheet.
+ * A full description of supported activities is available in Table 93 of the BHI260AP datasheet.
  * 
  * Instructions:
  * 1. Upload this sketch to your Nicla Sense ME board.

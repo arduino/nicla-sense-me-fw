@@ -2,7 +2,7 @@
  * This example shows how to use the access the magnetometer data and send it over serial.
  * 
  * Every 1 second, this sketch will send the heading of the magnetometer over serial.
- * by calculating the arctangent between the x and y axis and multiplied in a convertion
+ * by calculating the arctangent between the x and y axis and multiplied in a conversion
  * factor to convert the headings from radians to degrees.
  * 
  * Instructions:
