@@ -6,7 +6,7 @@
  * 
  * Instructions:
  * 1. Upload this sketch to your Nicla Sense ME board.
- * 2. Open the Serial Monitor at a baud rate of 9600.
+ * 2. Open the Serial Monitor at a baud rate of 115200.
  * 3. The pressure will be printed to the serial monitor.
  * 
  * Initial author: @mcmchris
