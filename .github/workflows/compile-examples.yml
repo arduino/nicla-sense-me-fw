@@ -147,6 +147,7 @@ jobs:
             # Install these libraries in addition to the universal ones
             arduinoiotcloud-libraries: |
               - name: ArduinoIoTCloud
+              - name: Arduino_Cellular
             # Compile these sketches in addition to the universal ones
             arduinoiotcloud-sketch-paths: |
               - Arduino_BHY2Host/examples/Nicla_IoT_Bridge
@@ -169,6 +170,7 @@ jobs:
             # Install these libraries
             blebridge-libraries: |
               - name: ArduinoIoTCloud
+              - name: Arduino_Cellular
             # Compile these sketches
             blebridge-sketch-paths: |
               - Arduino_BHY2Host/examples/Portenta_BLE_Bridge

@@ -14,7 +14,7 @@
  */
 
 #include "Arduino_BHY2.h"
-#include "Math.h"
+#include "math.h"
 
 SensorXYZ magnetometer(SENSOR_ID_MAG);
 
