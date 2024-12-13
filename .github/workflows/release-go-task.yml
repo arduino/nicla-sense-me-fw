@@ -33,16 +33,8 @@ jobs:
             artifact-suffix: Linux_32bit
           - task: Linux_64bit
             artifact-suffix: Linux_64bit
-          - task: Linux_ARMv6
-            artifact-suffix: Linux_ARMv6
-          - task: Linux_ARMv7
-            artifact-suffix: Linux_ARMv7
-          - task: Linux_ARM64
-            artifact-suffix: Linux_ARM64
           - task: macOS_64bit
             artifact-suffix: macOS_64bit
-          - task: macOS_ARM64
-            artifact-suffix: macOS_ARM64
 
     steps:
       - name: Checkout repository
@@ -92,9 +84,6 @@ jobs:
           - artifact-suffix: macOS_64bit
             folder-suffix: darwin_amd64
             package-suffix: "macOS_64bit.tar.gz"
-          - artifact-suffix: macOS_ARM64
-            folder-suffix: darwin_arm64
-            package-suffix: "macOS_ARM64.tar.gz"
 
     steps:
       - name: Set environment variables
