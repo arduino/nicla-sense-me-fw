@@ -1,0 +1,9 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+
+Upstream-Name: SyncAndCollectIMUData.ino
+Upstream-Contact: Lucas Guo <lucas.guo.cn@gmail.com>
+Source:
+
+Files: base64.hpp
+Copyright: Copyright (c) 2016 Densauge
+License: MIT
